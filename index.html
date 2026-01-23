@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LHT IPSRS - SHIFT (Modern)</title>
+  <title>LHT IPSRS - SHIFT (RS. PURI CINERE)</title>
 
   <!-- Google Font (Inter) -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,6 +70,20 @@
     .btn.primary { background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:0; box-shadow: 0 10px 28px rgba(10,120,220,0.12); }
     .btn.ghost { background:transparent; border:1px solid rgba(10,20,40,0.06); color:var(--muted); font-weight:700; }
 
+    .btn svg { width:16px; height:16px; display:block; fill:currentColor; opacity:0.95; }
+    .btn .btn-label { display:inline-block; white-space:nowrap; }
+
+    .pill { background:var(--card); border-radius:999px; padding:6px 12px; font-size:13px; border:1px solid var(--border); color:var(--muted); font-weight:700; }
+
+    /* REPORT toolbar (in laporan card) */
+    .report-toolbar {
+      display:inline-flex; gap:8px; align-items:center;
+      background: linear-gradient(180deg, #ffffff, #fbfdff);
+      padding:6px; border-radius:12px; border:1px solid rgba(10,20,40,0.04);
+      box-shadow: 0 8px 24px rgba(10,20,60,0.04);
+    }
+    .btn-group .btn { border-radius:10px; padding:8px 10px; font-size:13px; }
+
     /* ===== LAYOUT ===== */
     .container { max-width:1100px; margin:18px auto; padding:0 14px; }
     .card {
@@ -104,14 +118,9 @@
       appearance: none;
     }
 
-    input::placeholder, textarea::placeholder {
-      color: var(--muted-2);
-      opacity:1;
-    }
-
+    input::placeholder, textarea::placeholder { color: var(--muted-2); opacity:1; }
     textarea { min-height:140px; resize:vertical; }
 
-    /* Focus state - clear visual indicator */
     input:focus, textarea:focus, select:focus {
       outline: none;
       border-color: var(--accent);
@@ -119,12 +128,7 @@
       transform: translateY(-1px);
     }
 
-    /* Slightly bigger clickable area for small fields (Pukul / NoLK) */
-    .small-field input {
-      padding:10px 12px;
-      font-size:14px;
-    }
-
+    .small-field input { padding:10px 12px; font-size:14px; }
     .form-section { display:flex; flex-direction:column; gap:8px; }
 
     .big-save {
@@ -136,22 +140,53 @@
 
     .smallnote { font-size:13px; color:var(--muted); margin-top:8px; }
 
-    /* Right panel spacing */
     .panel-right { display:flex; flex-direction:column; gap:10px; }
 
-    /* Table / other UI left unchanged */
     table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; }
     th, td { padding:10px 8px; border-bottom:1px solid rgba(10,20,40,0.06); text-align:left; vertical-align:top; }
     thead th { color:#fff; background:var(--accent); font-weight:700; position:sticky; top:0; z-index:1; }
     tbody tr:hover { background:#f3fbff; cursor:pointer; }
 
-    /* Mobile tweaks: make inputs larger and clearer */
+    .status-badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; color:#fff; }
+    .status-done { background:var(--success); }
+    .status-pending { background:var(--danger); }
+
+    /* ===== MOBILE CARD LIST ===== */
+    #mobileList { display:none; margin-top:12px; }
+    .card-item { border-radius:12px; padding:12px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid var(--border); margin-bottom:10px; box-shadow: 0 6px 18px rgba(10,20,60,0.03); }
+    .card-item .row { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
+    .card-item .meta { color:var(--muted); font-size:13px; }
+    .card-item .title { font-weight:700; color:#071737; margin-top:6px; }
+    .card-item .desc { margin-top:8px; color:#243444; font-size:14px; white-space:pre-wrap; }
+    .card-actions { display:flex; gap:8px; margin-top:12px; justify-content:flex-end; }
+
+    /* ===== REKAP PANEL ===== */
+    #panelRekap { margin-top:12px; padding:12px; border-radius:12px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid var(--border); }
+
+    /* ===== MODAL ===== */
+    .modal-bg {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(6,10,20,0.45); z-index:9999; padding:16px;
+    }
+    .modal-bg.show { display:flex; }
+    .modal {
+      width:min(980px,96vw); max-height:92vh; overflow:auto; border-radius:14px;
+      background:linear-gradient(180deg,#ffffff,#fbfdff); padding:18px; border:1px solid var(--border); box-shadow: 0 30px 80px rgba(10,20,60,0.25);
+    }
+    .modal h3 { margin:0; font-size:18px; color:#042a57; }
+    .modal .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap; }
+
+    /* ===== MISC ===== */
+    .muted { color:var(--muted); font-size:13px; }
+    .info-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .hidden { display:none !important; }
+    @media (max-width:900px){
+      .topbar .title { font-size:14px; }
+      #reportTable { display:none; }
+      #mobileList { display:block; }
+    }
+
     @media (max-width:700px) {
-      input, textarea, select {
-        padding:14px 14px;
-        font-size:16px;
-        border-width:1.5px;
-      }
+      input, textarea, select { padding:14px 14px; font-size:16px; border-width:1.5px; }
       .card { padding:12px; border-radius:10px; }
       .form-col label { font-size:14px; }
       .big-save { padding:14px; font-size:15px; }
@@ -159,9 +194,6 @@
       .small-field { display:flex; gap:8px; }
       .small-field > div { flex: none; }
     }
-
-    /* accessibility: increase contrast for inactive states if needed */
-    .muted { color:var(--muted); font-size:13px; }
   </style>
 </head>
 <body>
@@ -169,7 +201,7 @@
   <div class="topbar">
     <div class="brand">
       <div>
-        <div class="title">RUMAH SAKIT PURI CINERE</div>
+        <div class="title">RS. PURI CINERE</div>
         <div class="subtitle">INPUT LAPORAN HARIAN IPSRS (SHIFT)</div>
       </div>
     </div>
@@ -192,9 +224,11 @@
   </div>
 
   <div class="container">
+
     <!-- PAGE INPUT -->
     <div id="pageInput" class="page active">
       <div class="card grid">
+
         <!-- LEFT: FORM -->
         <div class="form-col">
           <div class="form-section">
@@ -266,12 +300,14 @@
             <div id="msg" class="muted" style="margin-top:8px;"></div>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- PAGE LAPORAN (keadaan dan skrip tetap sama) -->
+    <!-- PAGE LAPORAN -->
     <div id="pageLaporan" class="page" style="display:none;">
       <div class="card">
+
         <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
           <div>
             <div style="font-weight:800; font-size:18px; color:#042a57;">LAPORAN HARIAN IPSRS (SHIFT)</div>
@@ -363,9 +399,11 @@
             <tbody></tbody>
           </table>
 
+          <!-- Mobile card list shown on small screens -->
           <div id="mobileList"></div>
         </div>
 
+        <!-- PANEL REKAP -->
         <div id="panelRekap" style="display:none;">
           <b>REKAP SPARE PART / UNIT (AUTO SUM JUMLAH)</b>
           <div class="smallnote">Rekap dihitung dari data yang sedang tampil (sesuai filter).</div>
@@ -384,92 +422,93 @@
         </div>
 
         <div id="msgReport" class="muted" style="margin-top:10px;"></div>
+
+        <!-- MOVED: MODAL EDIT placed inside pageLaporan so it's not part of pageInput DOM flow -->
+        <div id="modalBg" class="modal-bg" aria-hidden="true">
+          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <h3 id="modalTitle">EDIT LAPORAN</h3>
+            <div style="display:flex; gap:8px; margin-top:8px; align-items:center; flex-wrap:wrap;">
+              <div class="pill" id="EditID">ID: -</div>
+              <div class="pill" id="EditSheet">Sheet: -</div>
+            </div>
+
+            <input type="hidden" id="Edit_ID" />
+
+            <div class="grid" style="margin-top:12px; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div>
+                <label>TANGGAL</label>
+                <input type="date" id="Edit_Tanggal"/>
+
+                <label>PELAPOR</label>
+                <input type="text" id="Edit_Pelapor"/>
+
+                <label>RUANG</label>
+                <input type="text" id="Edit_Ruang"/>
+
+                <label>PUKUL</label>
+                <input type="time" id="Edit_Pukul"/>
+
+                <label>NO. LK</label>
+                <input type="text" id="Edit_NoLK"/>
+
+                <label>MASALAH / KEGIATAN</label>
+                <textarea id="Edit_MasalahKegiatan"></textarea>
+
+                <label>TINDAKAN</label>
+                <textarea id="Edit_Tindakan"></textarea>
+              </div>
+
+              <div>
+                <label>PETUGAS</label>
+                <input type="text" id="Edit_Petugas"/>
+
+                <label>SELESAI / BELUM</label>
+                <select id="Edit_Status">
+                  <option value="">-- pilih --</option>
+                  <option value="SELESAI">SELESAI</option>
+                  <option value="BELUM">BELUM</option>
+                </select>
+
+                <label>KETERANGAN</label>
+                <input type="text" id="Edit_Keterangan"/>
+
+                <label>KATEGORI</label>
+                <input type="text" id="Edit_Kategori"/>
+
+                <label>AREA KERJA</label>
+                <input type="text" id="Edit_AreaKerja"/>
+
+                <label>ITEM</label>
+                <input type="text" id="Edit_Item"/>
+
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                  <div style="flex:1;">
+                    <label>SPARE PART / UNIT</label>
+                    <input type="text" id="Edit_SparePartUnit"/>
+                  </div>
+                  <div style="width:110px;">
+                    <label>TYPE</label>
+                    <input type="text" id="Edit_Type"/>
+                  </div>
+                  <div style="width:100px;">
+                    <label>JUMLAH</label>
+                    <input type="number" id="Edit_Jumlah"/>
+                  </div>
+                </div>
+
+                <div class="modal-actions">
+                  <button class="btn primary" onclick="saveEdit()">SIMPAN UPDATE</button>
+                  <button class="btn ghost" onclick="closeModal()">BATAL</button>
+                </div>
+                <div id="msgEdit" class="muted" style="margin-top:8px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END modal -->
       </div>
     </div>
 
-  </div>
-
-  <!-- EDIT MODAL (tidak diubah) -->
-  <div id="modalBg" class="modal-bg" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <h3 id="modalTitle">EDIT LAPORAN</h3>
-      <div style="display:flex; gap:8px; margin-top:8px; align-items:center; flex-wrap:wrap;">
-        <div class="pill" id="EditID">ID: -</div>
-        <div class="pill" id="EditSheet">Sheet: -</div>
-      </div>
-
-      <input type="hidden" id="Edit_ID" />
-
-      <div class="grid" style="margin-top:12px; grid-template-columns: 1fr 1fr; gap:12px;">
-        <div>
-          <label>TANGGAL</label>
-          <input type="date" id="Edit_Tanggal"/>
-
-          <label>PELAPOR</label>
-          <input type="text" id="Edit_Pelapor"/>
-
-          <label>RUANG</label>
-          <input type="text" id="Edit_Ruang"/>
-
-          <label>PUKUL</label>
-          <input type="time" id="Edit_Pukul"/>
-
-          <label>NO. LK</label>
-          <input type="text" id="Edit_NoLK"/>
-
-          <label>MASALAH / KEGIATAN</label>
-          <textarea id="Edit_MasalahKegiatan"></textarea>
-
-          <label>TINDAKAN</label>
-          <textarea id="Edit_Tindakan"></textarea>
-        </div>
-
-        <div>
-          <label>PETUGAS</label>
-          <input type="text" id="Edit_Petugas"/>
-
-          <label>SELESAI / BELUM</label>
-          <select id="Edit_Status">
-            <option value="">-- pilih --</option>
-            <option value="SELESAI">SELESAI</option>
-            <option value="BELUM">BELUM</option>
-          </select>
-
-          <label>KETERANGAN</label>
-          <input type="text" id="Edit_Keterangan"/>
-
-          <label>KATEGORI</label>
-          <input type="text" id="Edit_Kategori"/>
-
-          <label>AREA KERJA</label>
-          <input type="text" id="Edit_AreaKerja"/>
-
-          <label>ITEM</label>
-          <input type="text" id="Edit_Item"/>
-
-          <div style="display:flex; gap:8px; margin-top:8px;">
-            <div style="flex:1;">
-              <label>SPARE PART / UNIT</label>
-              <input type="text" id="Edit_SparePartUnit"/>
-            </div>
-            <div style="width:110px;">
-              <label>TYPE</label>
-              <input type="text" id="Edit_Type"/>
-            </div>
-            <div style="width:100px;">
-              <label>JUMLAH</label>
-              <input type="number" id="Edit_Jumlah"/>
-            </div>
-          </div>
-
-          <div class="modal-actions">
-            <button class="btn primary" onclick="saveEdit()">SIMPAN UPDATE</button>
-            <button class="btn ghost" onclick="closeModal()">BATAL</button>
-          </div>
-          <div id="msgEdit" class="muted" style="margin-top:8px;"></div>
-        </div>
-      </div>
-    </div>
   </div>
 
 <script>
@@ -632,7 +671,7 @@
     }
   }
 
-  // FILTERS, SORT, RENDER ... (rest of JS unchanged)
+  // FILTERS & HELPERS
   function uniqueSorted(arr) {
     const set = new Set(arr.filter(x => normalizeText(x) !== ""));
     return Array.from(set).sort((a,b) => a.localeCompare(b));
@@ -686,6 +725,7 @@
     renderRekap();
   }
 
+  // SORT
   function applySort() {
     viewData.sort((a,b) => {
       const ka = toDateKey(a.Tanggal); const kb = toDateKey(b.Tanggal);
@@ -696,6 +736,7 @@
   function sortUp(){ sortMode = "UP"; applyFilters(); }
   function sortDown(){ sortMode = "DOWN"; applyFilters(); }
 
+  // RENDER TABLE / MOBILE LIST
   function renderReportTable() {
     const tbody = document.querySelector("#reportTable tbody");
     tbody.innerHTML = "";
@@ -758,6 +799,7 @@
     });
   }
 
+  // REKAP
   function toggleRekap() {
     const p = document.getElementById("panelRekap");
     if (p.style.display === "none" || p.style.display === "") { p.style.display = "block"; renderRekap(); } else { p.style.display = "none"; }
@@ -787,6 +829,7 @@
     });
   }
 
+  // EDIT MODAL
   function openEditModal(row) {
     const r = row;
     document.getElementById("modalBg").classList.add("show");
@@ -858,14 +901,17 @@
     }
   }
 
+  // close modal if click background
   document.getElementById("modalBg").addEventListener("click", function(e){
     if (e.target.id === "modalBg") closeModal();
   });
 
+  // rerender mobile list on resize
   window.addEventListener("resize", () => {
     renderReportTable();
   });
 
+  // INIT
   buildMonthOptions();
   showPage('input');
 
