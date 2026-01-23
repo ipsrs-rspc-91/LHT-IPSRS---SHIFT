@@ -99,6 +99,12 @@
     textarea { min-height:140px; resize:vertical; }
     input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 8px 24px rgba(10,120,220,0.12); transform:translateY(-1px); }
 
+    /* Combined row for Pukul + NoLK */
+    .row-inline { display:flex; gap:10px; align-items:flex-start; }
+    .row-inline .col { flex: 1; min-width:0; }
+    .row-inline .col.small { flex: 0 0 140px; } /* for pukul */
+    .row-inline .col.xsmall { flex: 0 0 120px; } /* for NoLK */
+
     .big-save { margin-top:18px; padding:16px; border-radius:12px; background:linear-gradient(90deg,#06a84f,#2fc26a); color:white; font-weight:800; font-size:15px; text-align:center; cursor:pointer; border:0; box-shadow: 0 10px 30px rgba(34,185,87,0.12); }
     .smallnote { font-size:13px; color:var(--muted); margin-top:8px; }
 
@@ -121,22 +127,6 @@
     #savedToast { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index: var(--toast-z); }
     #savedToast.show { display:flex; }
     .toast { background:#fff; border-radius:12px; padding:18px 20px; min-width:260px; max-width:90%; box-shadow: 0 18px 40px rgba(10,20,60,0.16); border:1px solid rgba(10,20,40,0.06); text-align:center; }
-
-    /* sticky save button */
-    .sticky-save {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 12500; /* less than header, but above content */
-      background: linear-gradient(90deg,#06a84f,#2fc26a);
-      color:white;
-      padding:12px 16px;
-      border-radius:12px;
-      font-weight:800;
-      border:0;
-      box-shadow:0 12px 30px rgba(10,80,40,0.12);
-      cursor:pointer;
-    }
 
     @media (max-width:900px){
       .topbar .title { font-size:14px; }
@@ -188,14 +178,15 @@
             <label for="Pelapor">PELAPOR</label>
             <input id="Pelapor" type="text" placeholder="Nama pelapor"/>
 
-            <div class="small-field" style="margin-top:6px;">
-              <div style="width:140px;">
+            <!-- Combined row: PUKUL + NO. LK in same line -->
+            <div class="row-inline" style="margin-top:6px;">
+              <div class="col small">
                 <label for="Pukul">PUKUL</label>
-                <input id="Pukul" type="time"/>
+                <input id="Pukul" type="time" />
               </div>
-              <div style="width:120px;">
+              <div class="col xsmall">
                 <label for="NoLK">NO. LK</label>
-                <input id="NoLK" type="text"/>
+                <input id="NoLK" type="text" />
               </div>
             </div>
 
@@ -245,6 +236,7 @@
             <label for="Jumlah">JUMLAH</label>
             <input id="Jumlah" type="number" min="0"/>
 
+            <!-- Keep the inline/save button inside the panel (no floating button) -->
             <div class="big-save" onclick="saveData()">SIMPAN DATA BARU (SHIFT)</div>
             <div id="msg" class="muted" style="margin-top:8px;"></div>
           </div>
@@ -462,9 +454,6 @@
       <button id="savedToastOk" class="ok" type="button" onclick="hideSavedPopup()">OK</button>
     </div>
   </div>
-
-  <!-- STICKY SAVE BUTTON (optional) -->
-  <button id="stickySaveBtn" class="sticky-save" aria-label="Simpan" title="Simpan" onclick="saveData()">SIMPAN</button>
 
 <script>
   // --- updateTopbarHeight: hitung tinggi topbar dan set CSS variable agar container tidak tertutup ---
