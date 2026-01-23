@@ -33,7 +33,7 @@
     .topbar {
       background: linear-gradient(90deg, #e8f6ff 0%, #dff8e6 100%);
       border-bottom:1px solid rgba(0,0,0,0.06);
-      padding:12px 18px;
+      padding:12px 14px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -48,24 +48,22 @@
       display:flex; gap:12px; align-items:center;
     }
     .logo {
-      width:46px; height:46px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:16px; box-shadow: var(--shadow);
+      width:42px; height:42px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:15px; box-shadow: var(--shadow);
     }
     .topbar .title {
-      font-weight:700; font-size:16px; color:#042f66; line-height:1;
+      font-weight:700; font-size:15px; color:#042f66; line-height:1;
     }
     .topbar .subtitle { font-size:12px; color:var(--muted); margin-top:2px; }
 
-    /* New: action container (glass panel) to make buttons clearer */
+    /* Action panel (topbar buttons) */
     .action-panel {
       display:flex; gap:8px; align-items:center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85));
       padding:6px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);
       box-shadow: 0 6px 20px rgba(10,20,60,0.06);
       backdrop-filter: blur(6px);
     }
-
-    .topbar .actions { display:flex; gap:8px; align-items:center; }
 
     .btn {
       display:inline-flex; align-items:center; gap:8px;
@@ -73,7 +71,7 @@
       cursor:pointer; font-weight:700; color:#062b57; box-shadow:none; font-size:13px;
       transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
     }
-    .btn:hover{ transform:translateY(-3px); box-shadow: 0 10px 26px rgba(10,30,80,0.08); }
+    .btn:hover{ transform:translateY(-3px); box-shadow: 0 10px 26px rgba(10,30,80,0.06); }
     .btn:active{ transform:translateY(-1px); }
 
     .btn.primary {
@@ -87,12 +85,12 @@
       font-weight:700;
     }
 
-    /* icon style */
     .btn svg { width:16px; height:16px; display:block; fill:currentColor; opacity:0.95; }
-    .btn.icon-left { padding-left:10px; }
+    .btn .btn-label { display:inline-block; white-space:nowrap; }
+
     .pill { background:var(--card); border-radius:999px; padding:6px 12px; font-size:13px; border:1px solid var(--border); color:var(--muted); font-weight:700; }
 
-    /* group for laporan toolbar inside card (report page) */
+    /* REPORT toolbar (in laporan card) */
     .report-toolbar {
       display:inline-flex; gap:8px; align-items:center;
       background: linear-gradient(180deg, #ffffff, #fbfdff);
@@ -100,11 +98,6 @@
       box-shadow: 0 8px 24px rgba(10,20,60,0.04);
     }
     .btn-group .btn { border-radius:10px; padding:8px 10px; font-size:13px; }
-
-    /* small subtle badges / labels */
-    .pill.accent {
-      border:0; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; box-shadow: 0 6px 18px rgba(10,120,220,0.09);
-    }
 
     /* ===== LAYOUT ===== */
     .container { max-width:1100px; margin:18px auto; padding:0 14px; }
@@ -127,7 +120,7 @@
     .form-section { display:flex; flex-direction:column; gap:6px; }
 
     .big-save {
-      margin-top:16px; padding:18px; border-radius:12px; background:linear-gradient(90deg,#06a84f,#2fc26a); color:white; font-weight:800; font-size:16px; text-align:center; cursor:pointer; border:0;
+      margin-top:16px; padding:16px; border-radius:12px; background:linear-gradient(90deg,#06a84f,#2fc26a); color:white; font-weight:800; font-size:15px; text-align:center; cursor:pointer; border:0;
       box-shadow: 0 10px 30px rgba(34,185,87,0.12);
     }
     .big-save:active { transform:translateY(1px); }
@@ -187,11 +180,53 @@
     .muted { color:var(--muted); font-size:13px; }
     .info-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
     .hidden { display:none !important; }
-    @media (max-width:900px){
+
+    /* ==== MOBILE ADJUSTMENTS: make topbar actions and input card look more elegant on small screens ==== */
+    @media (max-width:600px) {
+      .topbar { padding:10px 12px; }
+      .action-panel {
+        background: transparent;
+        padding:4px;
+        box-shadow: none;
+        border-radius:10px;
+        border:0;
+      }
+      /* show only icons on topbar, hide labels to save space & look cleaner */
+      .btn { padding:8px; min-width:40px; justify-content:center; }
+      .btn .btn-label { display:none; }
+      .pill { display:none; } /* hide bulky pill on small screens */
+      .logo { width:38px; height:38px; font-size:14px; }
       .topbar .title { font-size:14px; }
-      .logo { width:40px; height:40px; font-size:14px; }
-      #reportTable { display:none; }
-      #mobileList { display:block; }
+
+      /* make the primary button flat and compact on mobile */
+      .btn.primary {
+        background: var(--accent);
+        background: linear-gradient(90deg,var(--accent),var(--accent));
+        box-shadow: none;
+        color: #fff;
+        padding:8px;
+      }
+
+      /* make the input cards more flat and less "heavy" on mobile */
+      .card {
+        background: #fff;
+        padding:12px;
+        border-radius:10px;
+        border:1px solid rgba(10,20,40,0.04);
+        box-shadow: none;
+      }
+
+      /* reduce big-save height for mobile */
+      .big-save { padding:12px; font-size:14px; }
+
+      /* adjust modal for small screens */
+      .modal { padding:14px; border-radius:10px; box-shadow:none; border:1px solid rgba(10,20,40,0.06); }
+      .modal h3 { font-size:16px; }
+    }
+
+    @media (max-width:420px) {
+      .btn { min-width:36px; padding:6px; }
+      .logo { width:36px; height:36px; }
     }
   </style>
 </head>
@@ -207,23 +242,21 @@
     </div>
 
     <div class="actions">
-      <!-- Action panel makes laporan buttons clearer & elegant -->
+      <!-- Action panel: topbar buttons (responsive: shows icons only on small screens) -->
       <div class="action-panel" role="toolbar" aria-label="Aksi">
-        <!-- Pill bulan: akan ditampilkan hanya pada halaman LAPORAN -->
         <div id="judulBulanDesktop" class="pill" style="display:none; cursor:pointer;" title="Klik untuk memilih bulan laporan" onclick="document.getElementById('FilterBulan')?.focus();">
           BULAN -
         </div>
 
-        <!-- Dua tombol dengan id supaya bisa di-toggle tampilannya -->
-        <!-- Added small inline SVG icons for clarity -->
-        <button id="btnLaporan" class="btn ghost icon-left" onclick="showPage('laporan')" title="Lihat Laporan">
+        <!-- Buttons keep same IDs for JS, label wrapped so we can hide text on mobile -->
+        <button id="btnLaporan" class="btn ghost" onclick="showPage('laporan')" title="Lihat Laporan">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4v-2H3v2zm0 4h10v-2H3v2zM3 7h16V5H3v2zm18 6h-6v6h2v-4h4v-2z"/></svg>
-          LAPORAN
+          <span class="btn-label">LAPORAN</span>
         </button>
 
-        <button id="btnInput" class="btn primary icon-left" onclick="showPage('input')" title="Input Data Baru" style="display:none;">
+        <button id="btnInput" class="btn primary" onclick="showPage('input')" title="Input Data Baru" style="display:none;">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8z"/></svg>
-          INPUT DATA
+          <span class="btn-label">INPUT DATA</span>
         </button>
       </div>
     </div>
@@ -312,7 +345,7 @@
       </div>
     </div>
 
-    <!-- PAGE LAPORAN -->
+    <!-- PAGE LAPORAN (unchanged except responsive behaviors handled in CSS) -->
     <div id="pageLaporan" class="page" style="display:none;">
       <div class="card">
 
@@ -329,19 +362,19 @@
             <div class="report-toolbar btn-group" role="toolbar" aria-label="Laporan controls">
               <button class="btn ghost" onclick="toggleRekap()" title="Rekap Spare/Unit">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h18v-2H3v2zm0 4h10v-2H3v2zM3 7h18V5H3v2z"/></svg>
-                REKAP
+                <span class="btn-label">REKAP</span>
               </button>
               <button class="btn" onclick="sortUp()" title="Urutkan naik">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14l5-5 5 5z"/></svg>
-                UP
+                <span class="btn-label">UP</span>
               </button>
               <button class="btn" onclick="sortDown()" title="Urutkan turun">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>
-                DOWN
+                <span class="btn-label">DOWN</span>
               </button>
               <button class="btn primary" onclick="showPage('input')" title="Tambah data baru">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8z"/></svg>
-                INPUT DATA
+                <span class="btn-label">INPUT DATA</span>
               </button>
             </div>
           </div>
@@ -435,7 +468,7 @@
 
   </div>
 
-  <!-- MODAL EDIT (unchanged layout/ids) -->
+  <!-- MODAL EDIT -->
   <div id="modalBg" class="modal-bg" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <h3 id="modalTitle">EDIT LAPORAN</h3>
