@@ -45,18 +45,8 @@
       backdrop-filter: blur(4px);
     }
     .topbar .brand {
-      display:flex; gap:12px; align-items:center;
+      display:flex; gap:10px; align-items:center;
     }
-
-    .logo {
-      width:46px; height:46px; border-radius:10px;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow: var(--shadow); overflow:hidden;
-      /* keep a little padding visually */
-      padding:2px;
-      background: transparent;
-    }
-    .logo svg { width:100%; height:100%; display:block; }
 
     .topbar .title {
       font-weight:700; font-size:16px; color:#042f66; line-height:1;
@@ -189,7 +179,6 @@
     .hidden { display:none !important; }
     @media (max-width:900px){
       .topbar .title { font-size:14px; }
-      .logo { width:40px; height:40px; }
       #reportTable { display:none; }
       #mobileList { display:block; }
     }
@@ -218,39 +207,6 @@
 
   <div class="topbar">
     <div class="brand">
-      <!-- Inline SVG logo (putih di atas gradient) -->
-      <div class="logo" aria-hidden="false" role="img" aria-label="Logo RS Puri Cinere">
-        <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <defs>
-            <linearGradient id="hdrGradient" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0" stop-color="#e8f6ff"/>
-              <stop offset="1" stop-color="#dff8e6"/>
-            </linearGradient>
-            <!-- small subtle shadow gradient to give depth -->
-            <linearGradient id="whiteGrad" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stop-color="#ffffff" stop-opacity="1"/>
-              <stop offset="1" stop-color="#ffffff" stop-opacity="0.95"/>
-            </linearGradient>
-          </defs>
-
-          <!-- background rounded rect uses header-like gradient to match topbar -->
-          <rect width="160" height="160" rx="20" fill="url(#hdrGradient)"/>
-
-          <!-- simplified headphone emblem in white -->
-          <g transform="translate(24,22)" fill="#ffffff">
-            <!-- arch -->
-            <path d="M14 22c0-19 18-34 46-34s46 15 46 34v6c0 4-3 7-7 7-4 0-7-3-7-7 0-16-12-28-32-28S24 19 24 35c0 4-3 7-7 7-4 0-7-3-7-7v-6z"/>
-            <!-- left stem -->
-            <rect x="22" y="56" width="18" height="56" rx="9"></rect>
-            <!-- right stem -->
-            <rect x="74" y="56" width="18" height="56" rx="9"></rect>
-          </g>
-
-          <!-- label under emblem -->
-          <text x="80" y="138" font-family="Inter, Arial" font-weight="700" font-size="14" fill="#ffffff" text-anchor="middle">puri</text>
-        </svg>
-      </div>
-
       <div>
         <div class="title">RUMAH SAKIT PURI CINERE</div>
         <div class="subtitle">INPUT LAPORAN HARIAN IPSRS (SHIFT)</div>
