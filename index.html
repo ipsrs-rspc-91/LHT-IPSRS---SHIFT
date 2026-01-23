@@ -26,24 +26,31 @@
       --glass: rgba(255,255,255,0.6);
       --radius:12px;
       --shadow: 0 6px 18px rgba(20,30,60,0.06);
+      --topbar-height: 72px; /* default, akan diupdate oleh JS */
+      --topbar-z: 12000;     /* pastikan topbar di atas modal/popup */
+      --modal-z: 10000;
+      --toast-z: 11000;
     }
 
     *{box-sizing:border-box;}
     html,body{height:100%; margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; background:var(--bg); color:var(--text);}
     a{color:inherit;}
 
-    /* ===== TOPBAR ===== */
+    /* ===== TOPBAR (fixed) ===== */
     .topbar {
-      background: linear-gradient(90deg, #e8f6ff 0%, #dff8e6 100%);
-      border-bottom:1px solid rgba(0,0,0,0.06);
-      padding:12px 14px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--topbar-height);
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      position:sticky;
-      top:0;
-      z-index:40;
+      padding:12px 14px;
+      background: linear-gradient(90deg, #e8f6ff 0%, #dff8e6 100%);
+      border-bottom:1px solid rgba(0,0,0,0.06);
+      z-index: var(--topbar-z);
       box-shadow: 0 6px 20px rgba(10,15,30,0.03);
       backdrop-filter: blur(4px);
     }
@@ -56,7 +63,6 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.95));
       padding:6px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);
       box-shadow: 0 6px 20px rgba(10,20,60,0.06);
-      backdrop-filter: blur(6px);
     }
 
     .btn {
@@ -65,153 +71,73 @@
       cursor:pointer; font-weight:700; color:#062b57; box-shadow:none; font-size:13px;
       transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
     }
-    .btn:hover{ transform:translateY(-3px); box-shadow: 0 10px 26px rgba(10,30,80,0.06); }
-    .btn:active{ transform:translateY(-1px); }
     .btn.primary { background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:0; box-shadow: 0 10px 28px rgba(10,120,220,0.12); }
     .btn.ghost { background:transparent; border:1px solid rgba(10,20,40,0.06); color:var(--muted); font-weight:700; }
-
     .btn svg { width:16px; height:16px; display:block; fill:currentColor; opacity:0.95; }
     .btn .btn-label { display:inline-block; white-space:nowrap; }
 
     .pill { background:var(--card); border-radius:999px; padding:6px 12px; font-size:13px; border:1px solid var(--border); color:var(--muted); font-weight:700; }
 
-    /* REPORT toolbar (in laporan card) */
-    .report-toolbar {
-      display:inline-flex; gap:8px; align-items:center;
-      background: linear-gradient(180deg, #ffffff, #fbfdff);
-      padding:6px; border-radius:12px; border:1px solid rgba(10,20,40,0.04);
-      box-shadow: 0 8px 24px rgba(10,20,60,0.04);
-    }
-    .btn-group .btn { border-radius:10px; padding:8px 10px; font-size:13px; }
-
-    /* ===== LAYOUT ===== */
-    .container { max-width:1100px; margin:18px auto; padding:0 14px; }
-    .card {
-      background:var(--card);
-      border-radius:var(--radius);
-      padding:16px;
-      box-shadow: 0 8px 22px rgba(20,30,60,0.06);
-      border:1px solid rgba(10,20,40,0.04);
+    /* ===== LAYOUT (container offset to avoid header overlap) ===== */
+    .container {
+      max-width:1100px;
+      margin: 18px auto;
+      padding: calc(var(--topbar-height) + 16px) 14px 32px; /* top padding = header height + gap */
     }
 
+    .card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow: 0 8px 22px rgba(20,30,60,0.06); border:1px solid rgba(10,20,40,0.04); }
+
+    /* rest of styles (kept from previous) */
     .grid { display:grid; grid-template-columns: 1fr 420px; gap:14px; }
     @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
 
-    /* ===== FORM (LEFT) - improved clarity ===== */
-    .form-col label {
-      display:block; font-weight:700; margin-top:12px; color:#042a57; font-size:13px;
-      letter-spacing:0.2px;
-    }
-
+    .form-col label { display:block; font-weight:700; margin-top:12px; color:#042a57; font-size:13px; letter-spacing:0.2px; }
     input, textarea, select {
-      width:100%;
-      margin-top:8px;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background: #ffffff;
-      font-size:15px;
-      color:var(--text);
-      box-shadow: 0 4px 12px rgba(10,20,40,0.03);
-      transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease;
-      -webkit-appearance: none;
-      appearance: none;
+      width:100%; margin-top:8px; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+      background: #ffffff; font-size:15px; color:var(--text); box-shadow: 0 4px 12px rgba(10,20,40,0.03);
+      transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease; -webkit-appearance:none; appearance:none;
     }
-
-    input::placeholder, textarea::placeholder { color: var(--muted-2); opacity:1; }
     textarea { min-height:140px; resize:vertical; }
+    input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 8px 24px rgba(10,120,220,0.12); transform:translateY(-1px); }
 
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 8px 24px rgba(10,120,220,0.12);
-      transform: translateY(-1px);
-    }
-
-    .small-field input { padding:10px 12px; font-size:14px; }
-    .form-section { display:flex; flex-direction:column; gap:8px; }
-
-    .big-save {
-      margin-top:18px; padding:16px; border-radius:12px;
-      background:linear-gradient(90deg,#06a84f,#2fc26a); color:white; font-weight:800; font-size:15px; text-align:center; cursor:pointer; border:0;
-      box-shadow: 0 10px 30px rgba(34,185,87,0.12);
-    }
-    .big-save:active { transform:translateY(1px); }
-
+    .big-save { margin-top:18px; padding:16px; border-radius:12px; background:linear-gradient(90deg,#06a84f,#2fc26a); color:white; font-weight:800; font-size:15px; text-align:center; cursor:pointer; border:0; box-shadow: 0 10px 30px rgba(34,185,87,0.12); }
     .smallnote { font-size:13px; color:var(--muted); margin-top:8px; }
 
     .panel-right { display:flex; flex-direction:column; gap:10px; }
 
     table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; }
     th, td { padding:10px 8px; border-bottom:1px solid rgba(10,20,40,0.06); text-align:left; vertical-align:top; }
-    thead th { color:#fff; background:var(--accent); font-weight:700; position:sticky; top:0; z-index:1; }
+    thead th { color:#fff; background:var(--accent); font-weight:700; position:sticky; top: calc(var(--topbar-height)); z-index: calc(var(--topbar-z) - 1); }
     tbody tr:hover { background:#f3fbff; cursor:pointer; }
 
     .status-badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; color:#fff; }
     .status-done { background:var(--success); }
     .status-pending { background:var(--danger); }
 
-    /* ===== MOBILE CARD LIST ===== */
-    #mobileList { display:none; margin-top:12px; }
-    .card-item { border-radius:12px; padding:12px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid var(--border); margin-bottom:10px; box-shadow: 0 6px 18px rgba(10,20,60,0.03); }
-    .card-item .row { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
-    .card-item .meta { color:var(--muted); font-size:13px; }
-    .card-item .title { font-weight:700; color:#071737; margin-top:6px; }
-    .card-item .desc { margin-top:8px; color:#243444; font-size:14px; white-space:pre-wrap; }
-    .card-actions { display:flex; gap:8px; margin-top:12px; justify-content:flex-end; }
-
-    /* ===== REKAP PANEL ===== */
-    #panelRekap { margin-top:12px; padding:12px; border-radius:12px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid var(--border); }
-
-    /* ===== MODAL ===== */
-    .modal-bg {
-      position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(6,10,20,0.45); z-index:9999; padding:16px;
-    }
+    /* modal / toast z-index under header so header always visible */
+    .modal-bg { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(6,10,20,0.45); z-index: var(--modal-z); padding:16px; }
     .modal-bg.show { display:flex; }
-    .modal {
-      width:min(980px,96vw); max-height:92vh; overflow:auto; border-radius:14px;
-      background:linear-gradient(180deg,#ffffff,#fbfdff); padding:18px; border:1px solid var(--border); box-shadow: 0 30px 80px rgba(10,20,60,0.25);
-    }
-    .modal h3 { margin:0; font-size:18px; color:#042a57; }
-    .modal .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap; }
+    .modal { width:min(980px,96vw); max-height:92vh; overflow:auto; border-radius:14px; background:linear-gradient(180deg,#ffffff,#fbfdff); padding:18px; border:1px solid var(--border); box-shadow: 0 30px 80px rgba(10,20,60,0.25); }
 
-    /* ===== SAVED POPUP (STICKY) ===== */
-    #savedToast {
-      position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:12000;
-    }
+    #savedToast { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index: var(--toast-z); }
     #savedToast.show { display:flex; }
-    .toast {
-      background:#fff; border-radius:12px; padding:18px 20px; min-width:260px; max-width:90%;
-      box-shadow: 0 18px 40px rgba(10,20,60,0.16); border:1px solid rgba(10,20,40,0.06); text-align:center;
-    }
-    .toast h4 { margin:0 0 6px 0; font-size:16px; color:#042a57; }
-    .toast p { margin:0; color:var(--muted); font-size:14px; }
-    .toast .ok { margin-top:12px; display:inline-block; padding:8px 12px; background:var(--accent); color:#fff; border-radius:8px; cursor:pointer; font-weight:700; border:0; }
+    .toast { background:#fff; border-radius:12px; padding:18px 20px; min-width:260px; max-width:90%; box-shadow: 0 18px 40px rgba(10,20,60,0.16); border:1px solid rgba(10,20,40,0.06); text-align:center; }
 
-    /* ===== MISC ===== */
-    .muted { color:var(--muted); font-size:13px; }
-    .info-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    .hidden { display:none !important; }
+    /* mobile tweaks */
     @media (max-width:900px){
       .topbar .title { font-size:14px; }
-      #reportTable { display:none; }
-      #mobileList { display:block; }
     }
-
     @media (max-width:700px) {
       input, textarea, select { padding:14px 14px; font-size:16px; border-width:1.5px; }
       .card { padding:12px; border-radius:10px; }
-      .form-col label { font-size:14px; }
       .big-save { padding:14px; font-size:15px; }
       .grid { gap:10px; }
-      .small-field { display:flex; gap:8px; }
-      .small-field > div { flex: none; }
     }
   </style>
 </head>
 <body>
 
-  <div class="topbar">
+  <div class="topbar" id="topbar">
     <div class="brand">
       <div>
         <div class="title">RS. PURI CINERE</div>
@@ -237,12 +163,9 @@
   </div>
 
   <div class="container">
-
     <!-- PAGE INPUT -->
     <div id="pageInput" class="page active">
       <div class="card grid">
-
-        <!-- LEFT: FORM -->
         <div class="form-col">
           <div class="form-section">
             <label for="Tanggal">TANGGAL</label>
@@ -254,7 +177,7 @@
             <div class="small-field" style="margin-top:6px;">
               <div style="width:140px;">
                 <label for="Pukul">PUKUL</label>
-                <input id="Pukul" class="" type="time"/>
+                <input id="Pukul" type="time"/>
               </div>
               <div style="width:120px;">
                 <label for="NoLK">NO. LK</label>
@@ -275,7 +198,6 @@
           </div>
         </div>
 
-        <!-- RIGHT: DETAIL & SIMPAN -->
         <div class="panel-right">
           <div class="form-section">
             <label for="Petugas">PETUGAS</label>
@@ -313,11 +235,10 @@
             <div id="msg" class="muted" style="margin-top:8px;"></div>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- PAGE LAPORAN (rest unchanged) -->
+    <!-- PAGE LAPORAN -->
     <div id="pageLaporan" class="page" style="display:none;">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
@@ -328,6 +249,7 @@
               <div id="infoTotalPill" class="pill">Total: 0</div>
             </div>
           </div>
+
           <div style="display:flex; gap:8px; align-items:center;">
             <div class="report-toolbar btn-group" role="toolbar" aria-label="Laporan controls">
               <button class="btn ghost" onclick="toggleRekap()" title="Rekap Spare/Unit">
@@ -409,6 +331,7 @@
             </thead>
             <tbody></tbody>
           </table>
+
           <div id="mobileList"></div>
         </div>
 
@@ -431,7 +354,6 @@
 
         <div id="msgReport" class="muted" style="margin-top:10px;"></div>
 
-        <!-- EDIT MODAL inside pageLaporan -->
         <div id="modalBg" class="modal-bg" aria-hidden="true">
           <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h3 id="modalTitle">EDIT LAPORAN</h3>
@@ -455,7 +377,6 @@
 
                 <label>PUKUL</label>
                 <input type="time" id="Edit_Pukul"/>
-
                 <label>NO. LK</label>
                 <input type="text" id="Edit_NoLK"/>
 
@@ -519,292 +440,176 @@
 
   </div>
 
-  <!-- STICKY SAVED POPUP: remains visible until OK is clicked -->
+  <!-- SAVED POPUP -->
   <div id="savedToast" role="status" aria-live="polite">
     <div class="toast" id="savedToastInner">
       <h4 id="savedToastTitle">Berhasil</h4>
       <p id="savedToastMsg">Data sudah tersimpan.</p>
-      <button id="savedToastOk" class="ok" type="button">OK</button>
+      <button id="savedToastOk" class="ok" type="button" onclick="hideSavedPopup()">OK</button>
     </div>
   </div>
 
 <script>
+  // --- updateTopbarHeight: hitung tinggi topbar dan set CSS variable agar container tidak tertutup ---
+  function updateTopbarHeight() {
+    const topbar = document.getElementById('topbar');
+    if (!topbar) return;
+    const rect = topbar.getBoundingClientRect();
+    const height = Math.ceil(rect.height);
+    document.documentElement.style.setProperty('--topbar-height', height + 'px');
+    // update container padding-top accordingly (redundant with CSS var in .container)
+    const container = document.querySelector('.container');
+    if (container) container.style.paddingTop = (height + 16) + 'px';
+  }
+  window.addEventListener('load', updateTopbarHeight);
+  window.addEventListener('resize', () => {
+    if (window._updateTopbarTimeout) clearTimeout(window._updateTopbarTimeout);
+    window._updateTopbarTimeout = setTimeout(() => { updateTopbarHeight(); window._updateTopbarTimeout = null; }, 100);
+  });
+
   // API URL (Google Apps Script Web App)
   const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
 
   // GLOBAL
-  let rawData = [];
-  let viewData = [];
-  let sortMode = "DOWN";
+  let rawData = [], viewData = [], sortMode = "DOWN";
 
-  // UTIL
-  function setMsg(id, text) {
-    const el = document.getElementById(id);
-    if (el) el.innerText = text;
+  function setMsg(id, text){ const el=document.getElementById(id); if(el) el.innerText = text; }
+
+  function showPage(name){
+    document.getElementById("pageInput").style.display = (name==='input') ? '' : 'none';
+    document.getElementById("pageLaporan").style.display = (name==='laporan') ? '' : 'none';
+    const pill = document.getElementById("judulBulanDesktop"); if (pill) pill.style.display = (name==='laporan') ? 'inline-block' : 'none';
+    const btnLaporan = document.getElementById("btnLaporan"), btnInput = document.getElementById("btnInput");
+    if (btnLaporan && btnInput) { if (name==='input'){ btnLaporan.style.display='inline-flex'; btnInput.style.display='none'; } else { btnLaporan.style.display='none'; btnInput.style.display='inline-flex'; } }
+    if (name==='laporan') loadReportsBySelectedMonth();
   }
 
-  // Sticky popup: show until OK clicked. No auto-hide, no background/ESC close.
-  function showSavedPopup(message = "Data sudah tersimpan.", title = "Berhasil") {
-    const bg = document.getElementById("savedToast");
-    const titleEl = document.getElementById("savedToastTitle");
-    const msgEl = document.getElementById("savedToastMsg");
-    const okBtn = document.getElementById("savedToastOk");
-    if (!bg || !titleEl || !msgEl || !okBtn) return;
+  function getCurrentMonthYYYYMM(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+  function setJudulBulan(yyyymm){ const bulanNama={"01":"JANUARI","02":"FEBRUARI","03":"MARET","04":"APRIL","05":"MEI","06":"JUNI","07":"JULI","08":"AGUSTUS","09":"SEPTEMBER","10":"OKTOBER","11":"NOVEMBER","12":"DESEMBER"}; const year=yyyymm.substring(0,4); const month=yyyymm.substring(5,7); const nama=bulanNama[month]||yyyymm; const b=document.getElementById("infoBulanPill"); if(b) b.innerText=`Bulan: ${nama} ${year}`; const dd=document.getElementById("judulBulanDesktop"); if(dd){ dd.innerText=`BULAN ${nama} ${year}`; dd.title=`Menampilkan laporan untuk ${nama} ${year} — klik untuk pilih bulan`; } }
 
-    titleEl.innerText = title;
-    msgEl.innerText = message;
-    bg.classList.add("show");
-
-    // ensure OK button closes popup
-    okBtn.removeEventListener("click", hideSavedPopup);
-    okBtn.addEventListener("click", hideSavedPopup);
-
-    // Set focus to OK button for accessibility
-    okBtn.focus();
+  function buildMonthOptions(){
+    const select=document.getElementById("FilterBulan"); select.innerHTML=''; const now=new Date();
+    for(let i=0;i<36;i++){ const d=new Date(now.getFullYear(), now.getMonth()-i,1); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const yyyymm=`${y}-${m}`; const opt=document.createElement('option'); opt.value=yyyymm; opt.textContent=yyyymm; select.appendChild(opt); }
+    select.value=getCurrentMonthYYYYMM(); setJudulBulan(select.value);
   }
 
-  function hideSavedPopup() {
-    const bg = document.getElementById("savedToast");
-    if (!bg) return;
-    bg.classList.remove("show");
+  function normalizeText(x){ return (x||'').toString().trim(); }
+  function toDateKey(t){ const tt=normalizeText(t); if(tt.length>=10) return tt.substring(0,10).replaceAll('-',''); return '00000000'; }
 
-    // return focus to first input on input page
-    const firstInput = document.querySelector("#pageInput input, #pageInput textarea, #pageInput select");
-    if (firstInput) firstInput.focus();
-  }
+  function getInputPayload(){ return {
+    action:'add',
+    Tanggal:document.getElementById("Tanggal").value,
+    Pelapor:document.getElementById("Pelapor").value,
+    Ruang:document.getElementById("Ruang").value,
+    Pukul:document.getElementById("Pukul").value,
+    NoLK:document.getElementById("NoLK").value,
+    MasalahKegiatan:document.getElementById("MasalahKegiatan").value,
+    Tindakan:document.getElementById("Tindakan").value,
+    Petugas:document.getElementById("Petugas").value,
+    Status:document.getElementById("Status").value,
+    Keterangan:document.getElementById("Keterangan").value,
+    Kategori:document.getElementById("Kategori").value,
+    AreaKerja:document.getElementById("AreaKerja").value,
+    Item:document.getElementById("Item").value,
+    SparePartUnit:document.getElementById("SparePartUnit").value,
+    Type:document.getElementById("Type").value,
+    Jumlah:document.getElementById("Jumlah").value
+  }; }
 
-  // Navigation & helpers (unchanged)
-  function showPage(name) {
-    document.getElementById("pageInput").style.display = (name === "input") ? "" : "none";
-    document.getElementById("pageLaporan").style.display = (name === "laporan") ? "" : "none";
-
-    const pill = document.getElementById("judulBulanDesktop");
-    if (pill) pill.style.display = (name === "laporan") ? "inline-block" : "none";
-
-    const btnLaporan = document.getElementById("btnLaporan");
-    const btnInput = document.getElementById("btnInput");
-    if (btnLaporan && btnInput) {
-      if (name === "input") {
-        btnLaporan.style.display = "inline-flex";
-        btnInput.style.display = "none";
+  async function saveData(){
+    try{
+      setMsg("msg","Menyimpan data...");
+      const payload=getInputPayload();
+      if(!payload.Tanggal){ setMsg("msg","❌ Tanggal wajib diisi."); return; }
+      const res=await fetch(API_URL, {method:'POST', body: JSON.stringify(payload)});
+      const json=await res.json();
+      if(json.ok){
+        setMsg("msg","✅ Data tersimpan.");
+        clearInputForm();
+        showSavedPopup("Data sudah tersimpan","Berhasil");
       } else {
-        btnLaporan.style.display = "none";
-        btnInput.style.display = "inline-flex";
+        setMsg("msg","❌ Gagal: "+json.msg);
+        showSavedPopup("Gagal menyimpan: "+(json.msg||""),"Gagal");
       }
-    }
-
-    if (name === "laporan") loadReportsBySelectedMonth();
-  }
-
-  function getCurrentMonthYYYYMM() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    return `${y}-${m}`;
-  }
-
-  function setJudulBulan(yyyymm) {
-    const bulanNama = {
-      "01":"JANUARI","02":"FEBRUARI","03":"MARET","04":"APRIL",
-      "05":"MEI","06":"JUNI","07":"JULI","08":"AGUSTUS",
-      "09":"SEPTEMBER","10":"OKTOBER","11":"NOVEMBER","12":"DESEMBER"
-    };
-    const year = yyyymm.substring(0,4);
-    const month = yyyymm.substring(5,7);
-    const nama = bulanNama[month] || yyyymm;
-    const b = document.getElementById("infoBulanPill");
-    if (b) b.innerText = `Bulan: ${nama} ${year}`;
-    const dd = document.getElementById("judulBulanDesktop");
-    if (dd) {
-      dd.innerText = `BULAN ${nama} ${year}`;
-      dd.title = "Menampilkan laporan untuk " + nama + " " + year + " — klik untuk pilih bulan";
+    }catch(err){
+      setMsg("msg","❌ Error: "+err.message);
+      showSavedPopup("Error: "+err.message,"Gagal");
     }
   }
 
-  function buildMonthOptions() {
-    const select = document.getElementById("FilterBulan");
-    select.innerHTML = "";
-    const now = new Date();
-    for (let i = 0; i < 36; i++) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const yyyymm = `${y}-${m}`;
-      const opt = document.createElement("option");
-      opt.value = yyyymm;
-      opt.textContent = yyyymm;
-      select.appendChild(opt);
-    }
-    select.value = getCurrentMonthYYYYMM();
-    setJudulBulan(select.value);
-  }
+  function clearInputForm(){ document.querySelectorAll("#pageInput input, #pageInput textarea, #pageInput select").forEach(el=>el.value=''); }
 
-  function normalizeText(x) { return (x || "").toString().trim(); }
-  function toDateKey(tanggalStr) {
-    const t = normalizeText(tanggalStr);
-    if (t.length >= 10) return t.substring(0,10).replaceAll("-","");
-    return "00000000";
-  }
-
-  // INPUT SAVE
-  function getInputPayload() {
-    return {
-      action: "add",
-      Tanggal: document.getElementById("Tanggal").value,
-      Pelapor: document.getElementById("Pelapor").value,
-      Ruang: document.getElementById("Ruang").value,
-      Pukul: document.getElementById("Pukul").value,
-      NoLK: document.getElementById("NoLK").value,
-      MasalahKegiatan: document.getElementById("MasalahKegiatan").value,
-      Tindakan: document.getElementById("Tindakan").value,
-      Petugas: document.getElementById("Petugas").value,
-      Status: document.getElementById("Status").value,
-      Keterangan: document.getElementById("Keterangan").value,
-      Kategori: document.getElementById("Kategori").value,
-      AreaKerja: document.getElementById("AreaKerja").value,
-      Item: document.getElementById("Item").value,
-      SparePartUnit: document.getElementById("SparePartUnit").value,
-      Type: document.getElementById("Type").value,
-      Jumlah: document.getElementById("Jumlah").value
-    };
-  }
-
-  async function saveData() {
-  try {
-    setMsg("msg", "Menyimpan data...");
-    const payload = getInputPayload();
-    if (!payload.Tanggal) { setMsg("msg", "❌ Tanggal wajib diisi."); return; }
-    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-    const json = await res.json();
-    if (json.ok) {
-      // jangan tampilkan ID di pesan atau popup
-      setMsg("msg", "✅ Data tersimpan.");
-      clearInputForm();
-      showSavedPopup("Data sudah tersimpan", "Berhasil");
-    } else {
-      setMsg("msg", "❌ Gagal: " + json.msg);
-      showSavedPopup("Gagal menyimpan: " + (json.msg || ""), "Gagal");
-    }
-  } catch (err) {
-    setMsg("msg", "❌ Error: " + err.message);
-    showSavedPopup("Error: " + err.message, "Gagal");
-  }
-}
-  function clearInputForm() {
-    document.querySelectorAll("#pageInput input, #pageInput textarea, #pageInput select").forEach(el => el.value = "");
-  }
-
-  // LOAD REPORT
-  async function loadReportsBySelectedMonth() {
-    try {
-      const bulan = document.getElementById("FilterBulan").value || getCurrentMonthYYYYMM();
+  async function loadReportsBySelectedMonth(){
+    try{
+      const bulan=document.getElementById("FilterBulan").value||getCurrentMonthYYYYMM();
       setJudulBulan(bulan);
-      setMsg("msgReport", "Memuat laporan bulan " + bulan + " ...");
-      const res = await fetch(API_URL + "?action=get&bulan=" + bulan);
-      const json = await res.json();
-      if (!json.ok) {
-        rawData = []; viewData = []; renderReportTable(); setMsg("msgReport", "❌ Gagal load: " + json.msg); return;
-      }
-      rawData = (json.data || []).map(x => {
-        x.ID = normalizeText(x.ID); x.Tanggal = normalizeText(x.Tanggal); x.Pelapor = normalizeText(x.Pelapor);
-        x.Ruang = normalizeText(x.Ruang); x.Pukul = normalizeText(x.Pukul); x.NoLK = normalizeText(x.NoLK);
-        x.MasalahKegiatan = normalizeText(x.MasalahKegiatan); x.Tindakan = normalizeText(x.Tindakan);
-        x.Petugas = normalizeText(x.Petugas); x.Status = normalizeText(x.Status); x.Keterangan = normalizeText(x.Keterangan);
-        x.Kategori = normalizeText(x.Kategori); x.AreaKerja = normalizeText(x.AreaKerja); x.Item = normalizeText(x.Item);
-        x.SparePartUnit = normalizeText(x.SparePartUnit); x.Type = normalizeText(x.Type); x.Jumlah = normalizeText(x.Jumlah);
+      setMsg("msgReport","Memuat laporan bulan "+bulan+" ...");
+      const res=await fetch(API_URL+"?action=get&bulan="+bulan);
+      const json=await res.json();
+      if(!json.ok){ rawData=[]; viewData=[]; renderReportTable(); setMsg("msgReport","❌ Gagal load: "+json.msg); return; }
+      rawData=(json.data||[]).map(x=>{
+        x.ID=normalizeText(x.ID); x.Tanggal=normalizeText(x.Tanggal); x.Pelapor=normalizeText(x.Pelapor);
+        x.Ruang=normalizeText(x.Ruang); x.Pukul=normalizeText(x.Pukul); x.NoLK=normalizeText(x.NoLK);
+        x.MasalahKegiatan=normalizeText(x.MasalahKegiatan); x.Tindakan=normalizeText(x.Tindakan);
+        x.Petugas=normalizeText(x.Petugas); x.Status=normalizeText(x.Status); x.Keterangan=normalizeText(x.Keterangan);
+        x.Kategori=normalizeText(x.Kategori); x.AreaKerja=normalizeText(x.AreaKerja); x.Item=normalizeText(x.Item);
+        x.SparePartUnit=normalizeText(x.SparePartUnit); x.Type=normalizeText(x.Type); x.Jumlah=normalizeText(x.Jumlah);
         return x;
       });
       buildFilterOptionsFromData(rawData);
       applyFilters();
-    } catch (err) {
-      rawData = []; viewData = []; renderReportTable(); setMsg("msgReport", "❌ Error: " + err.message);
+    }catch(err){
+      rawData=[]; viewData=[]; renderReportTable(); setMsg("msgReport","❌ Error: "+err.message);
     }
   }
 
-  // FILTERS & HELPERS
-  function uniqueSorted(arr) {
-    const set = new Set(arr.filter(x => normalizeText(x) !== ""));
-    return Array.from(set).sort((a,b) => a.localeCompare(b));
+  function uniqueSorted(arr){ const set=new Set(arr.filter(x=>normalizeText(x)!='')); return Array.from(set).sort((a,b)=>a.localeCompare(b)); }
+  function escapeHtml(text){ return (text||'').toString().replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
+
+  function buildFilterOptionsFromData(data){
+    const kategoriList=uniqueSorted(data.map(x=>x.Kategori));
+    const areaList=uniqueSorted(data.map(x=>x.AreaKerja));
+    const itemList=uniqueSorted(data.map(x=>x.Item));
+    const fk=document.getElementById("FilterKategori"); fk.innerHTML=`<option value="ALL">SEMUA DATA</option>`; kategoriList.forEach(v=>fk.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+    const fa=document.getElementById("FilterAreaKerja"); fa.innerHTML=`<option value="ALL">SEMUA DATA</option>`; areaList.forEach(v=>fa.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+    const fi=document.getElementById("FilterItem"); fi.innerHTML=`<option value="ALL">SEMUA DATA</option>`; itemList.forEach(v=>fi.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+    document.getElementById("FilterStatus").value="ALL";
   }
 
-  function escapeHtml(text) {
-    return (text || "").toString()
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;");
-  }
-
-  function buildFilterOptionsFromData(data) {
-    const kategoriList = uniqueSorted(data.map(x => x.Kategori));
-    const areaList = uniqueSorted(data.map(x => x.AreaKerja));
-    const itemList = uniqueSorted(data.map(x => x.Item));
-
-    const fk = document.getElementById("FilterKategori");
-    fk.innerHTML = `<option value="ALL">SEMUA DATA</option>`;
-    kategoriList.forEach(v => fk.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
-
-    const fa = document.getElementById("FilterAreaKerja");
-    fa.innerHTML = `<option value="ALL">SEMUA DATA</option>`;
-    areaList.forEach(v => fa.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
-
-    const fi = document.getElementById("FilterItem");
-    fi.innerHTML = `<option value="ALL">SEMUA DATA</option>`;
-    itemList.forEach(v => fi.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
-
-    document.getElementById("FilterStatus").value = "ALL";
-  }
-
-  function applyFilters() {
-    const status = document.getElementById("FilterStatus").value;
-    const kategori = document.getElementById("FilterKategori").value;
-    const area = document.getElementById("FilterAreaKerja").value;
-    const item = document.getElementById("FilterItem").value;
-
-    viewData = rawData.filter(x => {
-      let ok = true;
-      if (status !== "ALL") ok = ok && (x.Status.toUpperCase() === status);
-      if (kategori !== "ALL") ok = ok && (x.Kategori === kategori);
-      if (area !== "ALL") ok = ok && (x.AreaKerja === area);
-      if (item !== "ALL") ok = ok && (x.Item === item);
+  function applyFilters(){
+    const status=document.getElementById("FilterStatus").value;
+    const kategori=document.getElementById("FilterKategori").value;
+    const area=document.getElementById("FilterAreaKerja").value;
+    const item=document.getElementById("FilterItem").value;
+    viewData=rawData.filter(x=>{
+      let ok=true;
+      if(status!=='ALL') ok=ok && (x.Status.toUpperCase()===status);
+      if(kategori!=='ALL') ok=ok && (x.Kategori===kategori);
+      if(area!=='ALL') ok=ok && (x.AreaKerja===area);
+      if(item!=='ALL') ok=ok && (x.Item===item);
       return ok;
     });
-
-    applySort();
-    renderReportTable();
-    renderRekap();
+    applySort(); renderReportTable(); renderRekap();
   }
 
-  // SORT
-  function applySort() {
-    viewData.sort((a,b) => {
-      const ka = toDateKey(a.Tanggal); const kb = toDateKey(b.Tanggal);
-      if (sortMode === "UP") return ka.localeCompare(kb);
-      return kb.localeCompare(ka);
-    });
-  }
-  function sortUp(){ sortMode = "UP"; applyFilters(); }
-  function sortDown(){ sortMode = "DOWN"; applyFilters(); }
+  function applySort(){ viewData.sort((a,b)=>{ const ka=toDateKey(a.Tanggal), kb=toDateKey(b.Tanggal); return (sortMode==='UP')? ka.localeCompare(kb) : kb.localeCompare(ka); }); }
+  function sortUp(){ sortMode='UP'; applyFilters(); } function sortDown(){ sortMode='DOWN'; applyFilters(); }
 
-  // RENDER TABLE / MOBILE LIST
-  function renderReportTable() {
-    const tbody = document.querySelector("#reportTable tbody");
-    tbody.innerHTML = "";
-    document.getElementById("infoTotalPill").innerText = `Total: ${viewData.length}`;
-
-    viewData.forEach((row, idx) => {
-      const tr = document.createElement("tr");
-      const statusClass = (row.Status.toUpperCase() === 'BELUM') ? 'status-pending' : (row.Status ? 'status-done' : '');
-      tr.innerHTML = `
+  function renderReportTable(){
+    const tbody=document.querySelector("#reportTable tbody"); tbody.innerHTML=''; document.getElementById("infoTotalPill").innerText=`Total: ${viewData.length}`;
+    viewData.forEach((row,idx)=>{
+      const tr=document.createElement("tr");
+      const statusClass=(row.Status.toUpperCase()==='BELUM')?'status-pending':(row.Status?'status-done':'');
+      tr.innerHTML=`
         <td style="text-align:center;"><b>${idx+1}</b></td>
         <td style="text-align:center;">${escapeHtml(row.Tanggal)}</td>
-        <td>${escapeHtml(row.Pelapor)}<div class="muted" style="font-size:12px; margin-top:6px;">${row.NoLK ? "[NO. LK : "+escapeHtml(row.NoLK)+"]" : ""}</div></td>
+        <td>${escapeHtml(row.Pelapor)}<div class="muted" style="font-size:12px; margin-top:6px;">${row.NoLK? "[NO. LK : "+escapeHtml(row.NoLK)+"]":""}</div></td>
         <td style="text-align:center;">${escapeHtml(row.Ruang)}</td>
         <td style="text-align:center;">${escapeHtml(row.Pukul)}</td>
         <td>${escapeHtml(row.MasalahKegiatan)}</td>
         <td>${escapeHtml(row.Tindakan)}</td>
         <td style="text-align:center;">${escapeHtml(row.Petugas)}</td>
-        <td style="text-align:center;"><span class="status-badge ${statusClass}">${escapeHtml(row.Status || "")}</span></td>
+        <td style="text-align:center;"><span class="status-badge ${statusClass}">${escapeHtml(row.Status||"")}</span></td>
         <td style="text-align:center;">${escapeHtml(row.Kategori)}</td>
         <td style="text-align:center;">${escapeHtml(row.AreaKerja)}</td>
         <td style="text-align:center;">${escapeHtml(row.Item)}</td>
@@ -812,160 +617,113 @@
       tr.onclick = () => openEditModal(row);
       tbody.appendChild(tr);
     });
-
-    renderMobileList();
-    setMsg("msgReport", "✅ Data tampil: " + viewData.length);
+    renderMobileList(); setMsg("msgReport","✅ Data tampil: "+viewData.length);
   }
 
-  function renderMobileList() {
-    const list = document.getElementById("mobileList");
-    list.innerHTML = "";
-    if (window.innerWidth > 900) { list.style.display = "none"; document.getElementById("reportTable").style.display = ""; return; }
-    document.getElementById("reportTable").style.display = "none";
-    list.style.display = "block";
-
-    viewData.forEach((r, idx) => {
-      const div = document.createElement("div");
-      div.className = "card-item";
-      const statusClass = (r.Status.toUpperCase() === 'BELUM') ? 'status-pending' : (r.Status ? 'status-done' : '');
-      div.innerHTML = `
+  function renderMobileList(){
+    const list=document.getElementById("mobileList"); list.innerHTML=''; if(window.innerWidth>900){ list.style.display='none'; document.getElementById("reportTable").style.display=''; return; }
+    document.getElementById("reportTable").style.display='none'; list.style.display='block';
+    viewData.forEach((r,idx)=>{
+      const div=document.createElement("div"); div.className='card-item';
+      const statusClass=(r.Status.toUpperCase()==='BELUM')?'status-pending':(r.Status?'status-done':'');
+      div.innerHTML=`
         <div class="row">
           <div>
             <div style="font-size:13px; color:var(--muted)">#${idx+1} • ${escapeHtml(r.Tanggal)}</div>
-            <div class="title">${escapeHtml(r.Pelapor)} ${r.Ruang ? '• '+escapeHtml(r.Ruang) : ''}</div>
-            <div class="meta">${r.NoLK ? '[NO. LK: '+escapeHtml(r.NoLK)+']' : ''}</div>
+            <div class="title">${escapeHtml(r.Pelapor)} ${r.Ruang? '• '+escapeHtml(r.Ruang):''}</div>
+            <div class="meta">${r.NoLK? '[NO. LK: '+escapeHtml(r.NoLK)+']':''}</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:13px;" class="${statusClass ? '' : 'muted'}"><span class="status-badge ${statusClass}">${escapeHtml(r.Status || '')}</span></div>
-            <div class="muted" style="margin-top:8px;">${escapeHtml(r.Item || '')}</div>
+            <div style="font-size:13px;" class="${statusClass? '': 'muted'}"><span class="status-badge ${statusClass}">${escapeHtml(r.Status||'')}</span></div>
+            <div class="muted" style="margin-top:8px;">${escapeHtml(r.Item||'')}</div>
           </div>
         </div>
-        <div class="desc">${escapeHtml(r.MasalahKegiatan || '')}</div>
-        <div class="card-actions">
-          <button class="btn" onclick="openEditModalFromCard(event, '${escapeHtml(r.ID)}')">Edit</button>
-        </div>
+        <div class="desc">${escapeHtml(r.MasalahKegiatan||'')}</div>
+        <div class="card-actions"><button class="btn" onclick="openEditModalFromCard(event, '${escapeHtml(r.ID)}')">Edit</button></div>
       `;
       list.appendChild(div);
     });
   }
 
-  // REKAP
-  function toggleRekap() {
-    const p = document.getElementById("panelRekap");
-    if (p.style.display === "none" || p.style.display === "") { p.style.display = "block"; renderRekap(); } else { p.style.display = "none"; }
-  }
-  function renderRekap() {
-    const tbody = document.querySelector("#rekapTable tbody");
-    tbody.innerHTML = "";
-    const map = new Map();
-    viewData.forEach(r => {
-      const spare = normalizeText(r.SparePartUnit);
-      const type = normalizeText(r.Type);
-      const jumlah = parseFloat(r.Jumlah || "0") || 0;
-      if (spare === "" && type === "" && jumlah === 0) return;
-      const key = spare + "||" + type;
-      const prev = map.get(key) || 0;
-      map.set(key, prev + jumlah);
+  function renderRekap(){
+    const tbody=document.querySelector("#rekapTable tbody"); tbody.innerHTML=''; const map=new Map();
+    viewData.forEach(r=>{
+      const spare=normalizeText(r.SparePartUnit); const type=normalizeText(r.Type); const jumlah=parseFloat(r.Jumlah||'0')||0;
+      if(spare==='' && type==='' && jumlah===0) return;
+      const key=spare+'||'+type; const prev=map.get(key)||0; map.set(key, prev+jumlah);
     });
-    const arr = Array.from(map.entries()).map(([key, total]) => {
-      const [spare, type] = key.split("||");
-      return { spare, type, total };
-    });
-    arr.sort((a,b) => b.total - a.total);
-    arr.forEach(x => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${escapeHtml(x.spare)}</td><td style="text-align:center;">${escapeHtml(x.type)}</td><td style="text-align:center;"><b>${x.total}</b></td>`;
-      tbody.appendChild(tr);
-    });
+    const arr=Array.from(map.entries()).map(([key,total])=>{ const [spare,type]=key.split('||'); return {spare,type,total}; });
+    arr.sort((a,b)=>b.total-a.total); arr.forEach(x=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${escapeHtml(x.spare)}</td><td style="text-align:center;">${escapeHtml(x.type)}</td><td style="text-align:center;"><b>${x.total}</b></td>`; tbody.appendChild(tr); });
   }
 
-  // EDIT MODAL
-  function openEditModal(row) {
-    const r = row;
-    document.getElementById("modalBg").classList.add("show");
-    setMsg("msgEdit", "");
-    document.getElementById("Edit_ID").value = r.ID || "";
-    document.getElementById("EditID").innerText = r.ID || "-";
-    document.getElementById("EditSheet").innerText = r._Sheet ? "Sheet: " + r._Sheet : "Sheet: (bulan)";
-    document.getElementById("Edit_Tanggal").value = r.Tanggal || "";
-    document.getElementById("Edit_Pelapor").value = r.Pelapor || "";
-    document.getElementById("Edit_Ruang").value = r.Ruang || "";
-    document.getElementById("Edit_Pukul").value = r.Pukul || "";
-    document.getElementById("Edit_NoLK").value = r.NoLK || "";
-    document.getElementById("Edit_MasalahKegiatan").value = r.MasalahKegiatan || "";
-    document.getElementById("Edit_Tindakan").value = r.Tindakan || "";
-    document.getElementById("Edit_Petugas").value = r.Petugas || "";
-    document.getElementById("Edit_Status").value = r.Status || "";
-    document.getElementById("Edit_Keterangan").value = r.Keterangan || "";
-    document.getElementById("Edit_Kategori").value = r.Kategori || "";
-    document.getElementById("Edit_AreaKerja").value = r.AreaKerja || "";
-    document.getElementById("Edit_Item").value = r.Item || "";
-    document.getElementById("Edit_SparePartUnit").value = r.SparePartUnit || "";
-    document.getElementById("Edit_Type").value = r.Type || "";
-    document.getElementById("Edit_Jumlah").value = r.Jumlah || "";
+  // Modal functions
+  function openEditModal(row){
+    const r=row; document.getElementById("modalBg").classList.add("show"); setMsg("msgEdit","");
+    document.getElementById("Edit_ID").value=r.ID||""; document.getElementById("EditID").innerText=r.ID||"-";
+    document.getElementById("EditSheet").innerText=r._Sheet? "Sheet: "+r._Sheet : "Sheet: (bulan)";
+    document.getElementById("Edit_Tanggal").value=r.Tanggal||""; document.getElementById("Edit_Pelapor").value=r.Pelapor||"";
+    document.getElementById("Edit_Ruang").value=r.Ruang||""; document.getElementById("Edit_Pukul").value=r.Pukul||"";
+    document.getElementById("Edit_NoLK").value=r.NoLK||""; document.getElementById("Edit_MasalahKegiatan").value=r.MasalahKegiatan||"";
+    document.getElementById("Edit_Tindakan").value=r.Tindakan||""; document.getElementById("Edit_Petugas").value=r.Petugas||"";
+    document.getElementById("Edit_Status").value=r.Status||""; document.getElementById("Edit_Keterangan").value=r.Keterangan||"";
+    document.getElementById("Edit_Kategori").value=r.Kategori||""; document.getElementById("Edit_AreaKerja").value=r.AreaKerja||"";
+    document.getElementById("Edit_Item").value=r.Item||""; document.getElementById("Edit_SparePartUnit").value=r.SparePartUnit||"";
+    document.getElementById("Edit_Type").value=r.Type||""; document.getElementById("Edit_Jumlah").value=r.Jumlah||"";
   }
+  function openEditModalFromCard(e,id){ e.stopPropagation(); const row=viewData.find(x=>x.ID===id)||rawData.find(x=>x.ID===id); if(row) openEditModal(row); }
+  function closeModal(){ document.getElementById("modalBg").classList.remove("show"); }
 
-  function openEditModalFromCard(e, id) {
-    e.stopPropagation();
-    const row = viewData.find(x => x.ID === id) || rawData.find(x => x.ID === id);
-    if (row) openEditModal(row);
-  }
-
-  function closeModal() { document.getElementById("modalBg").classList.remove("show"); }
-
-  async function saveEdit() {
-    try {
-      setMsg("msgEdit", "Menyimpan update...");
-      const payload = {
-        action: "update",
-        ID: document.getElementById("Edit_ID").value,
-        Tanggal: document.getElementById("Edit_Tanggal").value,
-        Pelapor: document.getElementById("Edit_Pelapor").value,
-        Ruang: document.getElementById("Edit_Ruang").value,
-        Pukul: document.getElementById("Edit_Pukul").value,
-        NoLK: document.getElementById("Edit_NoLK").value,
-        MasalahKegiatan: document.getElementById("Edit_MasalahKegiatan").value,
-        Tindakan: document.getElementById("Edit_Tindakan").value,
-        Petugas: document.getElementById("Edit_Petugas").value,
-        Status: document.getElementById("Edit_Status").value,
-        Keterangan: document.getElementById("Edit_Keterangan").value,
-        Kategori: document.getElementById("Edit_Kategori").value,
-        AreaKerja: document.getElementById("Edit_AreaKerja").value,
-        Item: document.getElementById("Edit_Item").value,
-        SparePartUnit: document.getElementById("Edit_SparePartUnit").value,
-        Type: document.getElementById("Edit_Type").value,
-        Jumlah: document.getElementById("Edit_Jumlah").value
+  async function saveEdit(){
+    try{
+      setMsg("msgEdit","Menyimpan update...");
+      const payload={
+        action:"update",
+        ID:document.getElementById("Edit_ID").value,
+        Tanggal:document.getElementById("Edit_Tanggal").value,
+        Pelapor:document.getElementById("Edit_Pelapor").value,
+        Ruang:document.getElementById("Edit_Ruang").value,
+        Pukul:document.getElementById("Edit_Pukul").value,
+        NoLK:document.getElementById("Edit_NoLK").value,
+        MasalahKegiatan:document.getElementById("Edit_MasalahKegiatan").value,
+        Tindakan:document.getElementById("Edit_Tindakan").value,
+        Petugas:document.getElementById("Edit_Petugas").value,
+        Status:document.getElementById("Edit_Status").value,
+        Keterangan:document.getElementById("Edit_Keterangan").value,
+        Kategori:document.getElementById("Edit_Kategori").value,
+        AreaKerja:document.getElementById("Edit_AreaKerja").value,
+        Item:document.getElementById("Edit_Item").value,
+        SparePartUnit:document.getElementById("Edit_SparePartUnit").value,
+        Type:document.getElementById("Edit_Type").value,
+        Jumlah:document.getElementById("Edit_Jumlah").value
       };
-      if (!payload.ID) { setMsg("msgEdit", "❌ ID kosong, tidak bisa update."); return; }
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-      const json = await res.json();
-      if (json.ok) {
-        setMsg("msgEdit", "✅ Update berhasil");
-        closeModal();
-        loadReportsBySelectedMonth();
-        showSavedPopup("Update berhasil", "Berhasil");
-      } else {
-        setMsg("msgEdit", "❌ Gagal: " + json.msg);
-        showSavedPopup("Gagal update: " + (json.msg || ""), "Gagal");
-      }
-    } catch (err) {
-      setMsg("msgEdit", "❌ Error: " + err.message);
-      showSavedPopup("Error: " + err.message, "Gagal");
-    }
+      if(!payload.ID){ setMsg("msgEdit","❌ ID kosong, tidak bisa update."); return; }
+      const res=await fetch(API_URL, {method:"POST", body: JSON.stringify(payload)});
+      const json=await res.json();
+      if(json.ok){ setMsg("msgEdit","✅ Update berhasil"); closeModal(); loadReportsBySelectedMonth(); showSavedPopup("Update berhasil","Berhasil"); }
+      else{ setMsg("msgEdit","❌ Gagal: "+json.msg); showSavedPopup("Gagal update: "+(json.msg||""),"Gagal"); }
+    }catch(err){ setMsg("msgEdit","❌ Error: "+err.message); showSavedPopup("Error: "+err.message,"Gagal"); }
   }
 
-  // close modal if click background
-  document.getElementById("modalBg").addEventListener("click", function(e){
-    if (e.target.id === "modalBg") closeModal();
-  });
+  // close modal by clicking background
+  document.getElementById("modalBg").addEventListener("click", function(e){ if(e.target.id==="modalBg") closeModal(); });
 
-  // rerender mobile list on resize
-  window.addEventListener("resize", () => {
-    renderReportTable();
-  });
+  // Saved popup (sticky or auto depending on showSavedPopup implementation)
+  function showSavedPopup(message="Data sudah tersimpan.", title="Berhasil"){
+    const bg=document.getElementById("savedToast"); if(!bg) return;
+    document.getElementById("savedToastTitle").innerText = title;
+    document.getElementById("savedToastMsg").innerText = message;
+    bg.classList.add("show");
+    // focus ok button
+    const ok=document.getElementById("savedToastOk"); if(ok) ok.focus();
+  }
+  function hideSavedPopup(){
+    const bg=document.getElementById("savedToast"); if(!bg) return; bg.classList.remove("show");
+    const first=document.querySelector("#pageInput input, #pageInput textarea, #pageInput select"); if(first) first.focus();
+  }
 
-  // INIT
+  // init
   buildMonthOptions();
+  updateTopbarHeight();
   showPage('input');
 
 </script>
