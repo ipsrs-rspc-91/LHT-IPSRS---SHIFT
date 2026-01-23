@@ -168,9 +168,14 @@
     </div>
 
     <div class="actions">
-      <div id="judulBulanDesktop" class="pill">BULAN -</div>
-      <button class="btn ghost" onclick="showPage('laporan')">LAPORAN</button>
-      <button class="btn primary" onclick="showPage('input')">INPUT DATA</button>
+      <!-- Pill bulan: akan ditampilkan hanya pada halaman LAPORAN -->
+      <div id="judulBulanDesktop" class="pill" style="display:none;" title="Klik untuk memilih bulan laporan" onclick="document.getElementById('FilterBulan')?.focus();">
+        BULAN -
+      </div>
+
+      <!-- Dua tombol dengan id supaya bisa di-toggle tampilannya -->
+      <button id="btnLaporan" class="btn ghost" onclick="showPage('laporan')">LAPORAN</button>
+      <button id="btnInput" class="btn primary" onclick="showPage('input')">INPUT DATA</button>
     </div>
   </div>
 
@@ -474,8 +479,28 @@
   }
 
   function showPage(name) {
+    // tampilkan halaman yang dipilih
     document.getElementById("pageInput").style.display = (name === "input") ? "" : "none";
     document.getElementById("pageLaporan").style.display = (name === "laporan") ? "" : "none";
+
+    // Tampilkan pill bulan hanya ketika berada di halaman laporan
+    const pill = document.getElementById("judulBulanDesktop");
+    if (pill) pill.style.display = (name === "laporan") ? "inline-block" : "none";
+
+    // Toggle tombol header: jika di halaman input -> tampilkan hanya tombol LAPORAN; jika di laporan -> tampilkan hanya tombol INPUT DATA
+    const btnLaporan = document.getElementById("btnLaporan");
+    const btnInput = document.getElementById("btnInput");
+    if (btnLaporan && btnInput) {
+      if (name === "input") {
+        btnLaporan.style.display = "inline-flex";
+        btnInput.style.display = "none";
+      } else {
+        btnLaporan.style.display = "none";
+        btnInput.style.display = "inline-flex";
+      }
+    }
+
+    // jika halaman laporan, load data sesuai bulan yang dipilih
     if (name === "laporan") loadReportsBySelectedMonth();
   }
 
@@ -495,12 +520,18 @@
     const year = yyyymm.substring(0,4);
     const month = yyyymm.substring(5,7);
     const nama = bulanNama[month] || yyyymm;
-    document.getElementById("judulBulan").innerText = `BULAN ${nama} ${year}`;
+    const label = `BULAN ${nama} ${year}`;
+
+    // update pill di laporan area
     const b = document.getElementById("infoBulanPill");
     if (b) b.innerText = `Bulan: ${nama} ${year}`;
-    const d = document.getElementById("infoBulanPill");
+
+    // update pill di topbar (jika ada)
     const dd = document.getElementById("judulBulanDesktop");
-    if (dd) dd.innerText = `BULAN ${nama} ${year}`;
+    if (dd) {
+      dd.innerText = label;
+      dd.title = "Menampilkan laporan untuk " + nama + " " + year + " — klik untuk pilih bulan";
+    }
   }
 
   function buildMonthOptions() {
@@ -560,6 +591,7 @@
       const json = await res.json();
       if (json.ok) {
         setMsg("msg", "✅ Data tersimpan. ID: " + json.id);
+        // tidak merubah tampilan header (bulan) karena input tidak perlu menunjukkan bulan
         clearInputForm();
       } else {
         setMsg("msg", "❌ Gagal: " + json.msg);
@@ -762,7 +794,6 @@
 
   // EDIT MODAL
   function openEditModal(row) {
-    // find row by ID (some data may be sanitized)
     const r = row;
     document.getElementById("modalBg").classList.add("show");
     setMsg("msgEdit", "");
@@ -787,7 +818,6 @@
     document.getElementById("Edit_Jumlah").value = r.Jumlah || "";
   }
 
-  // helper for mobile card edit button: find row by ID and open modal
   function openEditModalFromCard(e, id) {
     e.stopPropagation();
     const row = viewData.find(x => x.ID === id) || rawData.find(x => x.ID === id);
@@ -844,9 +874,11 @@
     renderReportTable();
   });
 
-  // INIT
+  // INIT: bangun daftar bulan, lalu atur halaman awal input (header disesuaikan)
   buildMonthOptions();
-  loadReportsBySelectedMonth();
+  // set initial view to input page (header tombol akan tampil sesuai permintaan)
+  showPage('input');
+
 </script>
 </body>
 </html>
