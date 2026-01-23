@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LHT IPSRS - SHIFT (Dark Elegant)</title>
+  <title>LHT IPSRS - SHIFT (Modern)</title>
 
   <!-- Google Font (Inter) -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,152 +11,144 @@
 
   <style>
     :root{
-      /* Dark elegant theme */
-      --bg: #08090b;          /* page background */
-      --panel: #0f1620;       /* main card/panel */
-      --muted: #94a3b8;       /* secondary text */
-      --text: #e6eef6;        /* primary text */
-      --accent: #18b3a3;      /* teal accent */
-      --accent-2: #0ea5a4;    /* secondary teal */
-      --gold: #d4af37;        /* small highlights (optional) */
-      --danger: #ff6b6b;
-      --glass: rgba(255,255,255,0.03);
-      --border: rgba(255,255,255,0.04);
-      --radius: 12px;
-      --shadow: 0 10px 30px rgba(2,6,23,0.6);
-      --card-elev: 0 8px 30px rgba(2,6,23,0.6);
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --accent:#0a69b8;
+      --muted:#6b7280;
+      --success:#1f9d55;
+      --danger:#e02424;
+      --yellow:#fff6bf;
+      --border: rgba(16,24,40,0.08);
+      --glass: rgba(255,255,255,0.6);
+      --radius:12px;
+      --shadow: 0 6px 18px rgba(20,30,60,0.06);
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; margin:0; font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    *{box-sizing:border-box;}
+    html,body{height:100%; margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; background:var(--bg); color:#0f172a;}
+    a{color:inherit;}
 
-    a{ color:inherit; }
-
-    /* TOPBAR */
+    /* ===== TOPBAR ===== */
     .topbar {
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:14px 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-bottom: 1px solid var(--border);
-      position:sticky; top:0; z-index:60;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+      background: linear-gradient(90deg, #e8f6ff 0%, #dff8e6 100%);
+      border-bottom:1px solid rgba(0,0,0,0.06);
+      padding:12px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      position:sticky;
+      top:0;
+      z-index:40;
+      box-shadow: 0 6px 20px rgba(10,15,30,0.03);
+      backdrop-filter: blur(4px);
     }
-
-    .brand { display:flex; gap:12px; align-items:center; }
+    .topbar .brand {
+      display:flex; gap:12px; align-items:center;
+    }
     .logo {
-      width:46px; height:46px; border-radius:10px; display:flex; align-items:center; justify-content:center;
-      background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-      border:1px solid var(--border);
-      font-weight:800; color:var(--accent); font-size:16px;
+      width:46px; height:46px; border-radius:10px; background:linear-gradient(135deg,var(--accent),#24a0ff);
+      display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:16px; box-shadow: var(--shadow);
     }
-    .title { font-weight:700; font-size:15px; color:var(--text); line-height:1; }
-    .subtitle { font-size:12px; color:var(--muted); margin-top:3px; }
-
-    .actions { display:flex; gap:10px; align-items:center; }
-
-    .pill {
-      padding:8px 12px; border-radius:999px; background:transparent;
-      border:1px solid transparent; color:var(--muted); font-size:13px;
+    .topbar .title {
+      font-weight:700; font-size:16px; color:#042f66; line-height:1;
     }
+    .topbar .subtitle { font-size:12px; color:var(--muted); margin-top:2px; }
 
-    /* Buttons */
+    .topbar .actions { display:flex; gap:8px; align-items:center; }
+
     .btn {
-      padding:8px 14px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer;
-      border:1px solid var(--border); background:transparent; color:var(--muted);
-      transition: all .12s ease;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:10px; background:var(--card); border:1px solid var(--border);
+      cursor:pointer; font-weight:600; color:#062b57; box-shadow:none;
     }
-    .btn:hover { transform:translateY(-2px); box-shadow: var(--card-elev); color:var(--text); }
-    .btn.primary {
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      color:#071823; border:0; box-shadow: 0 10px 30px rgba(2,17,23,0.6);
-    }
-    /* Emphasize the LAPORAN button when visible on dark bg */
-    #btnLaporan {
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
-      color: var(--accent);
-      border: 1px solid rgba(24,179,163,0.12);
-      padding:10px 16px;
-      border-radius:12px;
-      font-weight:800;
-      box-shadow: 0 6px 18px rgba(24,179,163,0.06);
-    }
-    #btnLaporan:hover {
-      box-shadow: 0 12px 30px rgba(24,179,163,0.12);
-      color:var(--text);
-    }
+    .btn:hover{ transform:translateY(-1px); }
+    .btn.primary { background: linear-gradient(90deg,var(--accent),#24a0ff); color:#fff; border:0; box-shadow: 0 6px 18px rgba(10,120,220,0.12); }
+    .btn.ghost { background:transparent; border:1px dashed rgba(0,0,0,0.06); color:var(--muted); }
+    .pill { background:var(--card); border-radius:999px; padding:6px 10px; font-size:13px; border:1px solid var(--border); color:var(--muted); }
 
-    /* LAYOUT / CONTAINER */
+    /* ===== LAYOUT ===== */
     .container { max-width:1100px; margin:18px auto; padding:0 14px; }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding:14px;
-      box-shadow: var(--shadow);
+    .card { background:var(--card); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow); border:1px solid var(--border); }
+
+    .grid {
+      display:grid; grid-template-columns: 1fr 420px; gap:14px;
+    }
+    @media (max-width: 1000px) {
+      .grid { grid-template-columns: 1fr; }
     }
 
-    .grid { display:grid; grid-template-columns: 1fr 420px; gap:14px; }
-    @media (max-width:1000px) { .grid { grid-template-columns: 1fr; } }
-
-    /* FORM */
-    label { display:block; font-weight:600; margin-top:10px; color:var(--text); font-size:13px; }
+    /* ===== FORM (LEFT) ===== */
+    .form-col label { display:block; font-weight:600; margin-top:10px; color:#0b2340; font-size:13px; }
     input, textarea, select {
-      width:100%; margin-top:6px; padding:10px 12px; border-radius:10px;
-      border:1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01);
-      color:var(--text); font-size:14px;
+      width:100%; margin-top:6px; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:linear-gradient(180deg,#fff,#fbfdff);
+      font-size:14px; color:#061428;
     }
-    input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.25); }
-    textarea { min-height:110px; resize:vertical; color:var(--text); }
+    textarea { min-height:120px; resize:vertical; }
+    .form-section { display:flex; flex-direction:column; gap:6px; }
 
     .big-save {
-      margin-top:16px; padding:14px; border-radius:12px; background: linear-gradient(90deg,var(--accent),var(--accent-2));
-      color:#071823; font-weight:800; text-align:center; cursor:pointer; border:0;
-      box-shadow: 0 10px 30px rgba(2,17,23,0.6);
+      margin-top:16px; padding:18px; border-radius:12px; background:linear-gradient(90deg,#06a84f,#2fc26a); color:white; font-weight:800; font-size:16px; text-align:center; cursor:pointer; border:0;
+      box-shadow: 0 10px 30px rgba(34,185,87,0.12);
     }
+    .big-save:active { transform:translateY(1px); }
 
     .smallnote { font-size:13px; color:var(--muted); margin-top:8px; }
 
-    /* RIGHT PANEL */
+    /* ===== RIGHT PANEL ===== */
     .panel-right { display:flex; flex-direction:column; gap:12px; }
     .toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-    .filters { display:grid; grid-template-columns: 1fr 1fr; gap:8px; align-items:center; }
-    @media (max-width:700px) { .filters { grid-template-columns: 1fr; } }
-
-    .muted { color:var(--muted); font-size:13px; }
-
-    /* TABLE */
-    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; color:var(--text); }
-    thead th { text-align:left; padding:10px; background: rgba(255,255,255,0.02); color:var(--muted); font-weight:700; position:sticky; top:0; z-index:2; }
-    th, td { padding:10px 8px; border-bottom: 1px solid rgba(255,255,255,0.02); vertical-align:top; }
-    tbody tr { transition: background .12s ease; cursor:pointer; }
-    tbody tr:hover { background: rgba(24,179,163,0.04); }
-
-    .status-badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; color:#071823; }
-    .status-done { background: var(--accent); color:#071823; }
-    .status-pending { background: var(--danger); color:#071823; }
-
-    /* MOBILE CARD LIST */
-    #mobileList { display:none; margin-top:12px; }
-    .card-item {
-      border-radius:12px; padding:12px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-      border:1px solid rgba(255,255,255,0.02); margin-bottom:10px;
+    .filters {
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:8px;
+      align-items:center;
     }
-    .card-item .title { font-weight:800; color:var(--text); margin-top:6px; }
+    @media (max-width:700px) {
+      .filters { grid-template-columns: 1fr; }
+    }
+    .filter-row { display:flex; gap:8px; align-items:center; }
+    .filter-row b { font-size:13px; color:#0b2340; }
+
+    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; }
+    th, td { padding:10px 8px; border-bottom:1px solid rgba(10,20,40,0.06); text-align:left; vertical-align:top; }
+    thead th { color:#fff; background:var(--accent); font-weight:700; position:sticky; top:0; z-index:1; }
+    tbody tr { transition: background .12s ease; }
+    tbody tr:hover { background:#f3fbff; cursor:pointer; }
+
+    .status-badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; color:#fff; }
+    .status-done { background:var(--success); }
+    .status-pending { background:var(--danger); }
+
+    /* ===== MOBILE CARD LIST ===== */
+    #mobileList { display:none; margin-top:12px; }
+    .card-item { border-radius:12px; padding:12px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid var(--border); margin-bottom:10px; box-shadow: 0 6px 18px rgba(10,20,60,0.03); }
+    .card-item .row { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
     .card-item .meta { color:var(--muted); font-size:13px; }
-    .card-item .desc { margin-top:8px; color:var(--text); font-size:14px; white-space:pre-wrap; }
+    .card-item .title { font-weight:700; color:#071737; margin-top:6px; }
+    .card-item .desc { margin-top:8px; color:#243444; font-size:14px; white-space:pre-wrap; }
+    .card-actions { display:flex; gap:8px; margin-top:12px; justify-content:flex-end; }
 
-    /* REKAP */
-    #panelRekap { margin-top:12px; padding:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); border:1px solid var(--border); }
+    /* ===== REKAP PANEL ===== */
+    #panelRekap { margin-top:12px; padding:12px; border-radius:12px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid var(--border); }
 
-    /* MODAL */
-    .modal-bg { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(2,6,23,0.6); z-index:9999; padding:16px; }
+    /* ===== MODAL ===== */
+    .modal-bg {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(6,10,20,0.45); z-index:9999; padding:16px;
+    }
     .modal-bg.show { display:flex; }
-    .modal { width:min(980px,96vw); max-height:92vh; overflow:auto; border-radius:14px; padding:18px; border:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); box-shadow: 0 30px 80px rgba(2,6,23,0.8); }
-    .modal h3 { margin:0; color:var(--text); font-size:18px; }
+    .modal {
+      width:min(980px,96vw); max-height:92vh; overflow:auto; border-radius:14px;
+      background:linear-gradient(180deg,#ffffff,#fbfdff); padding:18px; border:1px solid var(--border); box-shadow: 0 30px 80px rgba(10,20,60,0.25);
+    }
+    .modal h3 { margin:0; font-size:18px; color:#042a57; }
+    .modal .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap; }
 
-    /* responsive tweaks */
-    @media (max-width:900px) {
+    /* ===== MISC ===== */
+    .muted { color:var(--muted); font-size:13px; }
+    .info-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .hidden { display:none !important; }
+    @media (max-width:900px){
       .topbar .title { font-size:14px; }
       .logo { width:40px; height:40px; font-size:14px; }
       #reportTable { display:none; }
@@ -176,13 +168,13 @@
     </div>
 
     <div class="actions">
-      <!-- Pill bulan: hanya muncul di halaman LAPORAN -->
+      <!-- Pill bulan: akan ditampilkan hanya pada halaman LAPORAN -->
       <div id="judulBulanDesktop" class="pill" style="display:none;" title="Klik untuk memilih bulan laporan" onclick="document.getElementById('FilterBulan')?.focus();">
         BULAN -
       </div>
 
-      <!-- Buttons (toggled by showPage) -->
-      <button id="btnLaporan" class="btn" onclick="showPage('laporan')">LAPORAN</button>
+      <!-- Dua tombol dengan id supaya bisa di-toggle tampilannya -->
+      <button id="btnLaporan" class="btn ghost" onclick="showPage('laporan')">LAPORAN</button>
       <button id="btnInput" class="btn primary" onclick="showPage('input')">INPUT DATA</button>
     </div>
   </div>
@@ -193,81 +185,87 @@
     <div id="pageInput" class="page active">
       <div class="card grid">
 
-        <div>
-          <label for="Tanggal">TANGGAL</label>
-          <input id="Tanggal" type="date" />
+        <!-- LEFT: FORM -->
+        <div class="form-col">
+          <div class="form-section">
+            <label for="Tanggal">TANGGAL</label>
+            <input id="Tanggal" type="date" />
 
-          <div style="display:flex; gap:8px; margin-top:8px;">
-            <div style="flex:1;">
-              <label for="Pelapor">PELAPOR</label>
-              <input id="Pelapor" type="text" placeholder="Nama pelapor"/>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <div style="flex:1;">
+                <label for="Pelapor">PELAPOR</label>
+                <input id="Pelapor" type="text" placeholder="Nama pelapor"/>
+              </div>
+              <div style="width:140px;">
+                <label for="Pukul">PUKUL</label>
+                <input id="Pukul" type="time"/>
+              </div>
             </div>
-            <div style="width:140px;">
-              <label for="Pukul">PUKUL</label>
-              <input id="Pukul" type="time"/>
+
+            <div style="display:flex; gap:8px;">
+              <div style="flex:1;">
+                <label for="Ruang">RUANG</label>
+                <input id="Ruang" type="text" placeholder="Contoh: IGD"/>
+              </div>
+              <div style="width:120px;">
+                <label for="NoLK">NO. LK</label>
+                <input id="NoLK" type="text"/>
+              </div>
             </div>
+
+            <label for="MasalahKegiatan">MASALAH / KEGIATAN</label>
+            <textarea id="MasalahKegiatan" placeholder="Deskripsikan masalah atau kegiatan"></textarea>
+
+            <label for="Tindakan">TINDAKAN</label>
+            <textarea id="Tindakan" placeholder="Tindakan yang dilakukan"></textarea>
+
+            <div class="smallnote">* Jika ada penggantian spare part/unit baru.</div>
           </div>
-
-          <div style="display:flex; gap:8px;">
-            <div style="flex:1;">
-              <label for="Ruang">RUANG</label>
-              <input id="Ruang" type="text" placeholder="Contoh: IGD"/>
-            </div>
-            <div style="width:120px;">
-              <label for="NoLK">NO. LK</label>
-              <input id="NoLK" type="text"/>
-            </div>
-          </div>
-
-          <label for="MasalahKegiatan">MASALAH / KEGIATAN</label>
-          <textarea id="MasalahKegiatan" placeholder="Deskripsikan masalah atau kegiatan"></textarea>
-
-          <label for="Tindakan">TINDAKAN</label>
-          <textarea id="Tindakan" placeholder="Tindakan yang dilakukan"></textarea>
-
-          <div class="smallnote">* Jika ada penggantian spare part/unit baru.</div>
         </div>
 
+        <!-- RIGHT: DETAIL & SIMPAN -->
         <div class="panel-right">
-          <label for="Petugas">PETUGAS</label>
-          <input id="Petugas" type="text"/>
+          <div class="form-section">
+            <label for="Petugas">PETUGAS</label>
+            <input id="Petugas" type="text"/>
 
-          <label for="Status">SELESAI / BELUM</label>
-          <select id="Status">
-            <option value="">-- pilih --</option>
-            <option value="SELESAI">SELESAI</option>
-            <option value="BELUM">BELUM</option>
-          </select>
+            <label for="Status">SELESAI / BELUM</label>
+            <select id="Status">
+              <option value="">-- pilih --</option>
+              <option value="SELESAI">SELESAI</option>
+              <option value="BELUM">BELUM</option>
+            </select>
 
-          <label for="Keterangan">KETERANGAN (tambahan)</label>
-          <input id="Keterangan" type="text"/>
+            <label for="Keterangan">KETERANGAN (tambahan)</label>
+            <input id="Keterangan" type="text"/>
 
-          <label for="Kategori">KATEGORI</label>
-          <input id="Kategori" type="text"/>
+            <label for="Kategori">KATEGORI</label>
+            <input id="Kategori" type="text"/>
 
-          <label for="AreaKerja">AREA KERJA</label>
-          <input id="AreaKerja" type="text"/>
+            <label for="AreaKerja">AREA KERJA</label>
+            <input id="AreaKerja" type="text"/>
 
-          <label for="Item">ITEM</label>
-          <input id="Item" type="text"/>
+            <label for="Item">ITEM</label>
+            <input id="Item" type="text"/>
 
-          <div style="display:flex; gap:8px; margin-top:10px;">
-            <div style="flex:1;">
-              <label for="SparePartUnit">SPARE PART / UNIT</label>
-              <input id="SparePartUnit" type="text"/>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <div style="flex:1;">
+                <label for="SparePartUnit">SPARE PART / UNIT</label>
+                <input id="SparePartUnit" type="text"/>
+              </div>
+              <div style="width:110px;">
+                <label for="Type">TYPE</label>
+                <input id="Type" type="text"/>
+              </div>
+              <div style="width:100px;">
+                <label for="Jumlah">JUMLAH</label>
+                <input id="Jumlah" type="number" min="0"/>
+              </div>
             </div>
-            <div style="width:110px;">
-              <label for="Type">TYPE</label>
-              <input id="Type" type="text"/>
-            </div>
-            <div style="width:100px;">
-              <label for="Jumlah">JUMLAH</label>
-              <input id="Jumlah" type="number" min="0"/>
-            </div>
+
+            <div class="big-save" onclick="saveData()">SIMPAN DATA BARU (SHIFT)</div>
+            <div id="msg" class="muted" style="margin-top:8px;"></div>
           </div>
-
-          <div class="big-save" onclick="saveData()">SIMPAN DATA BARU (SHIFT)</div>
-          <div id="msg" class="muted" style="margin-top:8px;"></div>
         </div>
 
       </div>
@@ -279,15 +277,15 @@
 
         <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
           <div>
-            <div style="font-weight:800; font-size:18px; color:var(--text);">LAPORAN HARIAN IPSRS (SHIFT)</div>
-            <div class="muted" style="margin-top:6px; display:flex; gap:8px; align-items:center;">
+            <div style="font-weight:800; font-size:18px; color:#042a57;">LAPORAN HARIAN IPSRS (SHIFT)</div>
+            <div class="info-row" style="margin-top:6px;">
               <div id="infoBulanPill" class="pill">Bulan: -</div>
               <div id="infoTotalPill" class="pill">Total: 0</div>
             </div>
           </div>
 
           <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn" onclick="toggleRekap()">REKAP</button>
+            <button class="btn ghost" onclick="toggleRekap()">REKAP</button>
             <button class="btn" onclick="sortUp()">UP</button>
             <button class="btn" onclick="sortDown()">DOWN</button>
             <button class="btn primary" onclick="showPage('input')">INPUT DATA</button>
@@ -296,12 +294,12 @@
 
         <div class="filters" style="margin-top:12px;">
           <div style="display:flex; gap:8px; align-items:center;">
-            <b style="color:var(--muted)">BULAN</b>
+            <b>BULAN</b>
             <select id="FilterBulan" onchange="loadReportsBySelectedMonth()"></select>
           </div>
 
           <div style="display:flex; gap:8px; align-items:center;">
-            <b style="color:var(--muted)">SLSI/BLM/KET</b>
+            <b>SLSI/BLM/KET</b>
             <select id="FilterStatus" onchange="applyFilters()">
               <option value="ALL">SEMUA DATA</option>
               <option value="SELESAI">SELESAI</option>
@@ -310,21 +308,21 @@
           </div>
 
           <div style="display:flex; gap:8px; align-items:center;">
-            <b style="color:var(--muted)">KATEGORI</b>
+            <b>KATEGORI</b>
             <select id="FilterKategori" onchange="applyFilters()">
               <option value="ALL">SEMUA DATA</option>
             </select>
           </div>
 
           <div style="display:flex; gap:8px; align-items:center;">
-            <b style="color:var(--muted)">AREA KERJA</b>
+            <b>AREA KERJA</b>
             <select id="FilterAreaKerja" onchange="applyFilters()">
               <option value="ALL">SEMUA DATA</option>
             </select>
           </div>
 
           <div style="display:flex; gap:8px; align-items:center;">
-            <b style="color:var(--muted)">ITEM</b>
+            <b>ITEM</b>
             <select id="FilterItem" onchange="applyFilters()">
               <option value="ALL">SEMUA DATA</option>
             </select>
@@ -334,7 +332,7 @@
         <div class="muted" style="margin-top:10px;">✅ Klik baris atau kartu laporan untuk <b>Edit</b> (Popup). Data tetap tersimpan di Google Sheet.</div>
 
         <div style="overflow:auto; margin-top:12px;">
-          <table id="reportTable" role="grid" aria-label="Laporan IPSRS">
+          <table id="reportTable">
             <thead>
               <tr>
                 <th style="width:46px;">NO</th>
@@ -354,11 +352,11 @@
             <tbody></tbody>
           </table>
 
-          <!-- Mobile card list -->
+          <!-- Mobile card list shown on small screens -->
           <div id="mobileList"></div>
         </div>
 
-        <!-- REKAP -->
+        <!-- PANEL REKAP -->
         <div id="panelRekap" style="display:none;">
           <b>REKAP SPARE PART / UNIT (AUTO SUM JUMLAH)</b>
           <div class="smallnote">Rekap dihitung dari data yang sedang tampil (sesuai filter).</div>
@@ -455,9 +453,9 @@
             </div>
           </div>
 
-          <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+          <div class="modal-actions">
             <button class="btn primary" onclick="saveEdit()">SIMPAN UPDATE</button>
-            <button class="btn" onclick="closeModal()">BATAL</button>
+            <button class="btn ghost" onclick="closeModal()">BATAL</button>
           </div>
           <div id="msgEdit" class="muted" style="margin-top:8px;"></div>
         </div>
@@ -466,7 +464,7 @@
   </div>
 
 <script>
-  // ✅ API URL (Google Apps Script Web App)
+  // API URL (Google Apps Script Web App)
   const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
 
   // GLOBAL
@@ -475,17 +473,21 @@
   let sortMode = "DOWN";
 
   // UTIL
-  function setMsg(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
+  function setMsg(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+  }
 
   function showPage(name) {
+    // tampilkan halaman yang dipilih
     document.getElementById("pageInput").style.display = (name === "input") ? "" : "none";
     document.getElementById("pageLaporan").style.display = (name === "laporan") ? "" : "none";
 
-    // pill bulan only for laporan
+    // Tampilkan pill bulan hanya ketika berada di halaman laporan
     const pill = document.getElementById("judulBulanDesktop");
     if (pill) pill.style.display = (name === "laporan") ? "inline-block" : "none";
 
-    // toggle header buttons
+    // Toggle tombol header: jika di halaman input -> tampilkan hanya tombol LAPORAN; jika di laporan -> tampilkan hanya tombol INPUT DATA
     const btnLaporan = document.getElementById("btnLaporan");
     const btnInput = document.getElementById("btnInput");
     if (btnLaporan && btnInput) {
@@ -498,6 +500,7 @@
       }
     }
 
+    // jika halaman laporan, load data sesuai bulan yang dipilih
     if (name === "laporan") loadReportsBySelectedMonth();
   }
 
@@ -518,10 +521,17 @@
     const month = yyyymm.substring(5,7);
     const nama = bulanNama[month] || yyyymm;
     const label = `BULAN ${nama} ${year}`;
-    const info = document.getElementById("infoBulanPill");
-    if (info) info.innerText = `Bulan: ${nama} ${year}`;
-    const top = document.getElementById("judulBulanDesktop");
-    if (top) { top.innerText = label; top.title = "Menampilkan laporan untuk " + nama + " " + year; }
+
+    // update pill di laporan area
+    const b = document.getElementById("infoBulanPill");
+    if (b) b.innerText = `Bulan: ${nama} ${year}`;
+
+    // update pill di topbar (jika ada)
+    const dd = document.getElementById("judulBulanDesktop");
+    if (dd) {
+      dd.innerText = label;
+      dd.title = "Menampilkan laporan untuk " + nama + " " + year + " — klik untuk pilih bulan";
+    }
   }
 
   function buildMonthOptions() {
@@ -543,7 +553,11 @@
   }
 
   function normalizeText(x) { return (x || "").toString().trim(); }
-  function toDateKey(tanggalStr) { const t = normalizeText(tanggalStr); if (t.length >= 10) return t.substring(0,10).replaceAll("-",""); return "00000000"; }
+  function toDateKey(tanggalStr) {
+    const t = normalizeText(tanggalStr);
+    if (t.length >= 10) return t.substring(0,10).replaceAll("-","");
+    return "00000000";
+  }
 
   // INPUT SAVE
   function getInputPayload() {
@@ -577,6 +591,7 @@
       const json = await res.json();
       if (json.ok) {
         setMsg("msg", "✅ Data tersimpan. ID: " + json.id);
+        // tidak merubah tampilan header (bulan) karena input tidak perlu menunjukkan bulan
         clearInputForm();
       } else {
         setMsg("msg", "❌ Gagal: " + json.msg);
@@ -586,7 +601,9 @@
     }
   }
 
-  function clearInputForm() { document.querySelectorAll("#pageInput input, #pageInput textarea, #pageInput select").forEach(el => el.value = ""); }
+  function clearInputForm() {
+    document.querySelectorAll("#pageInput input, #pageInput textarea, #pageInput select").forEach(el => el.value = "");
+  }
 
   // LOAD REPORT
   async function loadReportsBySelectedMonth() {
@@ -596,7 +613,9 @@
       setMsg("msgReport", "Memuat laporan bulan " + bulan + " ...");
       const res = await fetch(API_URL + "?action=get&bulan=" + bulan);
       const json = await res.json();
-      if (!json.ok) { rawData = []; viewData = []; renderReportTable(); setMsg("msgReport", "❌ Gagal load: " + json.msg); return; }
+      if (!json.ok) {
+        rawData = []; viewData = []; renderReportTable(); setMsg("msgReport", "❌ Gagal load: " + json.msg); return;
+      }
       rawData = (json.data || []).map(x => {
         x.ID = normalizeText(x.ID); x.Tanggal = normalizeText(x.Tanggal); x.Pelapor = normalizeText(x.Pelapor);
         x.Ruang = normalizeText(x.Ruang); x.Pukul = normalizeText(x.Pukul); x.NoLK = normalizeText(x.NoLK);
@@ -614,17 +633,36 @@
   }
 
   // FILTERS
-  function uniqueSorted(arr) { const set = new Set(arr.filter(x => normalizeText(x) !== "")); return Array.from(set).sort((a,b) => a.localeCompare(b)); }
+  function uniqueSorted(arr) {
+    const set = new Set(arr.filter(x => normalizeText(x) !== ""));
+    return Array.from(set).sort((a,b) => a.localeCompare(b));
+  }
 
-  function escapeHtml(text) { return (text || "").toString().replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
+  function escapeHtml(text) {
+    return (text || "").toString()
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
 
   function buildFilterOptionsFromData(data) {
     const kategoriList = uniqueSorted(data.map(x => x.Kategori));
     const areaList = uniqueSorted(data.map(x => x.AreaKerja));
     const itemList = uniqueSorted(data.map(x => x.Item));
-    const fk = document.getElementById("FilterKategori"); fk.innerHTML = `<option value="ALL">SEMUA DATA</option>`; kategoriList.forEach(v => fk.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
-    const fa = document.getElementById("FilterAreaKerja"); fa.innerHTML = `<option value="ALL">SEMUA DATA</option>`; areaList.forEach(v => fa.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
-    const fi = document.getElementById("FilterItem"); fi.innerHTML = `<option value="ALL">SEMUA DATA</option>`; itemList.forEach(v => fi.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+
+    const fk = document.getElementById("FilterKategori");
+    fk.innerHTML = `<option value="ALL">SEMUA DATA</option>`;
+    kategoriList.forEach(v => fk.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+
+    const fa = document.getElementById("FilterAreaKerja");
+    fa.innerHTML = `<option value="ALL">SEMUA DATA</option>`;
+    areaList.forEach(v => fa.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+
+    const fi = document.getElementById("FilterItem");
+    fi.innerHTML = `<option value="ALL">SEMUA DATA</option>`;
+    itemList.forEach(v => fi.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+
     document.getElementById("FilterStatus").value = "ALL";
   }
 
@@ -633,6 +671,7 @@
     const kategori = document.getElementById("FilterKategori").value;
     const area = document.getElementById("FilterAreaKerja").value;
     const item = document.getElementById("FilterItem").value;
+
     viewData = rawData.filter(x => {
       let ok = true;
       if (status !== "ALL") ok = ok && (x.Status.toUpperCase() === status);
@@ -641,20 +680,29 @@
       if (item !== "ALL") ok = ok && (x.Item === item);
       return ok;
     });
+
     applySort();
     renderReportTable();
     renderRekap();
   }
 
   // SORT
-  function applySort() { viewData.sort((a,b) => { const ka = toDateKey(a.Tanggal); const kb = toDateKey(b.Tanggal); return (sortMode === "UP") ? ka.localeCompare(kb) : kb.localeCompare(ka); }); }
+  function applySort() {
+    viewData.sort((a,b) => {
+      const ka = toDateKey(a.Tanggal); const kb = toDateKey(b.Tanggal);
+      if (sortMode === "UP") return ka.localeCompare(kb);
+      return kb.localeCompare(ka);
+    });
+  }
   function sortUp(){ sortMode = "UP"; applyFilters(); }
   function sortDown(){ sortMode = "DOWN"; applyFilters(); }
 
-  // RENDER
+  // RENDER TABLE / MOBILE LIST
   function renderReportTable() {
-    const tbody = document.querySelector("#reportTable tbody"); tbody.innerHTML = "";
+    const tbody = document.querySelector("#reportTable tbody");
+    tbody.innerHTML = "";
     document.getElementById("infoTotalPill").innerText = `Total: ${viewData.length}`;
+
     viewData.forEach((row, idx) => {
       const tr = document.createElement("tr");
       const statusClass = (row.Status.toUpperCase() === 'BELUM') ? 'status-pending' : (row.Status ? 'status-done' : '');
@@ -675,31 +723,38 @@
       tr.onclick = () => openEditModal(row);
       tbody.appendChild(tr);
     });
+
+    // Render mobile cards if screen small
     renderMobileList();
     setMsg("msgReport", "✅ Data tampil: " + viewData.length);
   }
 
   function renderMobileList() {
-    const list = document.getElementById("mobileList"); list.innerHTML = "";
+    const list = document.getElementById("mobileList");
+    list.innerHTML = "";
     if (window.innerWidth > 900) { list.style.display = "none"; document.getElementById("reportTable").style.display = ""; return; }
-    document.getElementById("reportTable").style.display = "none"; list.style.display = "block";
+    // mobile
+    document.getElementById("reportTable").style.display = "none";
+    list.style.display = "block";
+
     viewData.forEach((r, idx) => {
-      const div = document.createElement("div"); div.className = "card-item";
+      const div = document.createElement("div");
+      div.className = "card-item";
       const statusClass = (r.Status.toUpperCase() === 'BELUM') ? 'status-pending' : (r.Status ? 'status-done' : '');
       div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="row">
           <div>
             <div style="font-size:13px; color:var(--muted)">#${idx+1} • ${escapeHtml(r.Tanggal)}</div>
             <div class="title">${escapeHtml(r.Pelapor)} ${r.Ruang ? '• '+escapeHtml(r.Ruang) : ''}</div>
             <div class="meta">${r.NoLK ? '[NO. LK: '+escapeHtml(r.NoLK)+']' : ''}</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:13px;"><span class="status-badge ${statusClass}">${escapeHtml(r.Status || '')}</span></div>
+            <div style="font-size:13px;" class="${statusClass ? '' : 'muted'}"><span class="status-badge ${statusClass}">${escapeHtml(r.Status || '')}</span></div>
             <div class="muted" style="margin-top:8px;">${escapeHtml(r.Item || '')}</div>
           </div>
         </div>
         <div class="desc">${escapeHtml(r.MasalahKegiatan || '')}</div>
-        <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+        <div class="card-actions">
           <button class="btn" onclick="openEditModalFromCard(event, '${escapeHtml(r.ID)}')">Edit</button>
         </div>
       `;
@@ -708,36 +763,67 @@
   }
 
   // REKAP
-  function toggleRekap() { const p = document.getElementById("panelRekap"); if (p.style.display === "none" || p.style.display === "") { p.style.display = "block"; renderRekap(); } else { p.style.display = "none"; } }
+  function toggleRekap() {
+    const p = document.getElementById("panelRekap");
+    if (p.style.display === "none" || p.style.display === "") { p.style.display = "block"; renderRekap(); } else { p.style.display = "none"; }
+  }
   function renderRekap() {
-    const tbody = document.querySelector("#rekapTable tbody"); tbody.innerHTML = "";
+    const tbody = document.querySelector("#rekapTable tbody");
+    tbody.innerHTML = "";
     const map = new Map();
     viewData.forEach(r => {
-      const spare = normalizeText(r.SparePartUnit); const type = normalizeText(r.Type);
-      const jumlah = parseFloat(r.Jumlah || "0") || 0; if (spare === "" && type === "" && jumlah === 0) return;
-      const key = spare + "||" + type; const prev = map.get(key) || 0; map.set(key, prev + jumlah);
+      const spare = normalizeText(r.SparePartUnit);
+      const type = normalizeText(r.Type);
+      const jumlah = parseFloat(r.Jumlah || "0") || 0;
+      if (spare === "" && type === "" && jumlah === 0) return;
+      const key = spare + "||" + type;
+      const prev = map.get(key) || 0;
+      map.set(key, prev + jumlah);
     });
-    const arr = Array.from(map.entries()).map(([key, total]) => { const [spare, type] = key.split("||"); return { spare, type, total }; });
+    const arr = Array.from(map.entries()).map(([key, total]) => {
+      const [spare, type] = key.split("||");
+      return { spare, type, total };
+    });
     arr.sort((a,b) => b.total - a.total);
-    arr.forEach(x => { const tr = document.createElement("tr"); tr.innerHTML = `<td>${escapeHtml(x.spare)}</td><td style="text-align:center;">${escapeHtml(x.type)}</td><td style="text-align:center;"><b>${x.total}</b></td>`; tbody.appendChild(tr); });
+    arr.forEach(x => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${escapeHtml(x.spare)}</td><td style="text-align:center;">${escapeHtml(x.type)}</td><td style="text-align:center;"><b>${x.total}</b></td>`;
+      tbody.appendChild(tr);
+    });
   }
 
   // EDIT MODAL
   function openEditModal(row) {
-    const r = row; document.getElementById("modalBg").classList.add("show"); setMsg("msgEdit", "");
-    document.getElementById("Edit_ID").value = r.ID || ""; document.getElementById("EditID").innerText = r.ID || "-";
+    const r = row;
+    document.getElementById("modalBg").classList.add("show");
+    setMsg("msgEdit", "");
+    document.getElementById("Edit_ID").value = r.ID || "";
+    document.getElementById("EditID").innerText = r.ID || "-";
     document.getElementById("EditSheet").innerText = r._Sheet ? "Sheet: " + r._Sheet : "Sheet: (bulan)";
-    document.getElementById("Edit_Tanggal").value = r.Tanggal || ""; document.getElementById("Edit_Pelapor").value = r.Pelapor || "";
-    document.getElementById("Edit_Ruang").value = r.Ruang || ""; document.getElementById("Edit_Pukul").value = r.Pukul || "";
-    document.getElementById("Edit_NoLK").value = r.NoLK || ""; document.getElementById("Edit_MasalahKegiatan").value = r.MasalahKegiatan || "";
-    document.getElementById("Edit_Tindakan").value = r.Tindakan || ""; document.getElementById("Edit_Petugas").value = r.Petugas || "";
-    document.getElementById("Edit_Status").value = r.Status || ""; document.getElementById("Edit_Keterangan").value = r.Keterangan || "";
-    document.getElementById("Edit_Kategori").value = r.Kategori || ""; document.getElementById("Edit_AreaKerja").value = r.AreaKerja || "";
-    document.getElementById("Edit_Item").value = r.Item || ""; document.getElementById("Edit_SparePartUnit").value = r.SparePartUnit || "";
-    document.getElementById("Edit_Type").value = r.Type || ""; document.getElementById("Edit_Jumlah").value = r.Jumlah || "";
+    document.getElementById("Edit_Tanggal").value = r.Tanggal || "";
+    document.getElementById("Edit_Pelapor").value = r.Pelapor || "";
+    document.getElementById("Edit_Ruang").value = r.Ruang || "";
+    document.getElementById("Edit_Pukul").value = r.Pukul || "";
+    document.getElementById("Edit_NoLK").value = r.NoLK || "";
+    document.getElementById("Edit_MasalahKegiatan").value = r.MasalahKegiatan || "";
+    document.getElementById("Edit_Tindakan").value = r.Tindakan || "";
+    document.getElementById("Edit_Petugas").value = r.Petugas || "";
+    document.getElementById("Edit_Status").value = r.Status || "";
+    document.getElementById("Edit_Keterangan").value = r.Keterangan || "";
+    document.getElementById("Edit_Kategori").value = r.Kategori || "";
+    document.getElementById("Edit_AreaKerja").value = r.AreaKerja || "";
+    document.getElementById("Edit_Item").value = r.Item || "";
+    document.getElementById("Edit_SparePartUnit").value = r.SparePartUnit || "";
+    document.getElementById("Edit_Type").value = r.Type || "";
+    document.getElementById("Edit_Jumlah").value = r.Jumlah || "";
   }
 
-  function openEditModalFromCard(e, id) { e.stopPropagation(); const row = viewData.find(x => x.ID === id) || rawData.find(x => x.ID === id); if (row) openEditModal(row); }
+  function openEditModalFromCard(e, id) {
+    e.stopPropagation();
+    const row = viewData.find(x => x.ID === id) || rawData.find(x => x.ID === id);
+    if (row) openEditModal(row);
+  }
+
   function closeModal() { document.getElementById("modalBg").classList.remove("show"); }
 
   async function saveEdit() {
@@ -766,20 +852,31 @@
       if (!payload.ID) { setMsg("msgEdit", "❌ ID kosong, tidak bisa update."); return; }
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
       const json = await res.json();
-      if (json.ok) { setMsg("msgEdit", "✅ Update berhasil"); closeModal(); loadReportsBySelectedMonth(); }
-      else setMsg("msgEdit", "❌ Gagal: " + json.msg);
-    } catch (err) { setMsg("msgEdit", "❌ Error: " + err.message); }
+      if (json.ok) {
+        setMsg("msgEdit", "✅ Update berhasil");
+        closeModal();
+        loadReportsBySelectedMonth();
+      } else {
+        setMsg("msgEdit", "❌ Gagal: " + json.msg);
+      }
+    } catch (err) {
+      setMsg("msgEdit", "❌ Error: " + err.message);
+    }
   }
 
-  // modal background close
-  document.getElementById("modalBg").addEventListener("click", function(e){ if (e.target.id === "modalBg") closeModal(); });
+  // close modal if click background
+  document.getElementById("modalBg").addEventListener("click", function(e){
+    if (e.target.id === "modalBg") closeModal();
+  });
 
-  // responsive re-render
-  window.addEventListener("resize", () => { renderReportTable(); });
+  // rerender mobile list on resize
+  window.addEventListener("resize", () => {
+    renderReportTable();
+  });
 
-  // INIT
+  // INIT: bangun daftar bulan, lalu atur halaman awal input (header disesuaikan)
   buildMonthOptions();
-  // start on input page (header shows only LAPORAN)
+  // set initial view to input page (header tombol akan tampil sesuai permintaan)
   showPage('input');
 
 </script>
