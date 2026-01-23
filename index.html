@@ -14,6 +14,7 @@
       --bg:#f5f7fb;
       --card:#ffffff;
       --accent:#0a69b8;
+      --accent-2:#24a0ff;
       --muted:#6b7280;
       --success:#1f9d55;
       --danger:#e02424;
@@ -47,7 +48,7 @@
       display:flex; gap:12px; align-items:center;
     }
     .logo {
-      width:46px; height:46px; border-radius:10px; background:linear-gradient(135deg,var(--accent),#24a0ff);
+      width:46px; height:46px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2));
       display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:16px; box-shadow: var(--shadow);
     }
     .topbar .title {
@@ -55,17 +56,55 @@
     }
     .topbar .subtitle { font-size:12px; color:var(--muted); margin-top:2px; }
 
+    /* New: action container (glass panel) to make buttons clearer */
+    .action-panel {
+      display:flex; gap:8px; align-items:center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+      padding:6px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);
+      box-shadow: 0 6px 20px rgba(10,20,60,0.06);
+      backdrop-filter: blur(6px);
+    }
+
     .topbar .actions { display:flex; gap:8px; align-items:center; }
 
     .btn {
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 12px; border-radius:10px; background:var(--card); border:1px solid var(--border);
-      cursor:pointer; font-weight:600; color:#062b57; box-shadow:none;
+      cursor:pointer; font-weight:700; color:#062b57; box-shadow:none; font-size:13px;
+      transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
     }
-    .btn:hover{ transform:translateY(-1px); }
-    .btn.primary { background: linear-gradient(90deg,var(--accent),#24a0ff); color:#fff; border:0; box-shadow: 0 6px 18px rgba(10,120,220,0.12); }
-    .btn.ghost { background:transparent; border:1px dashed rgba(0,0,0,0.06); color:var(--muted); }
-    .pill { background:var(--card); border-radius:999px; padding:6px 10px; font-size:13px; border:1px solid var(--border); color:var(--muted); }
+    .btn:hover{ transform:translateY(-3px); box-shadow: 0 10px 26px rgba(10,30,80,0.08); }
+    .btn:active{ transform:translateY(-1px); }
+
+    .btn.primary {
+      background: linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:#fff; border:0; box-shadow: 0 10px 28px rgba(10,120,220,0.12);
+    }
+    .btn.ghost {
+      background:transparent;
+      border:1px solid rgba(10,20,40,0.06);
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    /* icon style */
+    .btn svg { width:16px; height:16px; display:block; fill:currentColor; opacity:0.95; }
+    .btn.icon-left { padding-left:10px; }
+    .pill { background:var(--card); border-radius:999px; padding:6px 12px; font-size:13px; border:1px solid var(--border); color:var(--muted); font-weight:700; }
+
+    /* group for laporan toolbar inside card (report page) */
+    .report-toolbar {
+      display:inline-flex; gap:8px; align-items:center;
+      background: linear-gradient(180deg, #ffffff, #fbfdff);
+      padding:6px; border-radius:12px; border:1px solid rgba(10,20,40,0.04);
+      box-shadow: 0 8px 24px rgba(10,20,60,0.04);
+    }
+    .btn-group .btn { border-radius:10px; padding:8px 10px; font-size:13px; }
+
+    /* small subtle badges / labels */
+    .pill.accent {
+      border:0; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; box-shadow: 0 6px 18px rgba(10,120,220,0.09);
+    }
 
     /* ===== LAYOUT ===== */
     .container { max-width:1100px; margin:18px auto; padding:0 14px; }
@@ -168,14 +207,25 @@
     </div>
 
     <div class="actions">
-      <!-- Pill bulan: akan ditampilkan hanya pada halaman LAPORAN -->
-      <div id="judulBulanDesktop" class="pill" style="display:none;" title="Klik untuk memilih bulan laporan" onclick="document.getElementById('FilterBulan')?.focus();">
-        BULAN -
-      </div>
+      <!-- Action panel makes laporan buttons clearer & elegant -->
+      <div class="action-panel" role="toolbar" aria-label="Aksi">
+        <!-- Pill bulan: akan ditampilkan hanya pada halaman LAPORAN -->
+        <div id="judulBulanDesktop" class="pill" style="display:none; cursor:pointer;" title="Klik untuk memilih bulan laporan" onclick="document.getElementById('FilterBulan')?.focus();">
+          BULAN -
+        </div>
 
-      <!-- Dua tombol dengan id supaya bisa di-toggle tampilannya -->
-      <button id="btnLaporan" class="btn ghost" onclick="showPage('laporan')">LAPORAN</button>
-      <button id="btnInput" class="btn primary" onclick="showPage('input')">INPUT DATA</button>
+        <!-- Dua tombol dengan id supaya bisa di-toggle tampilannya -->
+        <!-- Added small inline SVG icons for clarity -->
+        <button id="btnLaporan" class="btn ghost icon-left" onclick="showPage('laporan')" title="Lihat Laporan">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4v-2H3v2zm0 4h10v-2H3v2zM3 7h16V5H3v2zm18 6h-6v6h2v-4h4v-2z"/></svg>
+          LAPORAN
+        </button>
+
+        <button id="btnInput" class="btn primary icon-left" onclick="showPage('input')" title="Input Data Baru" style="display:none;">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8z"/></svg>
+          INPUT DATA
+        </button>
+      </div>
     </div>
   </div>
 
@@ -276,10 +326,24 @@
           </div>
 
           <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn ghost" onclick="toggleRekap()">REKAP</button>
-            <button class="btn" onclick="sortUp()">UP</button>
-            <button class="btn" onclick="sortDown()">DOWN</button>
-            <button class="btn primary" onclick="showPage('input')">INPUT DATA</button>
+            <div class="report-toolbar btn-group" role="toolbar" aria-label="Laporan controls">
+              <button class="btn ghost" onclick="toggleRekap()" title="Rekap Spare/Unit">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h18v-2H3v2zm0 4h10v-2H3v2zM3 7h18V5H3v2z"/></svg>
+                REKAP
+              </button>
+              <button class="btn" onclick="sortUp()" title="Urutkan naik">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14l5-5 5 5z"/></svg>
+                UP
+              </button>
+              <button class="btn" onclick="sortDown()" title="Urutkan turun">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>
+                DOWN
+              </button>
+              <button class="btn primary" onclick="showPage('input')" title="Tambah data baru">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8z"/></svg>
+                INPUT DATA
+              </button>
+            </div>
           </div>
         </div>
 
@@ -371,7 +435,7 @@
 
   </div>
 
-  <!-- MODAL EDIT -->
+  <!-- MODAL EDIT (unchanged layout/ids) -->
   <div id="modalBg" class="modal-bg" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <h3 id="modalTitle">EDIT LAPORAN</h3>
@@ -382,8 +446,7 @@
 
       <input type="hidden" id="Edit_ID" />
 
-      <!-- Changed to single-column modal form; only Pukul + NoLK kept side-by-side -->
-      <div class="grid" style="margin-top:12px; grid-template-columns: 1fr; gap:12px;">
+      <div class="grid" style="margin-top:12px; grid-template-columns: 1fr 1fr; gap:12px;">
         <div>
           <label>TANGGAL</label>
           <input type="date" id="Edit_Tanggal"/>
@@ -394,23 +457,20 @@
           <label>RUANG</label>
           <input type="text" id="Edit_Ruang"/>
 
-          <div style="display:flex; gap:8px; margin-top:6px;">
-            <div style="width:140px;">
-              <label>PUKUL</label>
-              <input type="time" id="Edit_Pukul"/>
-            </div>
-            <div style="width:120px;">
-              <label>NO. LK</label>
-              <input type="text" id="Edit_NoLK"/>
-            </div>
-          </div>
+          <label>PUKUL</label>
+          <input type="time" id="Edit_Pukul"/>
+
+          <label>NO. LK</label>
+          <input type="text" id="Edit_NoLK"/>
 
           <label>MASALAH / KEGIATAN</label>
           <textarea id="Edit_MasalahKegiatan"></textarea>
 
           <label>TINDAKAN</label>
           <textarea id="Edit_Tindakan"></textarea>
+        </div>
 
+        <div>
           <label>PETUGAS</label>
           <input type="text" id="Edit_Petugas"/>
 
@@ -433,17 +493,22 @@
           <label>ITEM</label>
           <input type="text" id="Edit_Item"/>
 
-          <!-- Spare/Type/Jumlah separated (not grouped) -->
-          <label>SPARE PART / UNIT</label>
-          <input type="text" id="Edit_SparePartUnit"/>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <div style="flex:1;">
+              <label>SPARE PART / UNIT</label>
+              <input type="text" id="Edit_SparePartUnit"/>
+            </div>
+            <div style="width:110px;">
+              <label>TYPE</label>
+              <input type="text" id="Edit_Type"/>
+            </div>
+            <div style="width:100px;">
+              <label>JUMLAH</label>
+              <input type="number" id="Edit_Jumlah"/>
+            </div>
+          </div>
 
-          <label>TYPE</label>
-          <input type="text" id="Edit_Type"/>
-
-          <label>JUMLAH</label>
-          <input type="number" id="Edit_Jumlah"/>
-
-          <div class="modal-actions" style="margin-top:12px;">
+          <div class="modal-actions">
             <button class="btn primary" onclick="saveEdit()">SIMPAN UPDATE</button>
             <button class="btn ghost" onclick="closeModal()">BATAL</button>
           </div>
