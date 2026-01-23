@@ -3,116 +3,271 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>IPRS SHIFT - RS Puri Cinere</title>
+  <title>INPUT LAPORAN HARIAN IPSRS (SHIFT)</title>
+
   <style>
-    body { font-family: Arial, sans-serif; background:#f6f6f6; padding: 15px; }
-    .box { background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; }
-    label { display:block; margin-top:8px; font-weight: bold; }
-    input, textarea, select { width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:5px; }
-    button { padding:10px 15px; margin-top:10px; cursor:pointer; border:none; border-radius:5px; font-weight:bold; }
-    .btn-save { background:#2ecc71; color:#fff; }
-    .btn-update { background:#3498db; color:#fff; }
-    .btn-refresh { background:#555; color:#fff; }
+    body { font-family: Arial, sans-serif; background:#f6f6f6; margin:0; padding:0; }
+
+    /* ===== HEADER ===== */
+    .topbar {
+      background:#dff0d8;
+      border-bottom:3px solid #000;
+      padding:12px 15px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .topbar .left {
+      font-weight:bold;
+      font-size:18px;
+      color:#1a7d2b;
+    }
+    .topbar .center {
+      text-align:center;
+      flex:1;
+      font-weight:bold;
+      color:#1a7d2b;
+      font-size:18px;
+      line-height:1.2;
+    }
+    .topbar .right {
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .btn {
+      padding:10px 16px;
+      border:2px solid #000;
+      border-radius:3px;
+      cursor:pointer;
+      font-weight:bold;
+      background:#fff;
+    }
+    .btn-blue { background:#e6f0ff; }
+    .btn-red { background:#ffd6d6; }
+
+    /* ===== LAYOUT ===== */
+    .container { padding:15px; }
+    .page { display:none; }
+    .page.active { display:block; }
+
+    .box { background:#fff; border:2px solid #000; padding:15px; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+
+    label { display:block; font-weight:bold; margin-top:8px; }
+    input, textarea, select {
+      width:100%;
+      padding:8px;
+      border:1px solid #000;
+      box-sizing:border-box;
+      margin-top:3px;
+    }
+
+    textarea { height:120px; resize:vertical; }
+
+    .big-save {
+      border:2px solid #000;
+      height:220px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:bold;
+      font-size:18px;
+      cursor:pointer;
+      background:#f3f3f3;
+      text-align:center;
+    }
+
+    .smallnote { font-size:12px; color:#333; margin-top:8px; }
+
     table { width:100%; border-collapse:collapse; margin-top:10px; }
-    th, td { border:1px solid #ddd; padding:8px; font-size:13px; }
+    th, td { border:1px solid #000; padding:8px; font-size:13px; }
     th { background:#eee; }
-    tr:hover { background:#f2f2f2; }
-    .small { font-size:12px; color:#666; }
+
+    .row3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top:10px; }
+
+    .actions { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-green { background:#d4ffd4; }
+
+    .status { font-size:12px; margin-top:10px; font-weight:bold; }
   </style>
 </head>
 
 <body>
-  <div class="box">
-    <h2>INPUT LAPORAN HARIAN IPSRS (SHIFT)</h2>
-    <p class="small">RS. Puri Cinere - Data tersimpan ke Google Sheet</p>
 
-    <input type="hidden" id="ID" />
+  <!-- ===== HEADER BAR (ADA TOMBOL LAPORAN) ===== -->
+  <div class="topbar">
+    <div class="left">RUMAH SAKIT PURI CINERE</div>
 
-    <label>TANGGAL</label>
-    <input type="date" id="Tanggal"/>
+    <div class="center">
+      INPUT LAPORAN HARIAN IPSRS (SHIFT)<br>
+      RS. PURI CINERE - <span id="judulBulan">BULAN</span>
+    </div>
 
-    <label>PELAPOR</label>
-    <input type="text" id="Pelapor"/>
-
-    <label>RUANG</label>
-    <input type="text" id="Ruang"/>
-
-    <label>PUKUL</label>
-    <input type="time" id="Pukul"/>
-
-    <label>NO. LK</label>
-    <input type="text" id="NoLK"/>
-
-    <label>MASALAH / KEGIATAN</label>
-    <textarea id="MasalahKegiatan"></textarea>
-
-    <label>TINDAKAN</label>
-    <textarea id="Tindakan"></textarea>
-
-    <label>PETUGAS</label>
-    <input type="text" id="Petugas"/>
-
-    <label>SELESAI / BELUM</label>
-    <select id="Status">
-      <option value="">-- pilih --</option>
-      <option value="SELESAI">SELESAI</option>
-      <option value="BELUM">BELUM</option>
-    </select>
-
-    <label>KETERANGAN</label>
-    <input type="text" id="Keterangan"/>
-
-    <label>KATEGORI</label>
-    <input type="text" id="Kategori"/>
-
-    <label>AREA KERJA</label>
-    <input type="text" id="AreaKerja"/>
-
-    <label>ITEM</label>
-    <input type="text" id="Item"/>
-
-    <label>SPARE PART / UNIT</label>
-    <input type="text" id="SparePartUnit"/>
-
-    <label>TYPE</label>
-    <input type="text" id="Type"/>
-
-    <label>JUMLAH</label>
-    <input type="number" id="Jumlah"/>
-
-    <button class="btn-save" onclick="saveData()">SIMPAN DATA BARU</button>
-    <button class="btn-update" onclick="updateData()">UPDATE DATA (EDIT)</button>
-    <button class="btn-refresh" onclick="loadReports()">REFRESH LAPORAN</button>
-
-    <p class="small" id="msg"></p>
-  </div>
-
-  <div class="box">
-    <h3>LAPORAN (Klik baris untuk Edit)</h3>
-    <div style="overflow:auto;">
-      <table id="reportTable">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Tanggal</th>
-            <th>Ruang</th>
-            <th>Masalah</th>
-            <th>Tindakan</th>
-            <th>Petugas</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div class="right">
+      <button class="btn btn-blue" onclick="showPage('laporan')">LAPORAN</button>
+      <button class="btn btn-red" onclick="showPage('input')">X</button>
     </div>
   </div>
 
+  <div class="container">
+
+    <!-- ===================== PAGE INPUT ===================== -->
+    <div id="pageInput" class="page active">
+      <div class="box">
+
+        <input type="hidden" id="ID" />
+
+        <div class="grid">
+
+          <!-- KIRI -->
+          <div>
+            <label>TANGGAL</label>
+            <input type="date" id="Tanggal"/>
+
+            <label>PELAPOR</label>
+            <input type="text" id="Pelapor"/>
+
+            <label>RUANG</label>
+            <input type="text" id="Ruang"/>
+
+            <label>PUKUL</label>
+            <input type="time" id="Pukul"/>
+
+            <label>NO. LK</label>
+            <input type="text" id="NoLK"/>
+
+            <label>MASALAH / KEGIATAN</label>
+            <textarea id="MasalahKegiatan"></textarea>
+
+            <label>TINDAKAN</label>
+            <textarea id="Tindakan"></textarea>
+
+            <div class="row3">
+              <div>
+                <label>SPARE PART / UNIT</label>
+                <input type="text" id="SparePartUnit"/>
+              </div>
+              <div>
+                <label>TYPE</label>
+                <input type="text" id="Type"/>
+              </div>
+              <div>
+                <label>JUMLAH</label>
+                <input type="number" id="Jumlah"/>
+              </div>
+            </div>
+
+            <div class="smallnote">
+              * Jika ada penggantian spare part baru atau pemasangan unit baru.
+            </div>
+          </div>
+
+          <!-- KANAN -->
+          <div>
+            <label>PETUGAS</label>
+            <input type="text" id="Petugas"/>
+
+            <label>SELESAI / BELUM</label>
+            <select id="Status">
+              <option value="">-- pilih --</option>
+              <option value="SELESAI">SELESAI</option>
+              <option value="BELUM">BELUM</option>
+            </select>
+
+            <label>KETERANGAN (tambahan jika ada/diperlukan)</label>
+            <input type="text" id="Keterangan"/>
+
+            <label>KATEGORI</label>
+            <input type="text" id="Kategori"/>
+
+            <label>AREA KERJA</label>
+            <input type="text" id="AreaKerja"/>
+
+            <label>ITEM</label>
+            <input type="text" id="Item"/>
+
+            <div style="margin-top:15px;" class="big-save" onclick="saveData()">
+              SIMPAN DATA BARU<br>( SHIFT )
+            </div>
+
+            <div class="actions">
+              <button class="btn btn-green" onclick="updateData()">UPDATE DATA (EDIT)</button>
+              <button class="btn" onclick="clearForm()">CLEAR FORM</button>
+            </div>
+
+            <div class="status" id="msg"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== PAGE LAPORAN ===================== -->
+    <div id="pageLaporan" class="page">
+      <div class="box">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+          <h3 style="margin:0;">LAPORAN IPSRS (SHIFT)</h3>
+
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div>
+              <b>PILIH BULAN:</b>
+              <select id="FilterBulan" onchange="loadReportsBySelectedMonth()"></select>
+            </div>
+
+            <button class="btn" onclick="loadReportsBySelectedMonth()">REFRESH</button>
+            <button class="btn btn-blue" onclick="showPage('input')">KEMBALI INPUT</button>
+          </div>
+        </div>
+
+        <div class="smallnote">
+          Klik salah satu baris untuk edit data → otomatis masuk form input.
+        </div>
+
+        <div style="overflow:auto; margin-top:10px;">
+          <table id="reportTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tanggal</th>
+                <th>Ruang</th>
+                <th>Masalah</th>
+                <th>Tindakan</th>
+                <th>Petugas</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="status" id="msgReport"></div>
+      </div>
+    </div>
+
+  </div>
+
 <script>
-  // ✅ API URL milik Bapak (Google Apps Script Web App)
+  // ✅ API URL Bapak (Google Apps Script Web App)
   const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
 
   function setMsg(text) {
     document.getElementById("msg").innerText = text;
+  }
+  function setMsgReport(text) {
+    document.getElementById("msgReport").innerText = text;
+  }
+
+  function showPage(name) {
+    document.getElementById("pageInput").classList.remove("active");
+    document.getElementById("pageLaporan").classList.remove("active");
+
+    if (name === "laporan") {
+      document.getElementById("pageLaporan").classList.add("active");
+      loadReportsBySelectedMonth();
+    } else {
+      document.getElementById("pageInput").classList.add("active");
+    }
   }
 
   function getFormData() {
@@ -141,6 +296,12 @@
     try {
       setMsg("Menyimpan data...");
       const payload = getFormData();
+
+      if (!payload.Tanggal) {
+        setMsg("❌ Tanggal wajib diisi.");
+        return;
+      }
+
       payload.action = "add";
 
       const res = await fetch(API_URL, {
@@ -152,7 +313,6 @@
       if (json.ok) {
         setMsg("✅ Data tersimpan dengan ID: " + json.id);
         clearForm();
-        loadReports();
       } else {
         setMsg("❌ Gagal: " + json.msg);
       }
@@ -165,7 +325,7 @@
     try {
       const id = document.getElementById("ID").value;
       if (!id) {
-        setMsg("⚠️ Pilih data dulu dari tabel untuk edit.");
+        setMsg("⚠️ Pilih data dulu dari laporan untuk edit.");
         return;
       }
 
@@ -182,45 +342,11 @@
       if (json.ok) {
         setMsg("✅ Data berhasil diupdate");
         clearForm();
-        loadReports();
+        // refresh laporan bila sedang dibuka
+        loadReportsBySelectedMonth();
       } else {
         setMsg("❌ Gagal: " + json.msg);
       }
-    } catch (err) {
-      setMsg("❌ Error: " + err.message);
-    }
-  }
-
-  async function loadReports() {
-    try {
-      setMsg("Memuat laporan...");
-      const res = await fetch(API_URL + "?action=get");
-      const json = await res.json();
-
-      if (!json.ok) {
-        setMsg("❌ Gagal load data: " + json.msg);
-        return;
-      }
-
-      const tbody = document.querySelector("#reportTable tbody");
-      tbody.innerHTML = "";
-
-      json.data.reverse().forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.ID || ""}</td>
-          <td>${row.Tanggal || ""}</td>
-          <td>${row.Ruang || ""}</td>
-          <td>${row.MasalahKegiatan || ""}</td>
-          <td>${row.Tindakan || ""}</td>
-          <td>${row.Petugas || ""}</td>
-          <td>${row.Status || ""}</td>
-        `;
-        tr.onclick = () => fillForm(row);
-        tbody.appendChild(tr);
-      });
-
-      setMsg("✅ Laporan berhasil dimuat (" + json.data.length + " data)");
     } catch (err) {
       setMsg("❌ Error: " + err.message);
     }
@@ -245,7 +371,8 @@
     document.getElementById("Type").value = row.Type || "";
     document.getElementById("Jumlah").value = row.Jumlah || "";
 
-    setMsg("✏️ Mode EDIT aktif untuk ID: " + row.ID);
+    setMsg("✏️ Mode EDIT aktif untuk ID: " + (row.ID || ""));
+    showPage("input"); // balik ke input setelah klik laporan
   }
 
   function clearForm() {
@@ -253,10 +380,95 @@
     document.querySelectorAll("input, textarea, select").forEach(el => {
       if (el.id !== "ID") el.value = "";
     });
+    setMsg("");
   }
 
-  // auto load saat buka web
-  loadReports();
+  function getCurrentMonthYYYYMM() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    return `${y}-${m}`;
+  }
+
+  function setJudulBulan(yyyymm) {
+    const bulanNama = {
+      "01":"JANUARI","02":"FEBRUARI","03":"MARET","04":"APRIL",
+      "05":"MEI","06":"JUNI","07":"JULI","08":"AGUSTUS",
+      "09":"SEPTEMBER","10":"OKTOBER","11":"NOVEMBER","12":"DESEMBER"
+    };
+
+    const year = yyyymm.substring(0,4);
+    const month = yyyymm.substring(5,7);
+    const nama = bulanNama[month] || yyyymm;
+
+    document.getElementById("judulBulan").innerText = `BULAN ${nama} ${year}`;
+  }
+
+  function buildMonthOptions() {
+    const select = document.getElementById("FilterBulan");
+    select.innerHTML = "";
+
+    // buat pilihan 24 bulan terakhir (bisa diubah)
+    const now = new Date();
+    for (let i = 0; i < 24; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const yyyymm = `${y}-${m}`;
+
+      const opt = document.createElement("option");
+      opt.value = yyyymm;
+      opt.textContent = yyyymm;
+      select.appendChild(opt);
+    }
+
+    select.value = getCurrentMonthYYYYMM();
+    setJudulBulan(select.value);
+  }
+
+  async function loadReportsBySelectedMonth() {
+    try {
+      const bulan = document.getElementById("FilterBulan").value || getCurrentMonthYYYYMM();
+      setJudulBulan(bulan);
+
+      setMsgReport("Memuat laporan bulan " + bulan + " ...");
+      const res = await fetch(API_URL + "?action=get&bulan=" + bulan);
+      const json = await res.json();
+
+      if (!json.ok) {
+        setMsgReport("❌ Gagal load data: " + json.msg);
+        return;
+      }
+
+      const tbody = document.querySelector("#reportTable tbody");
+      tbody.innerHTML = "";
+
+      const data = (json.data || []).slice().reverse();
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.ID || ""}</td>
+          <td>${row.Tanggal || ""}</td>
+          <td>${row.Ruang || ""}</td>
+          <td>${row.MasalahKegiatan || ""}</td>
+          <td>${row.Tindakan || ""}</td>
+          <td>${row.Petugas || ""}</td>
+          <td>${row.Status || ""}</td>
+        `;
+        tr.onclick = () => fillForm(row);
+        tbody.appendChild(tr);
+      });
+
+      setMsgReport("✅ Total laporan bulan " + bulan + ": " + data.length + " data");
+    } catch (err) {
+      setMsgReport("❌ Error: " + err.message);
+    }
+  }
+
+  // Init
+  buildMonthOptions();
+  loadReportsBySelectedMonth();
 </script>
+
 </body>
 </html>
