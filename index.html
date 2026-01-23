@@ -175,6 +175,19 @@
     .modal h3 { margin:0; font-size:18px; color:#042a57; }
     .modal .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap; }
 
+    /* ===== SAVED POPUP (TOAST / MODAL) ===== */
+    #savedToast {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:12000;
+    }
+    #savedToast.show { display:flex; }
+    .toast {
+      background:#fff; border-radius:12px; padding:18px 20px; min-width:260px; max-width:90%;
+      box-shadow: 0 18px 40px rgba(10,20,60,0.16); border:1px solid rgba(10,20,40,0.06); text-align:center;
+    }
+    .toast h4 { margin:0 0 6px 0; font-size:16px; color:#042a57; }
+    .toast p { margin:0; color:var(--muted); font-size:14px; }
+    .toast .ok { margin-top:12px; display:inline-block; padding:8px 12px; background:var(--accent); color:#fff; border-radius:8px; cursor:pointer; font-weight:700; border:0; }
+
     /* ===== MISC ===== */
     .muted { color:var(--muted); font-size:13px; }
     .info-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
@@ -511,6 +524,15 @@
 
   </div>
 
+  <!-- SAVED POPUP -->
+  <div id="savedToast" role="status" aria-live="polite">
+    <div class="toast">
+      <h4 id="savedToastTitle">Berhasil</h4>
+      <p id="savedToastMsg">Data sudah tersimpan.</p>
+      <button class="ok" onclick="hideSavedPopup()">OK</button>
+    </div>
+  </div>
+
 <script>
   // API URL (Google Apps Script Web App)
   const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
@@ -519,11 +541,31 @@
   let rawData = [];
   let viewData = [];
   let sortMode = "DOWN";
+  let savedToastTimeout = null;
 
   // UTIL
   function setMsg(id, text) {
     const el = document.getElementById(id);
     if (el) el.innerText = text;
+  }
+
+  function showSavedPopup(message = "Data sudah tersimpan.", title = "Berhasil") {
+    const bg = document.getElementById("savedToast");
+    if (!bg) return;
+    document.getElementById("savedToastTitle").innerText = title;
+    document.getElementById("savedToastMsg").innerText = message;
+    bg.classList.add("show");
+
+    // Auto-hide after 2.2s
+    if (savedToastTimeout) clearTimeout(savedToastTimeout);
+    savedToastTimeout = setTimeout(() => { hideSavedPopup(); }, 2200);
+  }
+
+  function hideSavedPopup() {
+    const bg = document.getElementById("savedToast");
+    if (!bg) return;
+    bg.classList.remove("show");
+    if (savedToastTimeout) { clearTimeout(savedToastTimeout); savedToastTimeout = null; }
   }
 
   function showPage(name) {
@@ -564,12 +606,11 @@
     const year = yyyymm.substring(0,4);
     const month = yyyymm.substring(5,7);
     const nama = bulanNama[month] || yyyymm;
-    const label = `BULAN ${nama} ${year}`;
     const b = document.getElementById("infoBulanPill");
     if (b) b.innerText = `Bulan: ${nama} ${year}`;
     const dd = document.getElementById("judulBulanDesktop");
     if (dd) {
-      dd.innerText = label;
+      dd.innerText = `BULAN ${nama} ${year}`;
       dd.title = "Menampilkan laporan untuk " + nama + " " + year + " — klik untuk pilih bulan";
     }
   }
@@ -632,11 +673,14 @@
       if (json.ok) {
         setMsg("msg", "✅ Data tersimpan. ID: " + json.id);
         clearInputForm();
+        showSavedPopup("Data sudah tersimpan. ID: " + (json.id || ""), "Berhasil");
       } else {
         setMsg("msg", "❌ Gagal: " + json.msg);
+        showSavedPopup("Gagal menyimpan: " + (json.msg || "unknown"), "Gagal");
       }
     } catch (err) {
       setMsg("msg", "❌ Error: " + err.message);
+      showSavedPopup("Error: " + err.message, "Gagal");
     }
   }
 
@@ -893,11 +937,14 @@
         setMsg("msgEdit", "✅ Update berhasil");
         closeModal();
         loadReportsBySelectedMonth();
+        showSavedPopup("Update berhasil", "Berhasil");
       } else {
         setMsg("msgEdit", "❌ Gagal: " + json.msg);
+        showSavedPopup("Gagal update: " + (json.msg || ""), "Gagal");
       }
     } catch (err) {
       setMsg("msgEdit", "❌ Error: " + err.message);
+      showSavedPopup("Error: " + err.message, "Gagal");
     }
   }
 
