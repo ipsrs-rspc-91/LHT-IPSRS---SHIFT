@@ -26,8 +26,8 @@
       --glass: rgba(255,255,255,0.6);
       --radius:12px;
       --shadow: 0 6px 18px rgba(20,30,60,0.06);
-      --topbar-height: 72px; /* default, akan diupdate oleh JS */
-      --topbar-z: 12000;     /* pastikan topbar di atas modal/popup */
+      --topbar-height: 72px; /* default, updated by JS */
+      --topbar-z: 12000;     /* header above modals/popup */
       --modal-z: 10000;
       --toast-z: 11000;
     }
@@ -87,7 +87,6 @@
 
     .card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow: 0 8px 22px rgba(20,30,60,0.06); border:1px solid rgba(10,20,40,0.04); }
 
-    /* rest of styles (kept from previous) */
     .grid { display:grid; grid-template-columns: 1fr 420px; gap:14px; }
     @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
 
@@ -114,7 +113,7 @@
     .status-done { background:var(--success); }
     .status-pending { background:var(--danger); }
 
-    /* modal / toast z-index under header so header always visible */
+    /* modal / toast: under header (header always visible) */
     .modal-bg { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(6,10,20,0.45); z-index: var(--modal-z); padding:16px; }
     .modal-bg.show { display:flex; }
     .modal { width:min(980px,96vw); max-height:92vh; overflow:auto; border-radius:14px; background:linear-gradient(180deg,#ffffff,#fbfdff); padding:18px; border:1px solid var(--border); box-shadow: 0 30px 80px rgba(10,20,60,0.25); }
@@ -123,7 +122,22 @@
     #savedToast.show { display:flex; }
     .toast { background:#fff; border-radius:12px; padding:18px 20px; min-width:260px; max-width:90%; box-shadow: 0 18px 40px rgba(10,20,60,0.16); border:1px solid rgba(10,20,40,0.06); text-align:center; }
 
-    /* mobile tweaks */
+    /* sticky save button */
+    .sticky-save {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 12500; /* less than header, but above content */
+      background: linear-gradient(90deg,#06a84f,#2fc26a);
+      color:white;
+      padding:12px 16px;
+      border-radius:12px;
+      font-weight:800;
+      border:0;
+      box-shadow:0 12px 30px rgba(10,80,40,0.12);
+      cursor:pointer;
+    }
+
     @media (max-width:900px){
       .topbar .title { font-size:14px; }
     }
@@ -449,6 +463,9 @@
     </div>
   </div>
 
+  <!-- STICKY SAVE BUTTON (optional) -->
+  <button id="stickySaveBtn" class="sticky-save" aria-label="Simpan" title="Simpan" onclick="saveData()">SIMPAN</button>
+
 <script>
   // --- updateTopbarHeight: hitung tinggi topbar dan set CSS variable agar container tidak tertutup ---
   function updateTopbarHeight() {
@@ -457,7 +474,6 @@
     const rect = topbar.getBoundingClientRect();
     const height = Math.ceil(rect.height);
     document.documentElement.style.setProperty('--topbar-height', height + 'px');
-    // update container padding-top accordingly (redundant with CSS var in .container)
     const container = document.querySelector('.container');
     if (container) container.style.paddingTop = (height + 16) + 'px';
   }
@@ -481,6 +497,10 @@
     const pill = document.getElementById("judulBulanDesktop"); if (pill) pill.style.display = (name==='laporan') ? 'inline-block' : 'none';
     const btnLaporan = document.getElementById("btnLaporan"), btnInput = document.getElementById("btnInput");
     if (btnLaporan && btnInput) { if (name==='input'){ btnLaporan.style.display='inline-flex'; btnInput.style.display='none'; } else { btnLaporan.style.display='none'; btnInput.style.display='inline-flex'; } }
+    if (name==='input') {
+      // ensure auto-scroll handlers attached when entering input page
+      attachAutoScrollForInputs();
+    }
     if (name==='laporan') loadReportsBySelectedMonth();
   }
 
@@ -707,13 +727,12 @@
   // close modal by clicking background
   document.getElementById("modalBg").addEventListener("click", function(e){ if(e.target.id==="modalBg") closeModal(); });
 
-  // Saved popup (sticky or auto depending on showSavedPopup implementation)
+  // Saved popup
   function showSavedPopup(message="Data sudah tersimpan.", title="Berhasil"){
     const bg=document.getElementById("savedToast"); if(!bg) return;
     document.getElementById("savedToastTitle").innerText = title;
     document.getElementById("savedToastMsg").innerText = message;
     bg.classList.add("show");
-    // focus ok button
     const ok=document.getElementById("savedToastOk"); if(ok) ok.focus();
   }
   function hideSavedPopup(){
@@ -721,9 +740,55 @@
     const first=document.querySelector("#pageInput input, #pageInput textarea, #pageInput select"); if(first) first.focus();
   }
 
-  // init
+  // --- Auto-scroll focused input to visible area (respect header) ---
+  function scrollIntoViewWithOffset(el, offset = 12) {
+    if (!el) return;
+    const topbar = document.getElementById('topbar');
+    const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
+    const rect = el.getBoundingClientRect();
+    const absoluteTop = window.scrollY + rect.top;
+    const target = Math.max(0, absoluteTop - headerHeight - offset);
+    window.scrollTo({ top: target, behavior: 'smooth' });
+  }
+
+  function attachAutoScrollForInputs() {
+    const selector = '#pageInput input, #pageInput textarea, #pageInput select';
+    const inputs = document.querySelectorAll(selector);
+    inputs.forEach(el => {
+      if (el._autoScrollHandler) el.removeEventListener('focus', el._autoScrollHandler);
+      const handler = (e) => {
+        const pageInput = document.getElementById('pageInput');
+        if (pageInput && pageInput.style.display === 'none') return;
+        const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 450 : 120;
+        setTimeout(() => { scrollIntoViewWithOffset(e.target, 12); }, delay);
+      };
+      el.addEventListener('focus', handler);
+      el._autoScrollHandler = handler;
+    });
+  }
+
+  window.addEventListener('resize', () => {
+    if (window._autoScrollTimeout) clearTimeout(window._autoScrollTimeout);
+    window._autoScrollTimeout = setTimeout(() => { attachAutoScrollForInputs(); window._autoScrollTimeout = null; }, 150);
+  });
+  window.addEventListener('orientationchange', () => { setTimeout(attachAutoScrollForInputs, 300); });
+
+  // ensure clicking label also scrolls (improves UX)
+  document.addEventListener('click', (e) => {
+    const lbl = e.target.closest('label');
+    if (!lbl) return;
+    const forId = lbl.getAttribute('for');
+    if (!forId) return;
+    const target = document.getElementById(forId);
+    if (target && document.getElementById('pageInput').style.display !== 'none') {
+      setTimeout(() => { scrollIntoViewWithOffset(target, 12); }, 170);
+    }
+  });
+
+  // INIT
   buildMonthOptions();
   updateTopbarHeight();
+  attachAutoScrollForInputs();
   showPage('input');
 
 </script>
