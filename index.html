@@ -436,7 +436,7 @@
 
         <div id="msgReport" class="muted" style="margin-top:10px;"></div>
 
-        <!-- MOVED: MODAL EDIT placed inside pageLaporan so it's not part of pageInput DOM flow -->
+        <!-- MODAL EDIT moved inside pageLaporan -->
         <div id="modalBg" class="modal-bg" aria-hidden="true">
           <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h3 id="modalTitle">EDIT LAPORAN</h3>
@@ -524,12 +524,12 @@
 
   </div>
 
-  <!-- SAVED POPUP -->
-  <div id="savedToast" role="status" aria-live="polite">
-    <div class="toast">
+  <!-- SAVED POPUP (click background to close, Esc to close, OK button) -->
+  <div id="savedToast" role="status" aria-live="polite" onclick="savedPopupBackgroundClick(event)">
+    <div class="toast" id="savedToastInner" onclick="event.stopPropagation()">
       <h4 id="savedToastTitle">Berhasil</h4>
       <p id="savedToastMsg">Data sudah tersimpan.</p>
-      <button class="ok" onclick="hideSavedPopup()">OK</button>
+      <button id="savedToastOk" class="ok" type="button">OK</button>
     </div>
   </div>
 
@@ -549,25 +549,64 @@
     if (el) el.innerText = text;
   }
 
-  function showSavedPopup(message = "Data sudah tersimpan.", title = "Berhasil") {
+  // Saved popup functions
+  function savedToastKeyHandler(e) {
+    if (e.key === "Escape" || e.key === "Esc") {
+      hideSavedPopup();
+    }
+  }
+
+  function savedPopupBackgroundClick(e) {
+    const inner = document.getElementById("savedToastInner");
+    if (!inner) return;
+    if (!inner.contains(e.target)) hideSavedPopup();
+  }
+
+  function showSavedPopup(message = "Data sudah tersimpan.", title = "Berhasil", autoHide = true, autoHideMs = 2200) {
     const bg = document.getElementById("savedToast");
-    if (!bg) return;
-    document.getElementById("savedToastTitle").innerText = title;
-    document.getElementById("savedToastMsg").innerText = message;
+    const titleEl = document.getElementById("savedToastTitle");
+    const msgEl = document.getElementById("savedToastMsg");
+    const okBtn = document.getElementById("savedToastOk");
+    if (!bg || !titleEl || !msgEl || !okBtn) return;
+
+    titleEl.innerText = title;
+    msgEl.innerText = message;
     bg.classList.add("show");
 
-    // Auto-hide after 2.2s
-    if (savedToastTimeout) clearTimeout(savedToastTimeout);
-    savedToastTimeout = setTimeout(() => { hideSavedPopup(); }, 2200);
+    // Attach OK handler (ensure single listener)
+    okBtn.removeEventListener("click", hideSavedPopup);
+    okBtn.addEventListener("click", hideSavedPopup);
+
+    // Auto-hide
+    if (savedToastTimeout) {
+      clearTimeout(savedToastTimeout);
+      savedToastTimeout = null;
+    }
+    if (autoHide) {
+      savedToastTimeout = setTimeout(() => { hideSavedPopup(); }, autoHideMs);
+    }
+
+    // Listen for ESC to close
+    document.addEventListener("keydown", savedToastKeyHandler);
   }
 
   function hideSavedPopup() {
     const bg = document.getElementById("savedToast");
     if (!bg) return;
     bg.classList.remove("show");
-    if (savedToastTimeout) { clearTimeout(savedToastTimeout); savedToastTimeout = null; }
+
+    if (savedToastTimeout) {
+      clearTimeout(savedToastTimeout);
+      savedToastTimeout = null;
+    }
+    document.removeEventListener("keydown", savedToastKeyHandler);
+
+    // return focus to first input on input page
+    const firstInput = document.querySelector("#pageInput input, #pageInput textarea, #pageInput select");
+    if (firstInput) firstInput.focus();
   }
 
+  // Page navigation and helpers
   function showPage(name) {
     document.getElementById("pageInput").style.display = (name === "input") ? "" : "none";
     document.getElementById("pageLaporan").style.display = (name === "laporan") ? "" : "none";
@@ -676,7 +715,7 @@
         showSavedPopup("Data sudah tersimpan. ID: " + (json.id || ""), "Berhasil");
       } else {
         setMsg("msg", "❌ Gagal: " + json.msg);
-        showSavedPopup("Gagal menyimpan: " + (json.msg || "unknown"), "Gagal");
+        showSavedPopup("Gagal menyimpan: " + (json.msg || ""), "Gagal");
       }
     } catch (err) {
       setMsg("msg", "❌ Error: " + err.message);
