@@ -11,7 +11,7 @@
 
   <style>
     :root{
-      --bg:#f5f7fb;
+      --bg:#E2F0D9; /* <-- background diperbarui sesuai permintaan */
       --card:#ffffff;
       --accent:#0a69b8;
       --muted:#6b7280;
@@ -30,7 +30,7 @@
 
     /* ===== TOPBAR ===== */
     .topbar {
-      background: linear-gradient(90deg, #e8f6ff 0%, #dff8e6 100%);
+      background: linear-gradient(90deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.9) 100%);
       border-bottom:1px solid rgba(0,0,0,0.06);
       padding:12px 18px;
       display:flex;
@@ -61,10 +61,27 @@
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 12px; border-radius:10px; background:var(--card); border:1px solid var(--border);
       cursor:pointer; font-weight:600; color:#062b57; box-shadow:none;
+      transition: all .15s ease;
     }
-    .btn:hover{ transform:translateY(-1px); }
+    .btn:hover{ transform:translateY(-2px); }
     .btn.primary { background: linear-gradient(90deg,var(--accent),#24a0ff); color:#fff; border:0; box-shadow: 0 6px 18px rgba(10,120,220,0.12); }
     .btn.ghost { background:transparent; border:1px dashed rgba(0,0,0,0.06); color:var(--muted); }
+
+    /* Styling khusus agar tombol LAPORAN lebih terlihat saat tampil */
+    #btnLaporan {
+      background: #ffffff;
+      color: var(--accent);
+      border: 2px solid rgba(10,105,184,0.16);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight:800;
+      box-shadow: 0 8px 24px rgba(10,105,184,0.10);
+    }
+    #btnLaporan:hover {
+      box-shadow: 0 12px 36px rgba(10,105,184,0.14);
+      transform: translateY(-2px);
+    }
+
     .pill { background:var(--card); border-radius:999px; padding:6px 10px; font-size:13px; border:1px solid var(--border); color:var(--muted); }
 
     /* ===== LAYOUT ===== */
@@ -174,7 +191,7 @@
       </div>
 
       <!-- Dua tombol dengan id supaya bisa di-toggle tampilannya -->
-      <button id="btnLaporan" class="btn ghost" onclick="showPage('laporan')">LAPORAN</button>
+      <button id="btnLaporan" class="btn" onclick="showPage('laporan')">LAPORAN</button>
       <button id="btnInput" class="btn primary" onclick="showPage('input')">INPUT DATA</button>
     </div>
   </div>
