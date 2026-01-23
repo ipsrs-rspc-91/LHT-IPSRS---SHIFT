@@ -670,27 +670,26 @@
   }
 
   async function saveData() {
-    try {
-      setMsg("msg", "Menyimpan data...");
-      const payload = getInputPayload();
-      if (!payload.Tanggal) { setMsg("msg", "❌ Tanggal wajib diisi."); return; }
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-      const json = await res.json();
-      if (json.ok) {
-        setMsg("msg", "✅ Data tersimpan. ID: " + json.id);
-        clearInputForm();
-        // Sticky popup: will remain until user clicks OK
-        showSavedPopup("Data sudah tersimpan. ID: " + (json.id || ""), "Berhasil");
-      } else {
-        setMsg("msg", "❌ Gagal: " + json.msg);
-        showSavedPopup("Gagal menyimpan: " + (json.msg || ""), "Gagal");
-      }
-    } catch (err) {
-      setMsg("msg", "❌ Error: " + err.message);
-      showSavedPopup("Error: " + err.message, "Gagal");
+  try {
+    setMsg("msg", "Menyimpan data...");
+    const payload = getInputPayload();
+    if (!payload.Tanggal) { setMsg("msg", "❌ Tanggal wajib diisi."); return; }
+    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+    const json = await res.json();
+    if (json.ok) {
+      // jangan tampilkan ID di pesan atau popup
+      setMsg("msg", "✅ Data tersimpan.");
+      clearInputForm();
+      showSavedPopup("Data sudah tersimpan", "Berhasil");
+    } else {
+      setMsg("msg", "❌ Gagal: " + json.msg);
+      showSavedPopup("Gagal menyimpan: " + (json.msg || ""), "Gagal");
     }
+  } catch (err) {
+    setMsg("msg", "❌ Error: " + err.message);
+    showSavedPopup("Error: " + err.message, "Gagal");
   }
-
+}
   function clearInputForm() {
     document.querySelectorAll("#pageInput input, #pageInput textarea, #pageInput select").forEach(el => el.value = "");
   }
