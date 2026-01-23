@@ -59,7 +59,7 @@
     /* Action panel (topbar buttons) */
     .action-panel {
       display:flex; gap:8px; align-items:center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85));
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.95));
       padding:6px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);
       box-shadow: 0 6px 20px rgba(10,20,60,0.06);
       backdrop-filter: blur(6px);
@@ -181,31 +181,45 @@
     .info-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
     .hidden { display:none !important; }
 
-    /* ==== MOBILE ADJUSTMENTS: make topbar actions and input card look more elegant on small screens ==== */
+    /* ==== MOBILE ADJUSTMENTS: make topbar actions and input card clearer & higher contrast on small screens ==== */
     @media (max-width:600px) {
       .topbar { padding:10px 12px; }
-      .action-panel {
-        background: transparent;
-        padding:4px;
-        box-shadow: none;
-        border-radius:10px;
-        border:0;
-      }
-      /* show only icons on topbar, hide labels to save space & look cleaner */
-      .btn { padding:8px; min-width:40px; justify-content:center; }
-      .btn .btn-label { display:none; }
-      .pill { display:none; } /* hide bulky pill on small screens */
-      .logo { width:38px; height:38px; font-size:14px; }
-      .topbar .title { font-size:14px; }
 
-      /* make the primary button flat and compact on mobile */
-      .btn.primary {
-        background: var(--accent);
-        background: linear-gradient(90deg,var(--accent),var(--accent));
-        box-shadow: none;
-        color: #fff;
+      /* Make action panel more visible and higher contrast on mobile:
+         white background, subtle border and stronger shadow so buttons read clearly on small screens */
+      .action-panel {
+        background: linear-gradient(180deg,#ffffff,#fcfdff);
         padding:8px;
+        border-radius:12px;
+        border:1px solid rgba(10,20,40,0.08);
+        box-shadow: 0 10px 30px rgba(10,20,60,0.08);
       }
+
+      /* keep button labels visible on mobile for clarity */
+      .btn .btn-label { display:inline-block; font-size:13px; }
+
+      /* make buttons larger for touch and more contrast */
+      .btn { padding:10px 12px; font-size:15px; border-radius:12px; }
+      .btn svg { width:18px; height:18px; }
+
+      /* distinguish laporan button: use a clear outline with accent color */
+      #btnLaporan.ghost {
+        background: transparent;
+        color: var(--accent);
+        border: 2px solid rgba(10,100,180,0.12);
+        box-shadow: 0 6px 20px rgba(10,100,180,0.06);
+      }
+
+      /* make input button more prominent and compact */
+      #btnInput.primary {
+        padding:10px 14px;
+        border-radius:12px;
+        font-weight:800;
+        font-size:15px;
+        box-shadow: 0 10px 26px rgba(10,120,220,0.14);
+      }
+
+      .pill { display:none; } /* hide bulky pill on small screens to keep header clean */
 
       /* make the input cards more flat and less "heavy" on mobile */
       .card {
@@ -217,7 +231,7 @@
       }
 
       /* reduce big-save height for mobile */
-      .big-save { padding:12px; font-size:14px; }
+      .big-save { padding:12px; font-size:15px; }
 
       /* adjust modal for small screens */
       .modal { padding:14px; border-radius:10px; box-shadow:none; border:1px solid rgba(10,20,40,0.06); }
@@ -225,8 +239,11 @@
     }
 
     @media (max-width:420px) {
-      .btn { min-width:36px; padding:6px; }
+      .btn { min-width:40px; padding:8px 10px; }
       .logo { width:36px; height:36px; }
+      .btn .btn-label { font-size:14px; }
+      /* ensure spacing does not break */
+      .action-panel { gap:6px; }
     }
   </style>
 </head>
@@ -242,13 +259,13 @@
     </div>
 
     <div class="actions">
-      <!-- Action panel: topbar buttons (responsive: shows icons only on small screens) -->
+      <!-- Action panel: topbar buttons -->
       <div class="action-panel" role="toolbar" aria-label="Aksi">
         <div id="judulBulanDesktop" class="pill" style="display:none; cursor:pointer;" title="Klik untuk memilih bulan laporan" onclick="document.getElementById('FilterBulan')?.focus();">
           BULAN -
         </div>
 
-        <!-- Buttons keep same IDs for JS, label wrapped so we can hide text on mobile -->
+        <!-- Buttons keep same IDs for JS; label always visible on mobile for clarity -->
         <button id="btnLaporan" class="btn ghost" onclick="showPage('laporan')" title="Lihat Laporan">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4v-2H3v2zm0 4h10v-2H3v2zM3 7h16V5H3v2zm18 6h-6v6h2v-4h4v-2z"/></svg>
           <span class="btn-label">LAPORAN</span>
@@ -345,7 +362,7 @@
       </div>
     </div>
 
-    <!-- PAGE LAPORAN (unchanged except responsive behaviors handled in CSS) -->
+    <!-- PAGE LAPORAN -->
     <div id="pageLaporan" class="page" style="display:none;">
       <div class="card">
 
