@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>INPUT LAPORAN HARIAN IPSRS (SHIFT)</title>
+  <title>LHT IPSRS - SHIFT</title>
 
   <style>
     body { font-family: Arial, sans-serif; background:#f6f6f6; margin:0; padding:0; }
@@ -12,15 +12,17 @@
     .topbar {
       background:#dff0d8;
       border-bottom:3px solid #000;
-      padding:12px 15px;
+      padding:10px 12px;
       display:flex;
       align-items:center;
       justify-content:space-between;
+      gap:10px;
     }
     .topbar .left {
       font-weight:bold;
       font-size:18px;
       color:#1a7d2b;
+      white-space:nowrap;
     }
     .topbar .center {
       text-align:center;
@@ -34,9 +36,10 @@
       display:flex;
       gap:10px;
       align-items:center;
+      white-space:nowrap;
     }
     .btn {
-      padding:10px 16px;
+      padding:8px 14px;
       border:2px solid #000;
       border-radius:3px;
       cursor:pointer;
@@ -45,29 +48,34 @@
     }
     .btn-blue { background:#e6f0ff; }
     .btn-red { background:#ffd6d6; }
+    .btn-green { background:#d4ffd4; }
+    .btn-gray { background:#efefef; }
+    .btn-yellow { background:#fff6bf; }
 
-    /* ===== LAYOUT ===== */
-    .container { padding:15px; }
+    /* ===== PAGES ===== */
+    .container { padding:12px; }
     .page { display:none; }
     .page.active { display:block; }
 
-    .box { background:#fff; border:2px solid #000; padding:15px; }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+    .box { background:#fff; border:2px solid #000; padding:12px; }
 
+    /* ===== INPUT FORM (SENGAJA SIMPLE TANPA TOMBOL EDIT) ===== */
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
     label { display:block; font-weight:bold; margin-top:8px; }
     input, textarea, select {
       width:100%;
-      padding:8px;
+      padding:7px;
       border:1px solid #000;
       box-sizing:border-box;
       margin-top:3px;
     }
+    textarea { height:110px; resize:vertical; }
 
-    textarea { height:120px; resize:vertical; }
+    .row3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top:10px; }
 
     .big-save {
       border:2px solid #000;
-      height:220px;
+      height:210px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -76,26 +84,83 @@
       cursor:pointer;
       background:#f3f3f3;
       text-align:center;
+      user-select:none;
+    }
+    .smallnote { font-size:12px; color:#333; margin-top:8px; }
+    .status { font-size:12px; margin-top:10px; font-weight:bold; }
+
+    /* ===== REPORT TABLE ===== */
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { border:1px solid #000; padding:7px; font-size:12px; vertical-align:top; }
+    th { background:#0a69b8; color:#fff; text-align:center; }
+    tr:nth-child(even) td { background:#eaeaea; }
+    tr:hover td { background:#dff3ff; cursor:pointer; }
+
+    .toolbar {
+      display:flex; justify-content:space-between; align-items:center;
+      gap:10px; flex-wrap:wrap;
+      margin-bottom:8px;
     }
 
-    .smallnote { font-size:12px; color:#333; margin-top:8px; }
+    .filters {
+      display:grid;
+      grid-template-columns: 150px 180px 200px 220px 220px;
+      gap:6px;
+      background:#fff6bf;
+      border:2px solid #000;
+      padding:8px;
+      align-items:center;
+    }
+    .filters b { font-size:12px; }
+    .filters select {
+      width:100%;
+      padding:6px;
+      border:1px solid #000;
+      background:#fff6bf;
+      font-weight:bold;
+    }
 
-    table { width:100%; border-collapse:collapse; margin-top:10px; }
-    th, td { border:1px solid #000; padding:8px; font-size:13px; }
-    th { background:#eee; }
+    .note-mini { font-size:12px; color:#111; }
 
-    .row3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top:10px; }
+    /* ===== POPUP MODAL ===== */
+    .modal-bg {
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.5);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:15px;
+      z-index:9999;
+    }
+    .modal-bg.show { display:flex; }
 
-    .actions { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
-    .btn-green { background:#d4ffd4; }
+    .modal {
+      width: min(980px, 95vw);
+      max-height: 92vh;
+      overflow:auto;
+      background:#fff;
+      border:3px solid #000;
+      padding:12px;
+      border-radius:6px;
+    }
+    .modal h3 { margin:0 0 8px 0; }
+    .modal .modal-actions {
+      display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;
+      margin-top:10px;
+    }
 
-    .status { font-size:12px; margin-top:10px; font-weight:bold; }
+    .pill { display:inline-block; padding:3px 8px; border:1px solid #000; background:#eee; border-radius:20px; font-size:12px; }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .filters { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- ===== HEADER BAR (ADA TOMBOL LAPORAN) ===== -->
+  <!-- ===== HEADER BAR ===== -->
   <div class="topbar">
     <div class="left">RUMAH SAKIT PURI CINERE</div>
 
@@ -106,7 +171,7 @@
 
     <div class="right">
       <button class="btn btn-blue" onclick="showPage('laporan')">LAPORAN</button>
-      <button class="btn btn-red" onclick="showPage('input')">X</button>
+      <button class="btn btn-red" onclick="showPage('input')">INPUT</button>
     </div>
   </div>
 
@@ -115,8 +180,6 @@
     <!-- ===================== PAGE INPUT ===================== -->
     <div id="pageInput" class="page active">
       <div class="box">
-
-        <input type="hidden" id="ID" />
 
         <div class="grid">
 
@@ -159,7 +222,7 @@
             </div>
 
             <div class="smallnote">
-              * Jika ada penggantian spare part baru atau pemasangan unit baru.
+              * Jika ada penggantian spare part/unit baru.
             </div>
           </div>
 
@@ -191,11 +254,6 @@
               SIMPAN DATA BARU<br>( SHIFT )
             </div>
 
-            <div class="actions">
-              <button class="btn btn-green" onclick="updateData()">UPDATE DATA (EDIT)</button>
-              <button class="btn" onclick="clearForm()">CLEAR FORM</button>
-            </div>
-
             <div class="status" id="msg"></div>
           </div>
 
@@ -206,39 +264,92 @@
     <!-- ===================== PAGE LAPORAN ===================== -->
     <div id="pageLaporan" class="page">
       <div class="box">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-          <h3 style="margin:0;">LAPORAN IPSRS (SHIFT)</h3>
 
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <div>
-              <b>PILIH BULAN:</b>
-              <select id="FilterBulan" onchange="loadReportsBySelectedMonth()"></select>
-            </div>
+        <div class="toolbar">
+          <div>
+            <b style="font-size:18px;">LAPORAN HARIAN IPSRS (SHIFT)</b><br>
+            <span class="pill" id="infoBulanPill">Bulan: -</span>
+            <span class="pill" id="infoTotalPill">Total: 0</span>
+          </div>
 
-            <button class="btn" onclick="loadReportsBySelectedMonth()">REFRESH</button>
-            <button class="btn btn-blue" onclick="showPage('input')">KEMBALI INPUT</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-yellow" onclick="toggleRekap()">REKAP</button>
+            <button class="btn btn-gray" onclick="sortUp()">UP</button>
+            <button class="btn btn-gray" onclick="sortDown()">DOWN</button>
+            <button class="btn btn-blue" onclick="showPage('input')">INPUT DATA</button>
           </div>
         </div>
 
-        <div class="smallnote">
-          Klik salah satu baris untuk edit data → otomatis masuk form input.
+        <!-- FILTER KUNING -->
+        <div class="filters">
+          <b>BULAN</b>
+          <select id="FilterBulan" onchange="loadReportsBySelectedMonth()"></select>
+
+          <b>SLSI/BLM/KET</b>
+          <select id="FilterStatus" onchange="applyFilters()">
+            <option value="ALL">SEMUA DATA</option>
+            <option value="SELESAI">SELESAI</option>
+            <option value="BELUM">BELUM</option>
+          </select>
+
+          <b>KATEGORI</b>
+          <select id="FilterKategori" onchange="applyFilters()">
+            <option value="ALL">SEMUA DATA</option>
+          </select>
+
+          <b>AREA KERJA</b>
+          <select id="FilterAreaKerja" onchange="applyFilters()">
+            <option value="ALL">SEMUA DATA</option>
+          </select>
+
+          <b>ITEM</b>
+          <select id="FilterItem" onchange="applyFilters()">
+            <option value="ALL">SEMUA DATA</option>
+          </select>
         </div>
 
-        <div style="overflow:auto; margin-top:10px;">
+        <div class="note-mini" style="margin-top:8px;">
+          ✅ Klik baris laporan untuk <b>Edit</b> (Popup). Data tetap tersimpan di Google Sheet.
+        </div>
+
+        <div style="overflow:auto;">
           <table id="reportTable">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Tanggal</th>
-                <th>Ruang</th>
-                <th>Masalah</th>
-                <th>Tindakan</th>
-                <th>Petugas</th>
-                <th>Status</th>
+                <th>NO</th>
+                <th>TANGGAL</th>
+                <th>PELAPOR</th>
+                <th>RUANG</th>
+                <th>PUKUL</th>
+                <th>MASALAH / KEGIATAN</th>
+                <th>TINDAKAN</th>
+                <th>PETUGAS</th>
+                <th>SLSI/BLM/KET</th>
+                <th>KATEGORI</th>
+                <th>AREA KERJA</th>
+                <th>ITEM</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
+        </div>
+
+        <!-- PANEL REKAP SPAREPART -->
+        <div id="panelRekap" style="display:none; margin-top:12px; border:2px solid #000; padding:10px;">
+          <b>REKAP SPARE PART / UNIT (AUTO SUM JUMLAH)</b>
+          <div class="smallnote">Rekap dihitung dari data yang sedang tampil (sesuai filter).</div>
+          <div style="overflow:auto;">
+            <table id="rekapTable">
+              <thead>
+                <tr>
+                  <th>SPARE PART / UNIT</th>
+                  <th>TYPE</th>
+                  <th>TOTAL JUMLAH</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
 
         <div class="status" id="msgReport"></div>
@@ -247,15 +358,102 @@
 
   </div>
 
+  <!-- ===================== MODAL EDIT ===================== -->
+  <div id="modalBg" class="modal-bg">
+    <div class="modal">
+      <h3>EDIT LAPORAN</h3>
+      <div class="smallnote">
+        ID: <span class="pill" id="EditID">-</span>
+        <span class="pill" id="EditSheet">Sheet: -</span>
+      </div>
+
+      <input type="hidden" id="Edit_ID" />
+
+      <div class="grid" style="margin-top:8px;">
+        <div>
+          <label>TANGGAL</label>
+          <input type="date" id="Edit_Tanggal"/>
+
+          <label>PELAPOR</label>
+          <input type="text" id="Edit_Pelapor"/>
+
+          <label>RUANG</label>
+          <input type="text" id="Edit_Ruang"/>
+
+          <label>PUKUL</label>
+          <input type="time" id="Edit_Pukul"/>
+
+          <label>NO. LK</label>
+          <input type="text" id="Edit_NoLK"/>
+
+          <label>MASALAH / KEGIATAN</label>
+          <textarea id="Edit_MasalahKegiatan"></textarea>
+
+          <label>TINDAKAN</label>
+          <textarea id="Edit_Tindakan"></textarea>
+        </div>
+
+        <div>
+          <label>PETUGAS</label>
+          <input type="text" id="Edit_Petugas"/>
+
+          <label>SELESAI / BELUM</label>
+          <select id="Edit_Status">
+            <option value="">-- pilih --</option>
+            <option value="SELESAI">SELESAI</option>
+            <option value="BELUM">BELUM</option>
+          </select>
+
+          <label>KETERANGAN</label>
+          <input type="text" id="Edit_Keterangan"/>
+
+          <label>KATEGORI</label>
+          <input type="text" id="Edit_Kategori"/>
+
+          <label>AREA KERJA</label>
+          <input type="text" id="Edit_AreaKerja"/>
+
+          <label>ITEM</label>
+          <input type="text" id="Edit_Item"/>
+
+          <div class="row3">
+            <div>
+              <label>SPARE PART / UNIT</label>
+              <input type="text" id="Edit_SparePartUnit"/>
+            </div>
+            <div>
+              <label>TYPE</label>
+              <input type="text" id="Edit_Type"/>
+            </div>
+            <div>
+              <label>JUMLAH</label>
+              <input type="number" id="Edit_Jumlah"/>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn btn-green" onclick="saveEdit()">SIMPAN UPDATE</button>
+            <button class="btn btn-red" onclick="closeModal()">BATAL</button>
+          </div>
+
+          <div class="status" id="msgEdit"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
   // ✅ API URL Bapak (Google Apps Script Web App)
   const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
 
-  function setMsg(text) {
-    document.getElementById("msg").innerText = text;
-  }
-  function setMsgReport(text) {
-    document.getElementById("msgReport").innerText = text;
+  // ==================== GLOBAL DATA ====================
+  let rawData = [];      // data bulan dipilih
+  let viewData = [];     // data setelah filter tampil
+  let sortMode = "DOWN"; // UP / DOWN
+
+  // ==================== UTIL ====================
+  function setMsg(id, text) {
+    document.getElementById(id).innerText = text;
   }
 
   function showPage(name) {
@@ -268,119 +466,6 @@
     } else {
       document.getElementById("pageInput").classList.add("active");
     }
-  }
-
-  function getFormData() {
-    return {
-      ID: document.getElementById("ID").value,
-      Tanggal: document.getElementById("Tanggal").value,
-      Pelapor: document.getElementById("Pelapor").value,
-      Ruang: document.getElementById("Ruang").value,
-      Pukul: document.getElementById("Pukul").value,
-      NoLK: document.getElementById("NoLK").value,
-      MasalahKegiatan: document.getElementById("MasalahKegiatan").value,
-      Tindakan: document.getElementById("Tindakan").value,
-      Petugas: document.getElementById("Petugas").value,
-      Status: document.getElementById("Status").value,
-      Keterangan: document.getElementById("Keterangan").value,
-      Kategori: document.getElementById("Kategori").value,
-      AreaKerja: document.getElementById("AreaKerja").value,
-      Item: document.getElementById("Item").value,
-      SparePartUnit: document.getElementById("SparePartUnit").value,
-      Type: document.getElementById("Type").value,
-      Jumlah: document.getElementById("Jumlah").value
-    };
-  }
-
-  async function saveData() {
-    try {
-      setMsg("Menyimpan data...");
-      const payload = getFormData();
-
-      if (!payload.Tanggal) {
-        setMsg("❌ Tanggal wajib diisi.");
-        return;
-      }
-
-      payload.action = "add";
-
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-
-      const json = await res.json();
-      if (json.ok) {
-        setMsg("✅ Data tersimpan dengan ID: " + json.id);
-        clearForm();
-      } else {
-        setMsg("❌ Gagal: " + json.msg);
-      }
-    } catch (err) {
-      setMsg("❌ Error: " + err.message);
-    }
-  }
-
-  async function updateData() {
-    try {
-      const id = document.getElementById("ID").value;
-      if (!id) {
-        setMsg("⚠️ Pilih data dulu dari laporan untuk edit.");
-        return;
-      }
-
-      setMsg("Mengupdate data...");
-      const payload = getFormData();
-      payload.action = "update";
-
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-
-      const json = await res.json();
-      if (json.ok) {
-        setMsg("✅ Data berhasil diupdate");
-        clearForm();
-        // refresh laporan bila sedang dibuka
-        loadReportsBySelectedMonth();
-      } else {
-        setMsg("❌ Gagal: " + json.msg);
-      }
-    } catch (err) {
-      setMsg("❌ Error: " + err.message);
-    }
-  }
-
-  function fillForm(row) {
-    document.getElementById("ID").value = row.ID || "";
-    document.getElementById("Tanggal").value = row.Tanggal || "";
-    document.getElementById("Pelapor").value = row.Pelapor || "";
-    document.getElementById("Ruang").value = row.Ruang || "";
-    document.getElementById("Pukul").value = row.Pukul || "";
-    document.getElementById("NoLK").value = row.NoLK || "";
-    document.getElementById("MasalahKegiatan").value = row.MasalahKegiatan || "";
-    document.getElementById("Tindakan").value = row.Tindakan || "";
-    document.getElementById("Petugas").value = row.Petugas || "";
-    document.getElementById("Status").value = row.Status || "";
-    document.getElementById("Keterangan").value = row.Keterangan || "";
-    document.getElementById("Kategori").value = row.Kategori || "";
-    document.getElementById("AreaKerja").value = row.AreaKerja || "";
-    document.getElementById("Item").value = row.Item || "";
-    document.getElementById("SparePartUnit").value = row.SparePartUnit || "";
-    document.getElementById("Type").value = row.Type || "";
-    document.getElementById("Jumlah").value = row.Jumlah || "";
-
-    setMsg("✏️ Mode EDIT aktif untuk ID: " + (row.ID || ""));
-    showPage("input"); // balik ke input setelah klik laporan
-  }
-
-  function clearForm() {
-    document.getElementById("ID").value = "";
-    document.querySelectorAll("input, textarea, select").forEach(el => {
-      if (el.id !== "ID") el.value = "";
-    });
-    setMsg("");
   }
 
   function getCurrentMonthYYYYMM() {
@@ -402,15 +487,15 @@
     const nama = bulanNama[month] || yyyymm;
 
     document.getElementById("judulBulan").innerText = `BULAN ${nama} ${year}`;
+    document.getElementById("infoBulanPill").innerText = `Bulan: ${nama} ${year}`;
   }
 
   function buildMonthOptions() {
     const select = document.getElementById("FilterBulan");
     select.innerHTML = "";
 
-    // buat pilihan 24 bulan terakhir (bisa diubah)
     const now = new Date();
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < 36; i++) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const y = d.getFullYear();
       const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -426,46 +511,375 @@
     setJudulBulan(select.value);
   }
 
+  function normalizeText(x) {
+    return (x || "").toString().trim();
+  }
+
+  function toDateKey(tanggalStr) {
+    // tanggalStr: "2025-07-23"
+    // key: "20250723"
+    const t = normalizeText(tanggalStr);
+    if (t.length >= 10) return t.substring(0,10).replaceAll("-","");
+    return "00000000";
+  }
+
+  // ==================== INPUT SAVE ====================
+  function getInputPayload() {
+    return {
+      action: "add",
+      Tanggal: document.getElementById("Tanggal").value,
+      Pelapor: document.getElementById("Pelapor").value,
+      Ruang: document.getElementById("Ruang").value,
+      Pukul: document.getElementById("Pukul").value,
+      NoLK: document.getElementById("NoLK").value,
+      MasalahKegiatan: document.getElementById("MasalahKegiatan").value,
+      Tindakan: document.getElementById("Tindakan").value,
+      Petugas: document.getElementById("Petugas").value,
+      Status: document.getElementById("Status").value,
+      Keterangan: document.getElementById("Keterangan").value,
+      Kategori: document.getElementById("Kategori").value,
+      AreaKerja: document.getElementById("AreaKerja").value,
+      Item: document.getElementById("Item").value,
+      SparePartUnit: document.getElementById("SparePartUnit").value,
+      Type: document.getElementById("Type").value,
+      Jumlah: document.getElementById("Jumlah").value
+    };
+  }
+
+  async function saveData() {
+    try {
+      setMsg("msg", "Menyimpan data...");
+      const payload = getInputPayload();
+
+      if (!payload.Tanggal) {
+        setMsg("msg", "❌ Tanggal wajib diisi.");
+        return;
+      }
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json();
+      if (json.ok) {
+        setMsg("msg", "✅ Data tersimpan. ID: " + json.id);
+        clearInputForm();
+      } else {
+        setMsg("msg", "❌ Gagal: " + json.msg);
+      }
+    } catch (err) {
+      setMsg("msg", "❌ Error: " + err.message);
+    }
+  }
+
+  function clearInputForm() {
+    document.querySelectorAll("#pageInput input, #pageInput textarea, #pageInput select").forEach(el => {
+      el.value = "";
+    });
+  }
+
+  // ==================== LOAD REPORT PER BULAN ====================
   async function loadReportsBySelectedMonth() {
     try {
       const bulan = document.getElementById("FilterBulan").value || getCurrentMonthYYYYMM();
       setJudulBulan(bulan);
+      setMsg("msgReport", "Memuat laporan bulan " + bulan + " ...");
 
-      setMsgReport("Memuat laporan bulan " + bulan + " ...");
       const res = await fetch(API_URL + "?action=get&bulan=" + bulan);
       const json = await res.json();
 
       if (!json.ok) {
-        setMsgReport("❌ Gagal load data: " + json.msg);
+        rawData = [];
+        viewData = [];
+        renderReportTable();
+        setMsg("msgReport", "❌ Gagal load: " + json.msg);
         return;
       }
 
-      const tbody = document.querySelector("#reportTable tbody");
-      tbody.innerHTML = "";
-
-      const data = (json.data || []).slice().reverse();
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.ID || ""}</td>
-          <td>${row.Tanggal || ""}</td>
-          <td>${row.Ruang || ""}</td>
-          <td>${row.MasalahKegiatan || ""}</td>
-          <td>${row.Tindakan || ""}</td>
-          <td>${row.Petugas || ""}</td>
-          <td>${row.Status || ""}</td>
-        `;
-        tr.onclick = () => fillForm(row);
-        tbody.appendChild(tr);
+      rawData = (json.data || []).map(x => {
+        // jaga kolom kosong
+        x.ID = normalizeText(x.ID);
+        x.Tanggal = normalizeText(x.Tanggal);
+        x.Pelapor = normalizeText(x.Pelapor);
+        x.Ruang = normalizeText(x.Ruang);
+        x.Pukul = normalizeText(x.Pukul);
+        x.NoLK = normalizeText(x.NoLK);
+        x.MasalahKegiatan = normalizeText(x.MasalahKegiatan);
+        x.Tindakan = normalizeText(x.Tindakan);
+        x.Petugas = normalizeText(x.Petugas);
+        x.Status = normalizeText(x.Status);
+        x.Keterangan = normalizeText(x.Keterangan);
+        x.Kategori = normalizeText(x.Kategori);
+        x.AreaKerja = normalizeText(x.AreaKerja);
+        x.Item = normalizeText(x.Item);
+        x.SparePartUnit = normalizeText(x.SparePartUnit);
+        x.Type = normalizeText(x.Type);
+        x.Jumlah = normalizeText(x.Jumlah);
+        return x;
       });
 
-      setMsgReport("✅ Total laporan bulan " + bulan + ": " + data.length + " data");
+      buildFilterOptionsFromData(rawData);
+      applyFilters();
     } catch (err) {
-      setMsgReport("❌ Error: " + err.message);
+      rawData = [];
+      viewData = [];
+      renderReportTable();
+      setMsg("msgReport", "❌ Error: " + err.message);
     }
   }
 
-  // Init
+  // ==================== FILTERS (KUNING) ====================
+  function uniqueSorted(arr) {
+    const set = new Set(arr.filter(x => normalizeText(x) !== ""));
+    return Array.from(set).sort((a,b) => a.localeCompare(b));
+  }
+
+  function buildFilterOptionsFromData(data) {
+    // Kategori
+    const kategoriList = uniqueSorted(data.map(x => x.Kategori));
+    const areaList = uniqueSorted(data.map(x => x.AreaKerja));
+    const itemList = uniqueSorted(data.map(x => x.Item));
+
+    const fk = document.getElementById("FilterKategori");
+    fk.innerHTML = `<option value="ALL">SEMUA DATA</option>`;
+    kategoriList.forEach(v => {
+      fk.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+    });
+
+    const fa = document.getElementById("FilterAreaKerja");
+    fa.innerHTML = `<option value="ALL">SEMUA DATA</option>`;
+    areaList.forEach(v => {
+      fa.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+    });
+
+    const fi = document.getElementById("FilterItem");
+    fi.innerHTML = `<option value="ALL">SEMUA DATA</option>`;
+    itemList.forEach(v => {
+      fi.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+    });
+
+    // reset status filter tetap ALL
+    document.getElementById("FilterStatus").value = "ALL";
+  }
+
+  function applyFilters() {
+    const status = document.getElementById("FilterStatus").value;
+    const kategori = document.getElementById("FilterKategori").value;
+    const area = document.getElementById("FilterAreaKerja").value;
+    const item = document.getElementById("FilterItem").value;
+
+    viewData = rawData.filter(x => {
+      let ok = true;
+      if (status !== "ALL") ok = ok && (x.Status.toUpperCase() === status);
+      if (kategori !== "ALL") ok = ok && (x.Kategori === kategori);
+      if (area !== "ALL") ok = ok && (x.AreaKerja === area);
+      if (item !== "ALL") ok = ok && (x.Item === item);
+      return ok;
+    });
+
+    applySort();
+    renderReportTable();
+    renderRekap();
+  }
+
+  // ==================== SORT UP/DOWN ====================
+  function applySort() {
+    viewData.sort((a,b) => {
+      const ka = toDateKey(a.Tanggal);
+      const kb = toDateKey(b.Tanggal);
+      if (sortMode === "UP") return ka.localeCompare(kb);
+      return kb.localeCompare(ka);
+    });
+  }
+
+  function sortUp() {
+    sortMode = "UP";
+    applyFilters();
+  }
+  function sortDown() {
+    sortMode = "DOWN";
+    applyFilters();
+  }
+
+  // ==================== RENDER TABLE ====================
+  function escapeHtml(text) {
+    return (text || "").toString()
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
+
+  function renderReportTable() {
+    const tbody = document.querySelector("#reportTable tbody");
+    tbody.innerHTML = "";
+
+    document.getElementById("infoTotalPill").innerText = `Total: ${viewData.length}`;
+
+    viewData.forEach((row, idx) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="text-align:center;"><b>${idx+1}</b></td>
+        <td style="text-align:center;">${escapeHtml(row.Tanggal)}</td>
+        <td style="text-align:center;">${escapeHtml(row.Pelapor)}<br><span style="font-size:11px;color:#000;">${row.NoLK ? "[NO. LK : "+escapeHtml(row.NoLK)+"]" : ""}</span></td>
+        <td style="text-align:center;">${escapeHtml(row.Ruang)}</td>
+        <td style="text-align:center;">${escapeHtml(row.Pukul)}</td>
+        <td>${escapeHtml(row.MasalahKegiatan)}</td>
+        <td>${escapeHtml(row.Tindakan)}</td>
+        <td style="text-align:center;">${escapeHtml(row.Petugas)}</td>
+        <td style="text-align:center; font-weight:bold; ${row.Status.toUpperCase()==='BELUM' ? 'background:#ff3b3b;color:#fff;' : ''}">
+          ${escapeHtml(row.Status || "")}
+        </td>
+        <td style="text-align:center;">${escapeHtml(row.Kategori)}</td>
+        <td style="text-align:center;">${escapeHtml(row.AreaKerja)}</td>
+        <td style="text-align:center;">${escapeHtml(row.Item)}</td>
+      `;
+
+      // klik baris -> popup edit
+      tr.onclick = () => openEditModal(row);
+      tbody.appendChild(tr);
+    });
+
+    setMsg("msgReport", "✅ Data tampil: " + viewData.length);
+  }
+
+  // ==================== REKAP SPAREPART (AUTO SUM) ====================
+  function toggleRekap() {
+    const p = document.getElementById("panelRekap");
+    if (p.style.display === "none") {
+      p.style.display = "block";
+      renderRekap();
+    } else {
+      p.style.display = "none";
+    }
+  }
+
+  function renderRekap() {
+    const tbody = document.querySelector("#rekapTable tbody");
+    tbody.innerHTML = "";
+
+    // group by SparePartUnit + Type
+    const map = new Map();
+
+    viewData.forEach(r => {
+      const spare = normalizeText(r.SparePartUnit);
+      const type = normalizeText(r.Type);
+      const jumlah = parseFloat(r.Jumlah || "0") || 0;
+
+      if (spare === "" && type === "" && jumlah === 0) return;
+
+      const key = spare + "||" + type;
+      const prev = map.get(key) || 0;
+      map.set(key, prev + jumlah);
+    });
+
+    const arr = Array.from(map.entries()).map(([key, total]) => {
+      const [spare, type] = key.split("||");
+      return { spare, type, total };
+    });
+
+    // sort desc total
+    arr.sort((a,b) => b.total - a.total);
+
+    arr.forEach(x => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escapeHtml(x.spare)}</td>
+        <td style="text-align:center;">${escapeHtml(x.type)}</td>
+        <td style="text-align:center;"><b>${x.total}</b></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ==================== EDIT POPUP ====================
+  function openEditModal(row) {
+    document.getElementById("modalBg").classList.add("show");
+    setMsg("msgEdit", "");
+
+    document.getElementById("Edit_ID").value = row.ID || "";
+    document.getElementById("EditID").innerText = row.ID || "-";
+    document.getElementById("EditSheet").innerText = row._Sheet ? "Sheet: " + row._Sheet : "Sheet: (bulan)";
+
+    document.getElementById("Edit_Tanggal").value = row.Tanggal || "";
+    document.getElementById("Edit_Pelapor").value = row.Pelapor || "";
+    document.getElementById("Edit_Ruang").value = row.Ruang || "";
+    document.getElementById("Edit_Pukul").value = row.Pukul || "";
+    document.getElementById("Edit_NoLK").value = row.NoLK || "";
+    document.getElementById("Edit_MasalahKegiatan").value = row.MasalahKegiatan || "";
+    document.getElementById("Edit_Tindakan").value = row.Tindakan || "";
+    document.getElementById("Edit_Petugas").value = row.Petugas || "";
+    document.getElementById("Edit_Status").value = row.Status || "";
+    document.getElementById("Edit_Keterangan").value = row.Keterangan || "";
+    document.getElementById("Edit_Kategori").value = row.Kategori || "";
+    document.getElementById("Edit_AreaKerja").value = row.AreaKerja || "";
+    document.getElementById("Edit_Item").value = row.Item || "";
+    document.getElementById("Edit_SparePartUnit").value = row.SparePartUnit || "";
+    document.getElementById("Edit_Type").value = row.Type || "";
+    document.getElementById("Edit_Jumlah").value = row.Jumlah || "";
+  }
+
+  function closeModal() {
+    document.getElementById("modalBg").classList.remove("show");
+  }
+
+  async function saveEdit() {
+    try {
+      setMsg("msgEdit", "Menyimpan update...");
+
+      const payload = {
+        action: "update",
+        ID: document.getElementById("Edit_ID").value,
+        Tanggal: document.getElementById("Edit_Tanggal").value,
+        Pelapor: document.getElementById("Edit_Pelapor").value,
+        Ruang: document.getElementById("Edit_Ruang").value,
+        Pukul: document.getElementById("Edit_Pukul").value,
+        NoLK: document.getElementById("Edit_NoLK").value,
+        MasalahKegiatan: document.getElementById("Edit_MasalahKegiatan").value,
+        Tindakan: document.getElementById("Edit_Tindakan").value,
+        Petugas: document.getElementById("Edit_Petugas").value,
+        Status: document.getElementById("Edit_Status").value,
+        Keterangan: document.getElementById("Edit_Keterangan").value,
+        Kategori: document.getElementById("Edit_Kategori").value,
+        AreaKerja: document.getElementById("Edit_AreaKerja").value,
+        Item: document.getElementById("Edit_Item").value,
+        SparePartUnit: document.getElementById("Edit_SparePartUnit").value,
+        Type: document.getElementById("Edit_Type").value,
+        Jumlah: document.getElementById("Edit_Jumlah").value
+      };
+
+      if (!payload.ID) {
+        setMsg("msgEdit", "❌ ID kosong, tidak bisa update.");
+        return;
+      }
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json();
+      if (json.ok) {
+        setMsg("msgEdit", "✅ Update berhasil");
+        closeModal();
+        // reload data bulan yang sama + reapply filter
+        loadReportsBySelectedMonth();
+      } else {
+        setMsg("msgEdit", "❌ Gagal: " + json.msg);
+      }
+
+    } catch (err) {
+      setMsg("msgEdit", "❌ Error: " + err.message);
+    }
+  }
+
+  // close modal jika klik background hitam
+  document.getElementById("modalBg").addEventListener("click", function(e){
+    if (e.target.id === "modalBg") closeModal();
+  });
+
+  // ==================== INIT ====================
   buildMonthOptions();
   loadReportsBySelectedMonth();
 </script>
