@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IPRS SHIFT - RS Puri Cinere</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f6f6f6; padding: 15px; }
+    .box { background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; }
+    label { display:block; margin-top:8px; font-weight: bold; }
+    input, textarea, select { width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:5px; }
+    button { padding:10px 15px; margin-top:10px; cursor:pointer; border:none; border-radius:5px; font-weight:bold; }
+    .btn-save { background:#2ecc71; color:#fff; }
+    .btn-update { background:#3498db; color:#fff; }
+    .btn-refresh { background:#555; color:#fff; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { border:1px solid #ddd; padding:8px; font-size:13px; }
+    th { background:#eee; }
+    tr:hover { background:#f2f2f2; }
+    .small { font-size:12px; color:#666; }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h2>INPUT LAPORAN HARIAN IPSRS (SHIFT)</h2>
+    <p class="small">RS. Puri Cinere - Data tersimpan ke Google Sheet</p>
+
+    <input type="hidden" id="ID" />
+
+    <label>TANGGAL</label>
+    <input type="date" id="Tanggal"/>
+
+    <label>PELAPOR</label>
+    <input type="text" id="Pelapor"/>
+
+    <label>RUANG</label>
+    <input type="text" id="Ruang"/>
+
+    <label>PUKUL</label>
+    <input type="time" id="Pukul"/>
+
+    <label>NO. LK</label>
+    <input type="text" id="NoLK"/>
+
+    <label>MASALAH / KEGIATAN</label>
+    <textarea id="MasalahKegiatan"></textarea>
+
+    <label>TINDAKAN</label>
+    <textarea id="Tindakan"></textarea>
+
+    <label>PETUGAS</label>
+    <input type="text" id="Petugas"/>
+
+    <label>SELESAI / BELUM</label>
+    <select id="Status">
+      <option value="">-- pilih --</option>
+      <option value="SELESAI">SELESAI</option>
+      <option value="BELUM">BELUM</option>
+    </select>
+
+    <label>KETERANGAN</label>
+    <input type="text" id="Keterangan"/>
+
+    <label>KATEGORI</label>
+    <input type="text" id="Kategori"/>
+
+    <label>AREA KERJA</label>
+    <input type="text" id="AreaKerja"/>
+
+    <label>ITEM</label>
+    <input type="text" id="Item"/>
+
+    <label>SPARE PART / UNIT</label>
+    <input type="text" id="SparePartUnit"/>
+
+    <label>TYPE</label>
+    <input type="text" id="Type"/>
+
+    <label>JUMLAH</label>
+    <input type="number" id="Jumlah"/>
+
+    <button class="btn-save" onclick="saveData()">SIMPAN DATA BARU</button>
+    <button class="btn-update" onclick="updateData()">UPDATE DATA (EDIT)</button>
+    <button class="btn-refresh" onclick="loadReports()">REFRESH LAPORAN</button>
+
+    <p class="small" id="msg"></p>
+  </div>
+
+  <div class="box">
+    <h3>LAPORAN (Klik baris untuk Edit)</h3>
+    <div style="overflow:auto;">
+      <table id="reportTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tanggal</th>
+            <th>Ruang</th>
+            <th>Masalah</th>
+            <th>Tindakan</th>
+            <th>Petugas</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  // ✅ API URL milik Bapak (Google Apps Script Web App)
+  const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
+
+  function setMsg(text) {
+    document.getElementById("msg").innerText = text;
+  }
+
+  function getFormData() {
+    return {
+      ID: document.getElementById("ID").value,
+      Tanggal: document.getElementById("Tanggal").value,
+      Pelapor: document.getElementById("Pelapor").value,
+      Ruang: document.getElementById("Ruang").value,
+      Pukul: document.getElementById("Pukul").value,
+      NoLK: document.getElementById("NoLK").value,
+      MasalahKegiatan: document.getElementById("MasalahKegiatan").value,
+      Tindakan: document.getElementById("Tindakan").value,
+      Petugas: document.getElementById("Petugas").value,
+      Status: document.getElementById("Status").value,
+      Keterangan: document.getElementById("Keterangan").value,
+      Kategori: document.getElementById("Kategori").value,
+      AreaKerja: document.getElementById("AreaKerja").value,
+      Item: document.getElementById("Item").value,
+      SparePartUnit: document.getElementById("SparePartUnit").value,
+      Type: document.getElementById("Type").value,
+      Jumlah: document.getElementById("Jumlah").value
+    };
+  }
+
+  async function saveData() {
+    try {
+      setMsg("Menyimpan data...");
+      const payload = getFormData();
+      payload.action = "add";
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json();
+      if (json.ok) {
+        setMsg("✅ Data tersimpan dengan ID: " + json.id);
+        clearForm();
+        loadReports();
+      } else {
+        setMsg("❌ Gagal: " + json.msg);
+      }
+    } catch (err) {
+      setMsg("❌ Error: " + err.message);
+    }
+  }
+
+  async function updateData() {
+    try {
+      const id = document.getElementById("ID").value;
+      if (!id) {
+        setMsg("⚠️ Pilih data dulu dari tabel untuk edit.");
+        return;
+      }
+
+      setMsg("Mengupdate data...");
+      const payload = getFormData();
+      payload.action = "update";
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json();
+      if (json.ok) {
+        setMsg("✅ Data berhasil diupdate");
+        clearForm();
+        loadReports();
+      } else {
+        setMsg("❌ Gagal: " + json.msg);
+      }
+    } catch (err) {
+      setMsg("❌ Error: " + err.message);
+    }
+  }
+
+  async function loadReports() {
+    try {
+      setMsg("Memuat laporan...");
+      const res = await fetch(API_URL + "?action=get");
+      const json = await res.json();
+
+      if (!json.ok) {
+        setMsg("❌ Gagal load data: " + json.msg);
+        return;
+      }
+
+      const tbody = document.querySelector("#reportTable tbody");
+      tbody.innerHTML = "";
+
+      json.data.reverse().forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.ID || ""}</td>
+          <td>${row.Tanggal || ""}</td>
+          <td>${row.Ruang || ""}</td>
+          <td>${row.MasalahKegiatan || ""}</td>
+          <td>${row.Tindakan || ""}</td>
+          <td>${row.Petugas || ""}</td>
+          <td>${row.Status || ""}</td>
+        `;
+        tr.onclick = () => fillForm(row);
+        tbody.appendChild(tr);
+      });
+
+      setMsg("✅ Laporan berhasil dimuat (" + json.data.length + " data)");
+    } catch (err) {
+      setMsg("❌ Error: " + err.message);
+    }
+  }
+
+  function fillForm(row) {
+    document.getElementById("ID").value = row.ID || "";
+    document.getElementById("Tanggal").value = row.Tanggal || "";
+    document.getElementById("Pelapor").value = row.Pelapor || "";
+    document.getElementById("Ruang").value = row.Ruang || "";
+    document.getElementById("Pukul").value = row.Pukul || "";
+    document.getElementById("NoLK").value = row.NoLK || "";
+    document.getElementById("MasalahKegiatan").value = row.MasalahKegiatan || "";
+    document.getElementById("Tindakan").value = row.Tindakan || "";
+    document.getElementById("Petugas").value = row.Petugas || "";
+    document.getElementById("Status").value = row.Status || "";
+    document.getElementById("Keterangan").value = row.Keterangan || "";
+    document.getElementById("Kategori").value = row.Kategori || "";
+    document.getElementById("AreaKerja").value = row.AreaKerja || "";
+    document.getElementById("Item").value = row.Item || "";
+    document.getElementById("SparePartUnit").value = row.SparePartUnit || "";
+    document.getElementById("Type").value = row.Type || "";
+    document.getElementById("Jumlah").value = row.Jumlah || "";
+
+    setMsg("✏️ Mode EDIT aktif untuk ID: " + row.ID);
+  }
+
+  function clearForm() {
+    document.getElementById("ID").value = "";
+    document.querySelectorAll("input, textarea, select").forEach(el => {
+      if (el.id !== "ID") el.value = "";
+    });
+  }
+
+  // auto load saat buka web
+  loadReports();
+</script>
+</body>
+</html>
