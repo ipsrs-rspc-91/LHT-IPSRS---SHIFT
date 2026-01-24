@@ -135,6 +135,11 @@
 
     .input-error { border-color: var(--danger) !important; box-shadow: 0 6px 20px rgba(224,36,36,0.08); }
 
+    /* small petugas popup modal tweaks */
+    .petugas-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+    .petugas-list .opt { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:10px; background:linear-gradient(180deg,#fafcff,#fff); border:1px solid rgba(10,20,40,0.05); cursor:pointer; }
+    .petugas-list .opt:hover { background:#f0fbff; }
+
     @media (max-width:900px){
       .topbar .title { font-size:14px; }
     }
@@ -216,8 +221,11 @@
         <div class="panel-right">
           <div class="form-section">
             <label for="Petugas">PETUGAS</label>
-            <!-- Ditambahkan datalist saran petugas -->
-            <input id="Petugas" type="text" list="PetugasList" placeholder="Pilih atau ketik nama petugas"/>
+            <!-- Popup chooser: input + button to open popup (replaces simple datalist UX) -->
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input id="Petugas" type="text" placeholder="Pilih atau ketik nama petugas"/>
+              <button type="button" class="btn ghost" onclick="openPetugasPopup('Petugas')" title="Pilih petugas">PILIH</button>
+            </div>
 
             <label for="Status">SELESAI / BELUM</label>
             <select id="Status">
@@ -406,8 +414,11 @@
 
               <div>
                 <label>PETUGAS</label>
-                <!-- Modal edit juga mengacu ke datalist yang sama -->
-                <input type="text" id="Edit_Petugas" list="PetugasList"/>
+                <!-- Modal edit also has a choose button to open the petugas popup -->
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <input type="text" id="Edit_Petugas" placeholder="Pilih atau ketik nama petugas"/>
+                  <button type="button" class="btn ghost" onclick="openPetugasPopup('Edit_Petugas')" title="Pilih petugas">PILIH</button>
+                </div>
 
                 <label>SELESAI / BELUM</label>
                 <select id="Edit_Status">
@@ -467,7 +478,23 @@
     </div>
   </div>
 
-  <!-- Datalist saran Petugas (tersedia untuk input Petugas dan Edit_Petugas) -->
+  <!-- Petugas Popup (new) -->
+  <div id="petugasPopupBg" class="modal-bg" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="petugasPopupTitle" style="width:320px; max-width:96vw;">
+      <h4 id="petugasPopupTitle">Pilih Petugas</h4>
+      <div class="smallnote">Pilih salah satu nama petugas untuk mengisi kolom.</div>
+      <div class="petugas-list" id="petugasOptions" role="list">
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Pantiarso')" onkeydown="if(event.key==='Enter'){ selectPetugas('Pantiarso'); }"> <span>Pantiarso</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Agung')" onkeydown="if(event.key==='Enter'){ selectPetugas('Agung'); }"> <span>Agung</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Rusdi')" onkeydown="if(event.key==='Enter'){ selectPetugas('Rusdi'); }"> <span>Rusdi</span> <span class="muted">Pilih</span> </div>
+      </div>
+      <div style="margin-top:12px; text-align:right;">
+        <button class="btn ghost" onclick="closePetugasPopup()">BATAL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Datalist kept as fallback (optional) -->
   <datalist id="PetugasList">
     <option value="Pantiarso"></option>
     <option value="Agung"></option>
@@ -654,6 +681,8 @@
     attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
     // auto-scroll handlers kept from previous implementation if needed
     attachAutoScrollForInputs();
+    // petugas popup: ensure keyboard Enter selects focused option
+    // nothing else required here; choose button opens popup
   }
 
   // preserve previous auto-scroll utility (unchanged behaviour)
@@ -951,6 +980,55 @@
     const bg=document.getElementById("savedToast"); if(!bg) return; bg.classList.remove("show");
     const first=document.querySelector("#pageInput input, #pageInput textarea, #pageInput select"); if(first) first.focus();
   }
+
+  // Petugas popup logic (new)
+  let _petugasTargetInputId = null;
+  function openPetugasPopup(inputId){
+    _petugasTargetInputId = inputId || null;
+    const bg = document.getElementById('petugasPopupBg');
+    if(!bg) return;
+    bg.classList.add('show');
+    bg.setAttribute('aria-hidden','false');
+    // focus first option for keyboard users
+    setTimeout(()=>{
+      const firstOpt = document.querySelector('#petugasOptions .opt');
+      if(firstOpt) firstOpt.focus();
+    },50);
+  }
+  function closePetugasPopup(){
+    const bg = document.getElementById('petugasPopupBg');
+    if(!bg) return;
+    bg.classList.remove('show');
+    bg.setAttribute('aria-hidden','true');
+    // return focus to target input if still present
+    if(_petugasTargetInputId){
+      const el = document.getElementById(_petugasTargetInputId);
+      if(el) el.focus();
+    }
+    _petugasTargetInputId = null;
+  }
+  function selectPetugas(name){
+    if(_petugasTargetInputId){
+      const el = document.getElementById(_petugasTargetInputId);
+      if(el) el.value = name;
+    }
+    closePetugasPopup();
+  }
+  // close petugas popup by clicking background
+  document.getElementById('petugasPopupBg').addEventListener('click', function(e){
+    if(e.target && e.target.id === 'petugasPopupBg') closePetugasPopup();
+  });
+  // ESC to close petugas popup
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      const bg = document.getElementById('petugasPopupBg');
+      if(bg && bg.classList.contains('show')){ closePetugasPopup(); return; }
+      const modal = document.getElementById('modalBg');
+      if(modal && modal.classList.contains('show')){ closeModal(); return; }
+      const toast = document.getElementById('savedToast');
+      if(toast && toast.classList.contains('show')){ hideSavedPopup(); return; }
+    }
+  });
 
   // keep responsive handlers
   window.addEventListener('resize', () => {
