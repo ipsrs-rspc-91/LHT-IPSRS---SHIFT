@@ -3,977 +3,193 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LHT IPSRS - SHIFT (RS. PURI CINERE)</title>
-
-  <!-- Google Font (Inter) -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
+  <title>Form Petugas (Static list + add)</title>
   <style>
-    :root{
-      --bg:#f5f7fb;
-      --card:#ffffff;
-      --accent:#0a69b8;
-      --accent-2:#24a0ff;
-      --muted:#6b7280;
-      --muted-2:#94a3b8;
-      --text:#071737;
-      --success:#1f9d55;
-      --danger:#e02424;
-      --yellow:#fff6bf;
-      --border-weak: rgba(16,24,40,0.06);
-      --border: rgba(15,23,42,0.12);
-      --glass: rgba(255,255,255,0.6);
-      --radius:12px;
-      --shadow: 0 6px 18px rgba(20,30,60,0.06);
-      --topbar-height: 72px; /* default, updated by JS */
-      --topbar-z: 12000;     /* header above modals/popup */
-      --modal-z: 10000;
-      --toast-z: 11000;
-    }
-
-    *{box-sizing:border-box;}
-    html,body{height:100%; margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; background:var(--bg); color:var(--text);}
-    a{color:inherit;}
-
-    /* ===== TOPBAR (fixed) ===== */
-    .topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: var(--topbar-height);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:12px 14px;
-      background: linear-gradient(90deg, #e8f6ff 0%, #dff8e6 100%);
-      border-bottom:1px solid rgba(0,0,0,0.06);
-      z-index: var(--topbar-z);
-      box-shadow: 0 6px 20px rgba(10,15,30,0.03);
-      backdrop-filter: blur(4px);
-    }
-    .topbar .brand { display:flex; gap:10px; align-items:center; }
-    .topbar .title { font-weight:700; font-size:16px; color:#042f66; line-height:1; }
-    .topbar .subtitle { font-size:12px; color:var(--muted); margin-top:2px; }
-
-    .action-panel {
-      display:flex; gap:8px; align-items:center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.95));
-      padding:6px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);
-      box-shadow: 0 6px 20px rgba(10,20,60,0.06);
-    }
-
-    .btn {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px; border-radius:10px; background:var(--card); border:1px solid var(--border-weak);
-      cursor:pointer; font-weight:700; color:#062b57; box-shadow:none; font-size:13px;
-      transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
-    }
-    .btn.primary { background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:0; box-shadow: 0 10px 28px rgba(10,120,220,0.12); }
-    .btn.ghost { background:transparent; border:1px solid rgba(10,20,40,0.06); color:var(--muted); font-weight:700; }
-    .btn svg { width:16px; height:16px; display:block; fill:currentColor; opacity:0.95; }
-    .btn .btn-label { display:inline-block; white-space:nowrap; }
-
-    .pill { background:var(--card); border-radius:999px; padding:6px 12px; font-size:13px; border:1px solid var(--border); color:var(--muted); font-weight:700; }
-
-    /* ===== LAYOUT (container offset to avoid header overlap) ===== */
-    .container {
-      max-width:1100px;
-      margin: 18px auto;
-      padding: calc(var(--topbar-height) + 16px) 14px 32px; /* top padding = header height + gap */
-    }
-
-    .card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow: 0 8px 22px rgba(20,30,60,0.06); border:1px solid rgba(10,20,40,0.04); }
-
-    .grid { display:grid; grid-template-columns: 1fr 420px; gap:14px; }
-    @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
-
-    .form-col label { display:block; font-weight:700; margin-top:12px; color:#042a57; font-size:13px; letter-spacing:0.2px; }
-    input, textarea, select {
-      width:100%; margin-top:8px; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
-      background: #ffffff; font-size:15px; color:var(--text); box-shadow: 0 4px 12px rgba(10,20,40,0.03);
-      transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease; -webkit-appearance:none; appearance:none;
-    }
-    textarea { min-height:140px; resize:vertical; }
-    input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 8px 24px rgba(10,120,220,0.12); transform:translateY(-1px); }
-
-    /* Combined row for Pukul + NoLK
-       Make both columns same width/height so they look symmetric */
-    .row-inline { display:flex; gap:10px; align-items:flex-start; }
-    .row-inline .col { min-width:0; }
-    .row-inline .col.small { flex: 0 0 150px; }   /* Pukul width */
-    .row-inline .col.xsmall { flex: 0 0 150px; }  /* NoLK width (match) */
-
-    /* styling for enforced text-time input */
-    .time-input { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace; letter-spacing:0.6px; text-align:center; }
-    .time-input::placeholder { color: var(--muted-2); font-style:italic; }
-
-    .big-save { margin-top:18px; padding:16px; border-radius:12px; background:linear-gradient(90deg,#06a84f,#2fc26a); color:white; font-weight:800; font-size:15px; text-align:center; cursor:pointer; border:0; box-shadow: 0 10px 30px rgba(34,185,87,0.12); }
-    .smallnote { font-size:13px; color:var(--muted); margin-top:8px; }
-
-    .panel-right { display:flex; flex-direction:column; gap:10px; }
-
-    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; }
-    th, td { padding:10px 8px; border-bottom:1px solid rgba(10,20,40,0.06); text-align:left; vertical-align:top; }
-    thead th { color:#fff; background:var(--accent); font-weight:700; position:sticky; top: calc(var(--topbar-height)); z-index: calc(var(--topbar-z) - 1); }
-    tbody tr:hover { background:#f3fbff; cursor:pointer; }
-
-    .status-badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; color:#fff; }
-    .status-done { background:var(--success); }
-    .status-pending { background:var(--danger); }
-
-    /* modal / toast: under header (header always visible) */
-    .modal-bg { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(6,10,20,0.45); z-index: var(--modal-z); padding:16px; }
-    .modal-bg.show { display:flex; }
-    .modal { width:min(980px,96vw); max-height:92vh; overflow:auto; border-radius:14px; background:linear-gradient(180deg,#ffffff,#fbfdff); padding:18px; border:1px solid var(--border); box-shadow: 0 30px 80px rgba(10,20,60,0.25); }
-
-    #savedToast { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index: var(--toast-z); }
-    #savedToast.show { display:flex; }
-    .toast { background:#fff; border-radius:12px; padding:18px 20px; min-width:260px; max-width:90%; box-shadow: 0 18px 40px rgba(10,20,60,0.16); border:1px solid rgba(10,20,40,0.06); text-align:center; }
-
-    .input-error { border-color: var(--danger) !important; box-shadow: 0 6px 20px rgba(224,36,36,0.08); }
-
-    @media (max-width:900px){
-      .topbar .title { font-size:14px; }
-    }
-    @media (max-width:700px) {
-      input, textarea, select { padding:14px 14px; font-size:16px; border-width:1.5px; }
-      .card { padding:12px; border-radius:10px; }
-      .big-save { padding:14px; font-size:15px; }
-      .grid { gap:10px; }
-      .row-inline .col.small, .row-inline .col.xsmall { flex: 1 1 0; } /* responsive: stack/fill on small screens */
-    }
+    :root{--bg:#f5f7fb;--card:#fff;--accent:#0a69b8;--muted:#6b7280;--text:#071737;}
+    body{font-family:Inter,system-ui,Arial;margin:24px;background:var(--bg);color:var(--text)}
+    .card{background:var(--card);padding:16px;border-radius:10px;max-width:720px;margin:0 auto;border:1px solid rgba(0,0,0,0.06)}
+    label{display:block;font-weight:700;margin-top:12px;color:#042a57}
+    input,textarea,select,button{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);margin-top:8px;font-size:15px}
+    .row{display:flex;gap:8px}
+    .row .col{flex:1}
+    .btn{background:linear-gradient(90deg,var(--accent),#24a0ff);color:#fff;border:0;padding:10px;border-radius:8px;cursor:pointer}
+    .muted{font-size:13px;color:var(--muted);margin-top:8px}
+    .small{padding:8px;font-size:13px;border-radius:8px}
   </style>
 </head>
 <body>
+  <div class="card">
+    <h2>Input Laporan (Petugas: daftar statis + tambah lokal)</h2>
 
-  <div class="topbar" id="topbar">
-    <div class="brand">
-      <div>
-        <div class="title">RS. PURI CINERE</div>
-        <div class="subtitle">INPUT LAPORAN HARIAN IPSRS (SHIFT)</div>
-      </div>
+    <label for="Petugas">PETUGAS</label>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="Petugas" list="PetugasList" placeholder="Pilih atau ketik nama..." />
+      <button id="AddBtn" class="btn" style="flex:0 0 140px">Tambahkan</button>
+    </div>
+    <datalist id="PetugasList"></datalist>
+    <div id="info" class="muted">Pilih nama dari daftar atau ketik lalu tekan "Tambahkan" untuk menyimpan secara lokal.</div>
+
+    <label for="Tanggal">TANGGAL</label>
+    <input id="Tanggal" type="date" />
+
+    <label for="Masalah">MASALAH / KEGIATAN</label>
+    <textarea id="Masalah" rows="3"></textarea>
+
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="SaveReport" class="btn" style="flex:1">Simpan (demo)</button>
+      <button id="ResetList" class="small">Reset daftar ke awal</button>
     </div>
 
-    <div class="actions">
-      <div class="action-panel" role="toolbar" aria-label="Aksi">
-        <div id="judulBulanDesktop" class="pill" style="display:none; cursor:pointer;" title="Klik untuk memilih bulan laporan" onclick="document.getElementById('FilterBulan')?.focus();">BULAN -</div>
-
-        <button id="btnLaporan" class="btn ghost" onclick="showPage('laporan')">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4v-2H3v2zm0 4h10v-2H3v2zM3 7h16V5H3v2zm18 6h-6v6h2v-4h4v-2z"/></svg>
-          <span class="btn-label">LAPORAN</span>
-        </button>
-
-        <button id="btnInput" class="btn primary" onclick="showPage('input')" style="display:none;">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8z"/></svg>
-          <span class="btn-label">INPUT DATA</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    <!-- PAGE INPUT -->
-    <div id="pageInput" class="page active">
-      <div class="card grid">
-        <div class="form-col">
-          <div class="form-section">
-            <label for="Tanggal">TANGGAL</label>
-            <input id="Tanggal" type="date" />
-
-            <label for="Pelapor">PELAPOR</label>
-            <input id="Pelapor" type="text" placeholder="Nama pelapor"/>
-
-            <!-- Combined row: PUKUL + NO. LK in same line -->
-            <div class="row-inline" style="margin-top:6px;">
-              <div class="col small">
-                <!-- changed to text-based time input with JS enforcement -->
-                <label for="Pukul">PUKUL (24 jam)</label>
-                <input id="Pukul" class="time-input" type="text" placeholder="HH:MM" maxlength="5" aria-describedby="pukulHelp" />
-                <div id="pukulHelp" class="smallnote" style="margin-top:6px;">Masukkan waktu format 24-jam, mis. 08:30 atau 14:05</div>
-              </div>
-              <div class="col xsmall">
-                <label for="NoLK">NO. LK</label>
-                <input id="NoLK" type="text" />
-              </div>
-            </div>
-
-            <label for="Ruang">RUANG</label>
-            <input id="Ruang" type="text" placeholder="Contoh: IGD"/>
-
-            <label for="MasalahKegiatan">MASALAH / KEGIATAN</label>
-            <textarea id="MasalahKegiatan" placeholder="Deskripsikan masalah atau kegiatan"></textarea>
-
-            <label for="Tindakan">TINDAKAN</label>
-            <textarea id="Tindakan" placeholder="Tindakan yang dilakukan"></textarea>
-
-            <div class="smallnote">* Jika ada penggantian spare part/unit baru.</div>
-          </div>
-        </div>
-
-        <div class="panel-right">
-          <div class="form-section">
-            <label for="Petugas">PETUGAS</label>
-            <input id="Petugas" type="text"/>
-
-            <label for="Status">SELESAI / BELUM</label>
-            <select id="Status">
-              <option value="">-- pilih --</option>
-              <option value="SELESAI">SELESAI</option>
-              <option value="BELUM">BELUM</option>
-            </select>
-
-            <label for="Keterangan">KETERANGAN (tambahan)</label>
-            <input id="Keterangan" type="text"/>
-
-            <label for="Kategori">KATEGORI</label>
-            <input id="Kategori" type="text"/>
-
-            <label for="AreaKerja">AREA KERJA</label>
-            <input id="AreaKerja" type="text"/>
-
-            <label for="Item">ITEM</label>
-            <input id="Item" type="text"/>
-
-            <label for="SparePartUnit">SPARE PART / UNIT</label>
-            <input id="SparePartUnit" type="text"/>
-
-            <label for="Type">TYPE</label>
-            <input id="Type" type="text"/>
-
-            <label for="Jumlah">JUMLAH</label>
-            <input id="Jumlah" type="number" min="0"/>
-
-            <!-- Keep the inline/save button inside the panel (no floating button) -->
-            <div class="big-save" onclick="saveData()">SIMPAN DATA BARU (SHIFT)</div>
-            <div id="msg" class="muted" style="margin-top:8px;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAGE LAPORAN -->
-    <div id="pageLaporan" class="page" style="display:none;">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-          <div>
-            <div style="font-weight:800; font-size:18px; color:#042a57;">LAPORAN HARIAN IPSRS (SHIFT)</div>
-            <div class="info-row" style="margin-top:6px;">
-              <div id="infoBulanPill" class="pill">Bulan: -</div>
-              <div id="infoTotalPill" class="pill">Total: 0</div>
-            </div>
-          </div>
-
-          <div style="display:flex; gap:8px; align-items:center;">
-            <div class="report-toolbar btn-group" role="toolbar" aria-label="Laporan controls">
-              <button class="btn ghost" onclick="toggleRekap()" title="Rekap Spare/Unit">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h18v-2H3v2zm0 4h10v-2H3v2zM3 7h18V5H3v2z"/></svg>
-                <span class="btn-label">REKAP</span>
-              </button>
-              <button class="btn" onclick="sortUp()" title="Urutkan naik">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14l5-5 5 5z"/></svg>
-                <span class="btn-label">UP</span>
-              </button>
-              <button class="btn" onclick="sortDown()" title="Urutkan turun">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>
-                <span class="btn-label">DOWN</span>
-              </button>
-              <button class="btn primary" onclick="showPage('input')" title="Tambah data baru">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8z"/></svg>
-                <span class="btn-label">INPUT DATA</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="filters" style="margin-top:12px;">
-          <div style="display:flex; gap:8px; align-items:center;">
-            <b>BULAN</b>
-            <select id="FilterBulan" onchange="loadReportsBySelectedMonth()"></select>
-          </div>
-
-          <div style="display:flex; gap:8px; align-items:center;">
-            <b>SLSI/BLM/KET</b>
-            <select id="FilterStatus" onchange="applyFilters()">
-              <option value="ALL">SEMUA DATA</option>
-              <option value="SELESAI">SELESAI</option>
-              <option value="BELUM">BELUM</option>
-            </select>
-          </div>
-
-          <div style="display:flex; gap:8px; align-items:center;">
-            <b>KATEGORI</b>
-            <select id="FilterKategori" onchange="applyFilters()">
-              <option value="ALL">SEMUA DATA</option>
-            </select>
-          </div>
-
-          <div style="display:flex; gap:8px; align-items:center;">
-            <b>AREA KERJA</b>
-            <select id="FilterAreaKerja" onchange="applyFilters()">
-              <option value="ALL">SEMUA DATA</option>
-            </select>
-          </div>
-
-          <div style="display:flex; gap:8px; align-items:center;">
-            <b>ITEM</b>
-            <select id="FilterItem" onchange="applyFilters()">
-              <option value="ALL">SEMUA DATA</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="muted" style="margin-top:10px;">✅ Klik baris atau kartu laporan untuk <b>Edit</b> (Popup). Data tetap tersimpan di Google Sheet.</div>
-
-        <div style="overflow:auto; margin-top:12px;">
-          <table id="reportTable">
-            <thead>
-              <tr>
-                <th style="width:46px;">NO</th>
-                <th style="width:110px;">TANGGAL</th>
-                <th>PELAPOR</th>
-                <th>RUANG</th>
-                <th>PUKUL</th>
-                <th>MASALAH / KEGIATAN</th>
-                <th>TINDAKAN</th>
-                <th>PETUGAS</th>
-                <th style="width:90px;">SLSI</th>
-                <th>KATEGORI</th>
-                <th>AREA</th>
-                <th>ITEM</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-
-          <div id="mobileList"></div>
-        </div>
-
-        <div id="panelRekap" style="display:none;">
-          <b>REKAP SPARE PART / UNIT (AUTO SUM JUMLAH)</b>
-          <div class="smallnote">Rekap dihitung dari data yang sedang tampil (sesuai filter).</div>
-          <div style="overflow:auto; margin-top:8px;">
-            <table id="rekapTable" style="width:100%">
-              <thead>
-                <tr>
-                  <th>SPARE PART / UNIT</th>
-                  <th style="width:180px;">TYPE</th>
-                  <th style="width:160px; text-align:center;">TOTAL JUMLAH</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div id="msgReport" class="muted" style="margin-top:10px;"></div>
-
-        <div id="modalBg" class="modal-bg" aria-hidden="true">
-          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-            <h3 id="modalTitle">EDIT LAPORAN</h3>
-            <div style="display:flex; gap:8px; margin-top:8px; align-items:center; flex-wrap:wrap;">
-              <div class="pill" id="EditID">ID: -</div>
-              <div class="pill" id="EditSheet">Sheet: -</div>
-            </div>
-
-            <input type="hidden" id="Edit_ID" />
-
-            <div class="grid" style="margin-top:12px; grid-template-columns: 1fr 1fr; gap:12px;">
-              <div>
-                <label>TANGGAL</label>
-                <input type="date" id="Edit_Tanggal"/>
-
-                <label>PELAPOR</label>
-                <input type="text" id="Edit_Pelapor"/>
-
-                <label>RUANG</label>
-                <input type="text" id="Edit_Ruang"/>
-
-                <label>PUKUL (24 jam)</label>
-                <input id="Edit_Pukul" class="time-input" type="text" placeholder="HH:MM" maxlength="5" />
-                <label>NO. LK</label>
-                <input type="text" id="Edit_NoLK"/>
-
-                <label>MASALAH / KEGIATAN</label>
-                <textarea id="Edit_MasalahKegiatan"></textarea>
-
-                <label>TINDAKAN</label>
-                <textarea id="Edit_Tindakan"></textarea>
-              </div>
-
-              <div>
-                <label>PETUGAS</label>
-                <input type="text" id="Edit_Petugas"/>
-
-                <label>SELESAI / BELUM</label>
-                <select id="Edit_Status">
-                  <option value="">-- pilih --</option>
-                  <option value="SELESAI">SELESAI</option>
-                  <option value="BELUM">BELUM</option>
-                </select>
-
-                <label>KETERANGAN</label>
-                <input type="text" id="Edit_Keterangan"/>
-
-                <label>KATEGORI</label>
-                <input type="text" id="Edit_Kategori"/>
-
-                <label>AREA KERJA</label>
-                <input type="text" id="Edit_AreaKerja"/>
-
-                <label>ITEM</label>
-                <input type="text" id="Edit_Item"/>
-
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                  <div style="flex:1;">
-                    <label>SPARE PART / UNIT</label>
-                    <input type="text" id="Edit_SparePartUnit"/>
-                  </div>
-                  <div style="width:110px;">
-                    <label>TYPE</label>
-                    <input type="text" id="Edit_Type"/>
-                  </div>
-                  <div style="width:100px;">
-                    <label>JUMLAH</label>
-                    <input type="number" id="Edit_Jumlah"/>
-                  </div>
-                </div>
-
-                <div class="modal-actions">
-                  <button class="btn primary" onclick="saveEdit()">SIMPAN UPDATE</button>
-                  <button class="btn ghost" onclick="closeModal()">BATAL</button>
-                </div>
-                <div id="msgEdit" class="muted" style="margin-top:8px;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-
-  <!-- SAVED POPUP -->
-  <div id="savedToast" role="status" aria-live="polite">
-    <div class="toast" id="savedToastInner">
-      <h4 id="savedToastTitle">Berhasil</h4>
-      <p id="savedToastMsg">Data sudah tersimpan.</p>
-      <button id="savedToastOk" class="ok" type="button" onclick="hideSavedPopup()">OK</button>
-    </div>
+    <div id="msg" class="muted"></div>
   </div>
 
 <script>
-  // update topbar height
-  function updateTopbarHeight() {
-    const topbar = document.getElementById('topbar');
-    if (!topbar) return;
-    const rect = topbar.getBoundingClientRect();
-    const height = Math.ceil(rect.height);
-    document.documentElement.style.setProperty('--topbar-height', height + 'px');
-    const container = document.querySelector('.container');
-    if (container) container.style.paddingTop = (height + 16) + 'px';
+/*
+  Static list initialized with the names you provided.
+  User-added names are stored in localStorage so they persist on this browser.
+*/
+
+const INITIAL_PETUGAS = [
+  "Pantiaro",
+  "Agung",
+  "Rusdi",
+  "Kartolo",
+  "Kabul",
+  "Setu",
+  "Sunandar",
+  "Wawan",
+  "Teguh",
+  "Sulaiman",
+  "Rohim",
+  "Sobur",
+  "Suryanto",
+  "Suryadih",
+  "Heri",
+  "Adang",
+  "Fahmi",
+  "Raihan"
+];
+
+const STORAGE_KEY = 'static_petugas_list_v1';
+
+// load list from localStorage; fallback to INITIAL_PETUGAS
+function loadPetugas(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return dedupePreserveOrder(INITIAL_PETUGAS.slice());
+    const arr = JSON.parse(raw);
+    if(Array.isArray(arr) && arr.length) return dedupePreserveOrder(arr);
+    return dedupePreserveOrder(INITIAL_PETUGAS.slice());
+  }catch(e){
+    return dedupePreserveOrder(INITIAL_PETUGAS.slice());
   }
-  window.addEventListener('load', updateTopbarHeight);
-  window.addEventListener('resize', () => {
-    if (window._updateTopbarTimeout) clearTimeout(window._updateTopbarTimeout);
-    window._updateTopbarTimeout = setTimeout(() => { updateTopbarHeight(); window._updateTopbarTimeout = null; }, 100);
+}
+
+// save to storage
+function savePetugas(arr){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(dedupePreserveOrder(arr))); }catch(e){}
+}
+
+// build datalist DOM
+function buildDatalist(arr){
+  const dl = document.getElementById('PetugasList');
+  dl.innerHTML = '';
+  const seen = new Set();
+  arr.forEach(name=>{
+    if(!name) return;
+    const key = name.trim().toLowerCase();
+    if(seen.has(key)) return;
+    seen.add(key);
+    const opt = document.createElement('option');
+    opt.value = name.trim();
+    dl.appendChild(opt);
   });
+}
 
-  const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
-
-  let rawData = [], viewData = [], sortMode = "DOWN";
-
-  function setMsg(id, text, isError = false){
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.innerText = text;
-    if(isError) el.classList.add('input-error'); else el.classList.remove('input-error');
+// add new local name
+function addNamaBaru(name){
+  if(!name || !name.trim()) return { ok:false, msg:'Nama kosong' };
+  const current = loadPetugas();
+  if(current.map(n=>n.toLowerCase()).includes(name.toLowerCase())){
+    return { ok:false, msg:'Nama sudah ada' };
   }
+  current.push(capitalizeEachWord(name.trim()));
+  savePetugas(current);
+  buildDatalist(current);
+  return { ok:true };
+}
 
-  function showPage(name){
-    document.getElementById("pageInput").style.display = (name==='input') ? '' : 'none';
-    document.getElementById("pageLaporan").style.display = (name==='laporan') ? '' : 'none';
-    const pill = document.getElementById("judulBulanDesktop"); if (pill) pill.style.display = (name==='laporan') ? 'inline-block' : 'none';
-    const btnLaporan = document.getElementById("btnLaporan"), btnInput = document.getElementById("btnInput");
-    if (btnLaporan && btnInput) { if (name==='input'){ btnLaporan.style.display='inline-flex'; btnInput.style.display='none'; } else { btnLaporan.style.display='none'; btnInput.style.display='inline-flex'; } }
-    if (name==='input') attachAutoHandlers();
-    if (name==='laporan') loadReportsBySelectedMonth();
-  }
+// reset to initial static list
+function resetToInitial(){
+  savePetugas(INITIAL_PETUGAS.slice());
+  buildDatalist(INITIAL_PETUGAS.slice());
+}
 
-  function getCurrentMonthYYYYMM(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
-  function setJudulBulan(yyyymm){ const bulanNama={"01":"JANUARI","02":"FEBRUARI","03":"MARET","04":"APRIL","05":"MEI","06":"JUNI","07":"JULI","08":"AGUSTUS","09":"SEPTEMBER","10":"OKTOBER","11":"NOVEMBER","12":"DESEMBER"}; const year=yyyymm.substring(0,4); const month=yyyymm.substring(5,7); const nama=bulanNama[month]||yyyymm; const b=document.getElementById("infoBulanPill"); if(b) b.innerText=`Bulan: ${nama} ${year}`; const dd=document.getElementById("judulBulanDesktop"); if(dd){ dd.innerText=`BULAN ${nama} ${year}`; dd.title=`Menampilkan laporan untuk ${nama} ${year} — klik untuk pilih bulan`; } }
-
-  function buildMonthOptions(){
-    const select=document.getElementById("FilterBulan"); select.innerHTML=''; const now=new Date();
-    for(let i=0;i<36;i++){ const d=new Date(now.getFullYear(), now.getMonth()-i,1); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const yyyymm=`${y}-${m}`; const opt=document.createElement('option'); opt.value=yyyymm; opt.textContent=yyyymm; select.appendChild(opt); }
-    select.value=getCurrentMonthYYYYMM(); setJudulBulan(select.value);
-  }
-
-  function normalizeText(x){ return (x||'').toString().trim(); }
-  function toDateKey(t){ const tt=normalizeText(t); if(tt.length>=10) return tt.substring(0,10).replaceAll('-',''); return '00000000'; }
-
-  // --- new strict HH:MM enforcement for time inputs (text-based) ---
-  function sanitizeTimeDigits(s){
-    return (s||'').replace(/[^\d]/g,'').slice(0,4); // allow up to 4 digits: HHMM
-  }
-
-  function formatHHMMFromDigits(digits){
-    if(!digits) return '';
-    if(digits.length <= 2) return digits;
-    return digits.slice(0,2) + ':' + digits.slice(2);
-  }
-
-  function clampToValidHHMM(hh, mm){
-    let H = parseInt(hh,10);
-    let M = parseInt(mm,10);
-    if(isNaN(H)) H = 0;
-    if(isNaN(M)) M = 0;
-    if(H < 0) H = 0; if(H > 23) H = 23;
-    if(M < 0) M = 0; if(M > 59) M = 59;
-    return `${String(H).padStart(2,'0')}:${String(M).padStart(2,'0')}`;
-  }
-
-  function tryNormalizeHHMM(value){
-    if(!value) return '';
-    const v = value.toString().trim();
-    // if already HH:MM and valid
-    const m = v.match(/^(\d{1,2}):(\d{2})$/);
-    if(m){
-      const hh = parseInt(m[1],10), mm = parseInt(m[2],10);
-      if(hh>=0 && hh<=23 && mm>=0 && mm<=59) return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
-    }
-    // strip non-digit and format
-    const digits = sanitizeTimeDigits(v);
-    if(digits.length === 4){
-      return clampToValidHHMM(digits.slice(0,2), digits.slice(2));
-    }
-    if(digits.length === 3){
-      // e.g. 830 -> 08:30
-      return clampToValidHHMM(digits.slice(0,1), digits.slice(1));
-    }
-    if(digits.length === 2){
-      // treat as hour -> :00
-      return clampToValidHHMM(digits, '0');
-    }
-    if(digits.length === 1){
-      return clampToValidHHMM(digits, '0');
-    }
-    // fallback: try parse AM/PM via Date
-    const ampm = v.match(/^(\d{1,2})(?::(\d{1,2}))?\s*([ap]\.?m\.?)$/i);
-    if(ampm){
-      let h = parseInt(ampm[1],10);
-      const m2 = ampm[2] ? parseInt(ampm[2],10) : 0;
-      const suffix = ampm[3].toLowerCase().replace(/\./g,'');
-      if(suffix === 'pm' && h < 12) h += 12;
-      if(suffix === 'am' && h === 12) h = 0;
-      if(h>=0 && h<=23 && m2>=0 && m2<=59) return `${String(h).padStart(2,'0')}:${String(m2).padStart(2,'0')}`;
-    }
-    return '';
-  }
-
-  function isValidHHMM(v){
-    if(!v) return false;
-    return /^([01]\d|2[0-3]):([0-5]\d)$/.test(v);
-  }
-
-  function attachTimeInputBehavior(el, helperMsgId){
-    if(!el) return;
-    // input handler: allow digits and auto-insert colon
-    const onInput = (e) => {
-      const pos = el.selectionStart;
-      const raw = el.value;
-      const digits = sanitizeTimeDigits(raw);
-      let formatted = formatHHMMFromDigits(digits);
-      el.value = formatted;
-      // remove error style while typing
-      el.classList.remove('input-error');
-      if(helperMsgId) setMsg(helperMsgId, '', false);
-      // try to restore caret reasonably (simple approach)
-      try { el.setSelectionRange(el.value.length, el.value.length); } catch(err){}
-    };
-    const onBlur = (e) => {
-      const normalized = tryNormalizeHHMM(el.value);
-      if(normalized && isValidHHMM(normalized)){
-        el.value = normalized;
-        el.classList.remove('input-error');
-        if(helperMsgId) setMsg(helperMsgId, '', false);
-      } else if(el.value.trim() === ''){
-        el.classList.remove('input-error');
-        if(helperMsgId) setMsg(helperMsgId, '', false);
-      } else {
-        el.classList.add('input-error');
-        if(helperMsgId) setMsg(helperMsgId, "Format waktu tidak valid. Gunakan HH:MM (24 jam), contoh 08:30 atau 14:05.", true);
-      }
-    };
-    const onKeyDown = (e) => {
-      // only allow digits, colon, control keys
-      const allowed = ['Backspace','Tab','ArrowLeft','ArrowRight','Delete','Home','End'];
-      if(allowed.includes(e.key)) return;
-      if(/^[0-9:]$/.test(e.key)) return;
-      e.preventDefault();
-    };
-    el.addEventListener('input', onInput);
-    el.addEventListener('blur', onBlur);
-    el.addEventListener('keydown', onKeyDown);
-    // paste handler to normalize pasted strings
-    el.addEventListener('paste', (ev) => {
-      ev.preventDefault();
-      const text = (ev.clipboardData || window.clipboardData).getData('text') || '';
-      const normalized = tryNormalizeHHMM(text) || text.replace(/[^\d:]/g,'').slice(0,5);
-      el.value = normalized;
-      el.dispatchEvent(new Event('input'));
-      el.dispatchEvent(new Event('blur'));
-    });
-    // store handlers to allow removal if needed
-    el._timeHandlers = { onInput, onBlur, onKeyDown };
-  }
-
-  function detachTimeInputBehavior(el){
-    if(!el || !el._timeHandlers) return;
-    el.removeEventListener('input', el._timeHandlers.onInput);
-    el.removeEventListener('blur', el._timeHandlers.onBlur);
-    el.removeEventListener('keydown', el._timeHandlers.onKeyDown);
-    delete el._timeHandlers;
-  }
-
-  function attachAutoHandlers(){
-    // call when page/input appears
-    attachTimeInputBehavior(document.getElementById('Pukul'), 'msg');
-    attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
-    // auto-scroll handlers kept from previous implementation if needed
-    attachAutoScrollForInputs();
-  }
-
-  // preserve previous auto-scroll utility (unchanged behaviour)
-  function scrollIntoViewWithOffset(el, offset = 12) {
-    if (!el) return;
-    const topbar = document.getElementById('topbar');
-    const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
-    const rect = el.getBoundingClientRect();
-    const absoluteTop = window.scrollY + rect.top;
-    const target = Math.max(0, absoluteTop - headerHeight - offset);
-    window.scrollTo({ top: target, behavior: 'smooth' });
-  }
-  function attachAutoScrollForInputs() {
-    const selector = '#pageInput input, #pageInput textarea, #pageInput select';
-    const inputs = document.querySelectorAll(selector);
-    inputs.forEach(el => {
-      if (el._autoScrollHandler) el.removeEventListener('focus', el._autoScrollHandler);
-      const handler = (e) => {
-        const pageInput = document.getElementById('pageInput');
-        if (pageInput && pageInput.style.display === 'none') return;
-        const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 450 : 120;
-        setTimeout(() => { scrollIntoViewWithOffset(e.target, 12); }, delay);
-      };
-      el.addEventListener('focus', handler);
-      el._autoScrollHandler = handler;
-    });
-  }
-
-  // small helpers used by existing logic
-  function normalizeTimeTo24(value){
-    // attempt to normalize incoming API values to HH:MM
-    const t = tryNormalizeHHMM(normalizeText(value));
-    return t || normalizeText(value);
-  }
-
-  function getInputPayload(){ 
-    const pukVal = document.getElementById("Pukul").value.trim();
-    return {
-      action:'add',
-      Tanggal:document.getElementById("Tanggal").value,
-      Pelapor:document.getElementById("Pelapor").value,
-      Ruang:document.getElementById("Ruang").value,
-      Pukul: isValidHHMM(pukVal) ? pukVal : '',
-      NoLK:document.getElementById("NoLK").value,
-      MasalahKegiatan:document.getElementById("MasalahKegiatan").value,
-      Tindakan:document.getElementById("Tindakan").value,
-      Petugas:document.getElementById("Petugas").value,
-      Status:document.getElementById("Status").value,
-      Keterangan:document.getElementById("Keterangan").value,
-      Kategori:document.getElementById("Kategori").value,
-      AreaKerja:document.getElementById("AreaKerja").value,
-      Item:document.getElementById("Item").value,
-      SparePartUnit:document.getElementById("SparePartUnit").value,
-      Type:document.getElementById("Type").value,
-      Jumlah:document.getElementById("Jumlah").value
-    }; 
-  }
-
-  async function saveData(){
-    try{
-      setMsg("msg","Menyimpan data...");
-      const payload = getInputPayload();
-      if(!payload.Tanggal){ setMsg("msg","❌ Tanggal wajib diisi.", true); return; }
-      const pukEl = document.getElementById('Pukul');
-      if(pukEl && pukEl.classList.contains('input-error')){
-        setMsg("msg","❌ Format PUKUL tidak valid. Perbaiki sebelum menyimpan.", true);
-        return;
-      }
-      // If not valid and not empty, block
-      if(pukEl && pukEl.value.trim() && !isValidHHMM(pukEl.value.trim())){
-        setMsg("msg","❌ Format PUKUL tidak valid. Gunakan HH:MM (24 jam).", true);
-        pukEl.classList.add('input-error');
-        return;
-      }
-      const res = await fetch(API_URL, { method:'POST', body: JSON.stringify(payload) });
-      const json = await res.json();
-      if(json.ok){
-        setMsg("msg","✅ Data tersimpan.");
-        clearInputForm();
-        showSavedPopup("Data sudah tersimpan","Berhasil");
-      } else {
-        setMsg("msg","❌ Gagal: "+json.msg, true);
-        showSavedPopup("Gagal menyimpan: "+(json.msg||""),"Gagal");
-      }
-    }catch(err){
-      setMsg("msg","❌ Error: "+err.message, true);
-      showSavedPopup("Error: "+err.message,"Gagal");
-    }
-  }
-
-  function clearInputForm(){ 
-    document.querySelectorAll("#pageInput input, #pageInput textarea, #pageInput select").forEach(el=>{
-      el.value = '';
-      el.classList.remove('input-error');
-    }); 
-  }
-
-  async function loadReportsBySelectedMonth(){
-    try{
-      const bulan=document.getElementById("FilterBulan").value||getCurrentMonthYYYYMM();
-      setJudulBulan(bulan);
-      setMsg("msgReport","Memuat laporan bulan "+bulan+" ...");
-      const res=await fetch(API_URL+"?action=get&bulan="+bulan);
-      const json=await res.json();
-      if(!json.ok){ rawData=[]; viewData=[]; renderReportTable(); setMsg("msgReport","❌ Gagal load: "+json.msg, true); return; }
-      rawData=(json.data||[]).map(x=>{
-        x.ID=normalizeText(x.ID); x.Tanggal=normalizeText(x.Tanggal); x.Pelapor=normalizeText(x.Pelapor);
-        x.Ruang=normalizeText(x.Ruang);
-        x.Pukul=normalizeTimeTo24(normalizeText(x.Pukul));
-        x.NoLK=normalizeText(x.NoLK);
-        x.MasalahKegiatan=normalizeText(x.MasalahKegiatan); x.Tindakan=normalizeText(x.Tindakan);
-        x.Petugas=normalizeText(x.Petugas); x.Status=normalizeText(x.Status); x.Keterangan=normalizeText(x.Keterangan);
-        x.Kategori=normalizeText(x.Kategori); x.AreaKerja=normalizeText(x.AreaKerja); x.Item=normalizeText(x.Item);
-        x.SparePartUnit=normalizeText(x.SparePartUnit); x.Type=normalizeText(x.Type); x.Jumlah=normalizeText(x.Jumlah);
-        return x;
-      });
-      buildFilterOptionsFromData(rawData);
-      applyFilters();
-    }catch(err){
-      rawData=[]; viewData=[]; renderReportTable(); setMsg("msgReport","❌ Error: "+err.message, true);
-    }
-  }
-
-  function uniqueSorted(arr){ const set=new Set(arr.filter(x=>normalizeText(x)!='')); return Array.from(set).sort((a,b)=>a.localeCompare(b)); }
-  function escapeHtml(text){ return (text||'').toString().replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
-
-  function buildFilterOptionsFromData(data){
-    const kategoriList=uniqueSorted(data.map(x=>x.Kategori));
-    const areaList=uniqueSorted(data.map(x=>x.AreaKerja));
-    const itemList=uniqueSorted(data.map(x=>x.Item));
-    const fk=document.getElementById("FilterKategori"); fk.innerHTML=`<option value="ALL">SEMUA DATA</option>`; kategoriList.forEach(v=>fk.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
-    const fa=document.getElementById("FilterAreaKerja"); fa.innerHTML=`<option value="ALL">SEMUA DATA</option>`; areaList.forEach(v=>fa.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
-    const fi=document.getElementById("FilterItem"); fi.innerHTML=`<option value="ALL">SEMUA DATA</option>`; itemList.forEach(v=>fi.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
-    document.getElementById("FilterStatus").value="ALL";
-  }
-
-  function applyFilters(){
-    const status=document.getElementById("FilterStatus").value;
-    const kategori=document.getElementById("FilterKategori").value;
-    const area=document.getElementById("FilterAreaKerja").value;
-    const item=document.getElementById("FilterItem").value;
-    viewData=rawData.filter(x=>{
-      let ok=true;
-      if(status!=='ALL') ok=ok && (x.Status.toUpperCase()===status);
-      if(kategori!=='ALL') ok=ok && (x.Kategori===kategori);
-      if(area!=='ALL') ok=ok && (x.AreaKerja===area);
-      if(item!=='ALL') ok=ok && (x.Item===item);
-      return ok;
-    });
-    applySort(); renderReportTable(); renderRekap();
-  }
-
-  function applySort(){ viewData.sort((a,b)=>{ const ka=toDateKey(a.Tanggal), kb=toDateKey(b.Tanggal); return (sortMode==='UP')? ka.localeCompare(kb) : kb.localeCompare(ka); }); }
-  function sortUp(){ sortMode='UP'; applyFilters(); } function sortDown(){ sortMode='DOWN'; applyFilters(); }
-
-  function renderReportTable(){
-    const tbody=document.querySelector("#reportTable tbody"); tbody.innerHTML=''; document.getElementById("infoTotalPill").innerText=`Total: ${viewData.length}`;
-    viewData.forEach((row,idx)=>{
-      const tr=document.createElement("tr");
-      const statusClass=(row.Status.toUpperCase()==='BELUM')?'status-pending':(row.Status?'status-done':'');
-      tr.innerHTML=`
-        <td style="text-align:center;"><b>${idx+1}</b></td>
-        <td style="text-align:center;">${escapeHtml(row.Tanggal)}</td>
-        <td>${escapeHtml(row.Pelapor)}<div class="muted" style="font-size:12px; margin-top:6px;">${row.NoLK? "[NO. LK : "+escapeHtml(row.NoLK)+"]":""}</div></td>
-        <td style="text-align:center;">${escapeHtml(row.Ruang)}</td>
-        <td style="text-align:center;">${escapeHtml(row.Pukul)}</td>
-        <td>${escapeHtml(row.MasalahKegiatan)}</td>
-        <td>${escapeHtml(row.Tindakan)}</td>
-        <td style="text-align:center;">${escapeHtml(row.Petugas)}</td>
-        <td style="text-align:center;"><span class="status-badge ${statusClass}">${escapeHtml(row.Status||"")}</span></td>
-        <td style="text-align:center;">${escapeHtml(row.Kategori)}</td>
-        <td style="text-align:center;">${escapeHtml(row.AreaKerja)}</td>
-        <td style="text-align:center;">${escapeHtml(row.Item)}</td>
-      `;
-      tr.onclick = () => openEditModal(row);
-      tbody.appendChild(tr);
-    });
-    renderMobileList(); setMsg("msgReport","✅ Data tampil: "+viewData.length);
-  }
-
-  function renderMobileList(){
-    const list=document.getElementById("mobileList"); list.innerHTML=''; if(window.innerWidth>900){ list.style.display='none'; document.getElementById("reportTable").style.display=''; return; }
-    document.getElementById("reportTable").style.display='none'; list.style.display='block';
-    viewData.forEach((r,idx)=>{
-      const div=document.createElement("div"); div.className='card-item';
-      const statusClass=(r.Status.toUpperCase()==='BELUM')?'status-pending':(r.Status?'status-done':'');
-      div.innerHTML=`
-        <div class="row">
-          <div>
-            <div style="font-size:13px; color:var(--muted)">#${idx+1} • ${escapeHtml(r.Tanggal)}</div>
-            <div class="title">${escapeHtml(r.Pelapor)} ${r.Ruang? '• '+escapeHtml(r.Ruang):''}</div>
-            <div class="meta">${r.NoLK? '[NO. LK: '+escapeHtml(r.NoLK)+']':''}</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:13px;" class="${statusClass? '': 'muted'}"><span class="status-badge ${statusClass}">${escapeHtml(r.Status||'')}</span></div>
-            <div class="muted" style="margin-top:8px;">${escapeHtml(r.Item||'')}</div>
-          </div>
-        </div>
-        <div class="desc">${escapeHtml(r.MasalahKegiatan||'')}</div>
-        <div class="card-actions"><button class="btn" onclick="openEditModalFromCard(event, '${escapeHtml(r.ID)}')">Edit</button></div>
-      `;
-      list.appendChild(div);
-    });
-  }
-
-  function renderRekap(){
-    const tbody=document.querySelector("#rekapTable tbody"); tbody.innerHTML=''; const map=new Map();
-    viewData.forEach(r=>{
-      const spare=normalizeText(r.SparePartUnit); const type=normalizeText(r.Type); const jumlah=parseFloat(r.Jumlah||'0')||0;
-      if(spare==='' && type==='' && jumlah===0) return;
-      const key=spare+'||'+type; const prev=map.get(key)||0; map.set(key, prev+jumlah);
-    });
-    const arr=Array.from(map.entries()).map(([key,total])=>{ const [spare,type]=key.split('||'); return {spare,type,total}; });
-    arr.sort((a,b)=>b.total-a.total); arr.forEach(x=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${escapeHtml(x.spare)}</td><td style="text-align:center;">${escapeHtml(x.type)}</td><td style="text-align:center;"><b>${x.total}</b></td>`; tbody.appendChild(tr); });
-  }
-
-  // Modal functions
-  function openEditModal(row){
-    const r=row; document.getElementById("modalBg").classList.add("show"); setMsg("msgEdit","");
-    document.getElementById("Edit_ID").value=r.ID||""; document.getElementById("EditID").innerText=r.ID||"-";
-    document.getElementById("EditSheet").innerText=r._Sheet? "Sheet: "+r._Sheet : "Sheet: (bulan)";
-    document.getElementById("Edit_Tanggal").value=r.Tanggal||"";
-    document.getElementById("Edit_Pelapor").value=r.Pelapor||"";
-    document.getElementById("Edit_Ruang").value=r.Ruang||"";
-    // put normalized HH:MM (if possible)
-    document.getElementById("Edit_Pukul").value = isValidHHMM(normalizeTimeTo24(r.Pukul||"")) ? normalizeTimeTo24(r.Pukul||"") : (r.Pukul||"");
-    if(!isValidHHMM(document.getElementById("Edit_Pukul").value) && document.getElementById("Edit_Pukul").value) document.getElementById("Edit_Pukul").classList.add('input-error'); else document.getElementById("Edit_Pukul").classList.remove('input-error');
-    document.getElementById("Edit_NoLK").value=r.NoLK||"";
-    document.getElementById("Edit_MasalahKegiatan").value=r.MasalahKegiatan||"";
-    document.getElementById("Edit_Tindakan").value=r.Tindakan||"";
-    document.getElementById("Edit_Petugas").value=r.Petugas||"";
-    document.getElementById("Edit_Status").value=r.Status||"";
-    document.getElementById("Edit_Keterangan").value=r.Keterangan||"";
-    document.getElementById("Edit_Kategori").value=r.Kategori||"";
-    document.getElementById("Edit_AreaKerja").value=r.AreaKerja||"";
-    document.getElementById("Edit_Item").value=r.Item||"";
-    document.getElementById("Edit_SparePartUnit").value=r.SparePartUnit||"";
-    document.getElementById("Edit_Type").value=r.Type||"";
-    document.getElementById("Edit_Jumlah").value=r.Jumlah||"";
-    // Ensure handlers attached (in case modal opened later)
-    attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
-  }
-  function openEditModalFromCard(e,id){ e.stopPropagation(); const row=viewData.find(x=>x.ID===id)||rawData.find(x=>x.ID===id); if(row) openEditModal(row); }
-  function closeModal(){ document.getElementById("modalBg").classList.remove("show"); }
-
-  async function saveEdit(){
-    try{
-      setMsg("msgEdit","Menyimpan update...");
-      const editPukulEl = document.getElementById("Edit_Pukul");
-      if(editPukulEl && editPukulEl.classList.contains('input-error')){
-        setMsg("msgEdit","❌ Format PUKUL tidak valid. Perbaiki sebelum menyimpan.", true);
-        return;
-      }
-      const editPukul = editPukulEl && editPukulEl.value.trim() && isValidHHMM(editPukulEl.value.trim()) ? editPukulEl.value.trim() : '';
-      const payload={
-        action:"update",
-        ID:document.getElementById("Edit_ID").value,
-        Tanggal:document.getElementById("Edit_Tanggal").value,
-        Pelapor:document.getElementById("Edit_Pelapor").value,
-        Ruang:document.getElementById("Edit_Ruang").value,
-        Pukul: editPukul,
-        NoLK:document.getElementById("Edit_NoLK").value,
-        MasalahKegiatan:document.getElementById("Edit_MasalahKegiatan").value,
-        Tindakan:document.getElementById("Edit_Tindakan").value,
-        Petugas:document.getElementById("Edit_Petugas").value,
-        Status:document.getElementById("Edit_Status").value,
-        Keterangan:document.getElementById("Edit_Keterangan").value,
-        Kategori:document.getElementById("Edit_Kategori").value,
-        AreaKerja:document.getElementById("Edit_AreaKerja").value,
-        Item:document.getElementById("Edit_Item").value,
-        SparePartUnit:document.getElementById("Edit_SparePartUnit").value,
-        Type:document.getElementById("Edit_Type").value,
-        Jumlah:document.getElementById("Edit_Jumlah").value
-      };
-      if(!payload.ID){ setMsg("msgEdit","❌ ID kosong, tidak bisa update.", true); return; }
-      const res=await fetch(API_URL, {method:"POST", body: JSON.stringify(payload)});
-      const json=await res.json();
-      if(json.ok){ setMsg("msgEdit","✅ Update berhasil"); closeModal(); loadReportsBySelectedMonth(); showSavedPopup("Update berhasil","Berhasil"); }
-      else{ setMsg("msgEdit","❌ Gagal: "+json.msg, true); showSavedPopup("Gagal update: "+(json.msg||""),"Gagal"); }
-    }catch(err){ setMsg("msgEdit","❌ Error: "+err.message, true); showSavedPopup("Error: "+err.message,"Gagal"); }
-  }
-
-  // close modal by clicking background
-  document.getElementById("modalBg").addEventListener("click", function(e){ if(e.target.id==="modalBg") closeModal(); });
-
-  // Saved popup
-  function showSavedPopup(message="Data sudah tersimpan.", title="Berhasil"){
-    const bg=document.getElementById("savedToast"); if(!bg) return;
-    document.getElementById("savedToastTitle").innerText = title;
-    document.getElementById("savedToastMsg").innerText = message;
-    bg.classList.add("show");
-    const ok=document.getElementById("savedToastOk"); if(ok) ok.focus();
-  }
-  function hideSavedPopup(){
-    const bg=document.getElementById("savedToast"); if(!bg) return; bg.classList.remove("show");
-    const first=document.querySelector("#pageInput input, #pageInput textarea, #pageInput select"); if(first) first.focus();
-  }
-
-  // keep responsive handlers
-  window.addEventListener('resize', () => {
-    if (window._autoScrollTimeout) clearTimeout(window._autoScrollTimeout);
-    window._autoScrollTimeout = setTimeout(() => { attachAutoHandlers(); window._autoScrollTimeout = null; }, 150);
+// helper: dedupe while preserving order and normalize spacing
+function dedupePreserveOrder(arr){
+  const out = [];
+  const seen = new Set();
+  arr.forEach(s=>{
+    if(!s) return;
+    const v = s.toString().trim();
+    const key = v.toLowerCase();
+    if(seen.has(key)) return;
+    seen.add(key);
+    out.push(v);
   });
-  window.addEventListener('orientationchange', () => { setTimeout(attachAutoHandlers, 300); });
+  return out;
+}
 
-  // label click -> scroll
-  document.addEventListener('click', (e) => {
-    const lbl = e.target.closest('label');
-    if (!lbl) return;
-    const forId = lbl.getAttribute('for');
-    if (!forId) return;
-    const target = document.getElementById(forId);
-    if (target && document.getElementById('pageInput').style.display !== 'none') {
-      setTimeout(() => { scrollIntoViewWithOffset(target, 12); }, 170);
+function capitalizeEachWord(s){
+  return s.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+}
+
+// initialization
+(function init(){
+  const list = loadPetugas();
+  buildDatalist(list);
+
+  const addBtn = document.getElementById('AddBtn');
+  const petugasInput = document.getElementById('Petugas');
+  const msg = document.getElementById('msg');
+
+  addBtn.addEventListener('click', () => {
+    const name = petugasInput.value || '';
+    if(!name.trim()){
+      showMsg('Masukkan nama terlebih dahulu.', true);
+      return;
+    }
+    const res = addNamaBaru(name);
+    if(res.ok){
+      showMsg('Nama petugas disimpan secara lokal.', false);
+    } else {
+      showMsg(res.msg, true);
     }
   });
 
-  function toggleRekap(){
-    const p = document.getElementById('panelRekap');
-    if(!p) return;
-    p.style.display = (p.style.display === 'none' || p.style.display==='') ? 'block' : 'none';
+  // demo save report (no server)
+  document.getElementById('SaveReport').addEventListener('click', ()=>{
+    const payload = {
+      Tanggal: document.getElementById('Tanggal').value,
+      Petugas: document.getElementById('Petugas').value,
+      Masalah: document.getElementById('Masalah').value
+    };
+    if(!payload.Tanggal){ showMsg('Isi tanggal dulu.', true); return; }
+    if(!payload.Petugas){ showMsg('Pilih atau isi nama petugas.', true); return; }
+    showMsg('Data tersimpan (demo). Payload: ' + JSON.stringify(payload), false);
+    // Optionally: send payload to your server/API here.
+  });
+
+  document.getElementById('ResetList').addEventListener('click', ()=>{
+    if(confirm('Reset daftar petugas ke daftar awal?')) resetToInitial();
+  });
+
+  function showMsg(text, isError=false){
+    msg.innerText = text;
+    msg.style.color = isError ? '#e02424' : '#1f9d55';
+    setTimeout(()=>{ if(msg.innerText === text) msg.innerText = ''; }, 4000);
   }
-
-  // INIT
-  buildMonthOptions();
-  updateTopbarHeight();
-  attachAutoHandlers();
-  showPage('input');
-
+})();
 </script>
 </body>
 </html>
