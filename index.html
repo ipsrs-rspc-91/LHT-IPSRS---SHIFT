@@ -234,18 +234,18 @@
             <label for="Keterangan">KETERANGAN (tambahan)</label>
             <input id="Keterangan" type="text"/>
 
+             <label for="Status">SELESAI / BELUM</label>
+            <!-- Make Status consistent with Petugas: input + PILIH button that opens status popup -->
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input id="Status" type="text" placeholder="Pilih Selesai atau Belum"/>
+              <button type="button" class="btn ghost" onclick="openStatusPopup('Status')" title="Pilih status">PILIH</button>
+            </div>
+
             <label for="Petugas">PETUGAS</label>
             <!-- Popup chooser: input + button to open popup (replaces simple datalist UX) -->
             <div style="display:flex; gap:8px; align-items:center;">
               <input id="Petugas" type="text" placeholder="Pilih atau ketik nama petugas"/>
               <button type="button" class="btn ghost" onclick="openPetugasPopup('Petugas')" title="Pilih petugas">PILIH</button>
-            </div>
-
-            <label for="Status">SELESAI / BELUM</label>
-            <!-- Make Status consistent with Petugas: input + PILIH button that opens status popup -->
-            <div style="display:flex; gap:8px; align-items:center;">
-              <input id="Status" type="text" placeholder="Pilih Selesai atau Belum"/>
-              <button type="button" class="btn ghost" onclick="openStatusPopup('Status')" title="Pilih status">PILIH</button>
             </div>
 
             <label for="Kategori">KATEGORI</label>
