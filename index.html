@@ -729,14 +729,26 @@
     const first=document.querySelector("#pageInput input, #pageInput textarea, #pageInput select"); if(first) first.focus();
   }
 
-  // --- Auto-scroll focused input to visible area (respect header) ---
-  function scrollIntoViewWithOffset(el, offset = 12) {
+  // === REPLACED: scrollIntoViewWithOffset (with extraRows=2) and attachAutoScrollForInputs ===
+  function scrollIntoViewWithOffset(el, extraRows = 2, baseOffset = 12) {
     if (!el) return;
     const topbar = document.getElementById('topbar');
     const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
-    const rect = el.getBoundingClientRect();
-    const absoluteTop = window.scrollY + rect.top;
-    const target = Math.max(0, absoluteTop - headerHeight - offset);
+
+    // tinggi elemen (fallback minimal 44px)
+    const elRect = el.getBoundingClientRect();
+    const elHeight = Math.max(44, Math.ceil(elRect.height || 44));
+
+    // ruang ekstra setara 'extraRows' input di atas elemen
+    const extraSpacing = elHeight * extraRows;
+
+    // posisi absolute top elemen relatif ke dokumen
+    const absoluteTop = window.scrollY + elRect.top;
+
+    // target scroll: elemen muncul dengan header + baseOffset + extraSpacing di atasnya
+    const target = Math.max(0, absoluteTop - headerHeight - baseOffset - extraSpacing);
+
+    // smooth scroll
     window.scrollTo({ top: target, behavior: 'smooth' });
   }
 
@@ -745,12 +757,19 @@
     const inputs = document.querySelectorAll(selector);
     inputs.forEach(el => {
       if (el._autoScrollHandler) el.removeEventListener('focus', el._autoScrollHandler);
+
       const handler = (e) => {
+        // jika halaman input tersembunyi, lewati
         const pageInput = document.getElementById('pageInput');
         if (pageInput && pageInput.style.display === 'none') return;
+
+        // delay untuk memberi waktu keyboard virtual muncul di mobile
         const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 450 : 120;
-        setTimeout(() => { scrollIntoViewWithOffset(e.target, 12); }, delay);
+
+        // gunakan extraRows = 2 agar ada jeda dua kotak input di atasnya
+        setTimeout(() => { scrollIntoViewWithOffset(e.target, 2, 12); }, delay);
       };
+
       el.addEventListener('focus', handler);
       el._autoScrollHandler = handler;
     });
@@ -770,7 +789,7 @@
     if (!forId) return;
     const target = document.getElementById(forId);
     if (target && document.getElementById('pageInput').style.display !== 'none') {
-      setTimeout(() => { scrollIntoViewWithOffset(target, 12); }, 170);
+      setTimeout(() => { scrollIntoViewWithOffset(target, 2, 12); }, 170);
     }
   });
 
