@@ -214,6 +214,22 @@
             <label for="Tindakan">TINDAKAN</label>
             <textarea id="Tindakan" placeholder="Tindakan yang dilakukan"></textarea>
 
+            <!-- MOVED: Spare Part / Unit, Type, Jumlah are now placed after Tindakan -->
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <div style="flex:1;">
+                <label for="SparePartUnit">SPARE PART / UNIT</label>
+                <input id="SparePartUnit" type="text"/>
+              </div>
+              <div style="width:110px;">
+                <label for="Type">TYPE</label>
+                <input id="Type" type="text"/>
+              </div>
+              <div style="width:100px;">
+                <label for="Jumlah">JUMLAH</label>
+                <input id="Jumlah" type="number" min="0"/>
+              </div>
+            </div>
+
             <div class="smallnote">* Jika ada penggantian spare part/unit baru.</div>
           </div>
         </div>
@@ -246,14 +262,7 @@
             <label for="Item">ITEM</label>
             <input id="Item" type="text"/>
 
-            <label for="SparePartUnit">SPARE PART / UNIT</label>
-            <input id="SparePartUnit" type="text"/>
-
-            <label for="Type">TYPE</label>
-            <input id="Type" type="text"/>
-
-            <label for="Jumlah">JUMLAH</label>
-            <input id="Jumlah" type="number" min="0"/>
+            <!-- Removed SparePart/Type/Jumlah from here (moved to left) -->
 
             <!-- Keep the inline/save button inside the panel (no floating button) -->
             <div class="big-save" onclick="saveData()">SIMPAN DATA BARU (SHIFT)</div>
@@ -410,6 +419,23 @@
 
                 <label>TINDAKAN</label>
                 <textarea id="Edit_Tindakan"></textarea>
+
+                <!-- MOVED: edit spare part/type/jumlah placed after tindakan in modal left column -->
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                  <div style="flex:1;">
+                    <label>SPARE PART / UNIT</label>
+                    <input type="text" id="Edit_SparePartUnit"/>
+                  </div>
+                  <div style="width:110px;">
+                    <label>TYPE</label>
+                    <input type="text" id="Edit_Type"/>
+                  </div>
+                  <div style="width:100px;">
+                    <label>JUMLAH</label>
+                    <input type="number" id="Edit_Jumlah"/>
+                  </div>
+                </div>
+
               </div>
 
               <div>
@@ -438,21 +464,6 @@
 
                 <label>ITEM</label>
                 <input type="text" id="Edit_Item"/>
-
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                  <div style="flex:1;">
-                    <label>SPARE PART / UNIT</label>
-                    <input type="text" id="Edit_SparePartUnit"/>
-                  </div>
-                  <div style="width:110px;">
-                    <label>TYPE</label>
-                    <input type="text" id="Edit_Type"/>
-                  </div>
-                  <div style="width:100px;">
-                    <label>JUMLAH</label>
-                    <input type="number" id="Edit_Jumlah"/>
-                  </div>
-                </div>
 
                 <div class="modal-actions">
                   <button class="btn primary" onclick="saveEdit()">SIMPAN UPDATE</button>
