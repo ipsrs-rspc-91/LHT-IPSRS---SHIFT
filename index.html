@@ -230,6 +230,10 @@
             <label for="Jumlah">JUMLAH</label>
             <input id="Jumlah" type="number" min="0"/>
 
+            <!-- KETERANGAN moved to be immediately below JUMLAH -->
+            <label for="Keterangan">KETERANGAN (tambahan)</label>
+            <input id="Keterangan" type="text"/>
+
             <label for="Petugas">PETUGAS</label>
             <!-- Popup chooser: input + button to open popup (replaces simple datalist UX) -->
             <div style="display:flex; gap:8px; align-items:center;">
@@ -243,9 +247,6 @@
               <input id="Status" type="text" placeholder="Pilih Selesai atau Belum"/>
               <button type="button" class="btn ghost" onclick="openStatusPopup('Status')" title="Pilih status">PILIH</button>
             </div>
-
-            <label for="Keterangan">KETERANGAN (tambahan)</label>
-            <input id="Keterangan" type="text"/>
 
             <label for="Kategori">KATEGORI</label>
             <input id="Kategori" type="text"/>
@@ -425,6 +426,10 @@
                 <label>JUMLAH</label>
                 <input type="number" id="Edit_Jumlah"/>
 
+                <!-- Edit Keterangan moved to be immediately below Edit_Jumlah -->
+                <label>KETERANGAN</label>
+                <input type="text" id="Edit_Keterangan"/>
+
                 <label>PETUGAS</label>
                 <div style="display:flex; gap:8px; align-items:center;">
                   <input type="text" id="Edit_Petugas" placeholder="Pilih atau ketik nama petugas"/>
@@ -436,9 +441,6 @@
                   <input type="text" id="Edit_Status" placeholder="Pilih Selesai atau Belum"/>
                   <button type="button" class="btn ghost" onclick="openStatusPopup('Edit_Status')" title="Pilih status">PILIH</button>
                 </div>
-
-                <label>KETERANGAN</label>
-                <input type="text" id="Edit_Keterangan"/>
 
                 <label>KATEGORI</label>
                 <input type="text" id="Edit_Kategori"/>
