@@ -216,7 +216,8 @@
         <div class="panel-right">
           <div class="form-section">
             <label for="Petugas">PETUGAS</label>
-            <input id="Petugas" type="text"/>
+            <!-- Ditambahkan datalist saran petugas -->
+            <input id="Petugas" type="text" list="PetugasList" placeholder="Pilih atau ketik nama petugas"/>
 
             <label for="Status">SELESAI / BELUM</label>
             <select id="Status">
@@ -405,7 +406,8 @@
 
               <div>
                 <label>PETUGAS</label>
-                <input type="text" id="Edit_Petugas"/>
+                <!-- Modal edit juga mengacu ke datalist yang sama -->
+                <input type="text" id="Edit_Petugas" list="PetugasList"/>
 
                 <label>SELESAI / BELUM</label>
                 <select id="Edit_Status">
@@ -464,6 +466,12 @@
       <button id="savedToastOk" class="ok" type="button" onclick="hideSavedPopup()">OK</button>
     </div>
   </div>
+
+  <!-- Datalist saran Petugas (tersedia untuk input Petugas dan Edit_Petugas) -->
+  <datalist id="PetugasList">
+    <option value="Pantiarso"></option>
+    <option value="Agung Rusdi"></option>
+  </datalist>
 
 <script>
   // update topbar height
