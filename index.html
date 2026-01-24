@@ -135,10 +135,10 @@
 
     .input-error { border-color: var(--danger) !important; box-shadow: 0 6px 20px rgba(224,36,36,0.08); }
 
-    /* small petugas popup modal tweaks */
-    .petugas-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
-    .petugas-list .opt { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:10px; background:linear-gradient(180deg,#fafcff,#fff); border:1px solid rgba(10,20,40,0.05); cursor:pointer; }
-    .petugas-list .opt:hover { background:#f0fbff; }
+    /* small popup modal tweaks */
+    .petugas-list, .status-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+    .petugas-list .opt, .status-list .opt { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:10px; background:linear-gradient(180deg,#fafcff,#fff); border:1px solid rgba(10,20,40,0.05); cursor:pointer; }
+    .petugas-list .opt:hover, .status-list .opt:hover { background:#f0fbff; }
 
     @media (max-width:900px){
       .topbar .title { font-size:14px; }
@@ -228,11 +228,11 @@
             </div>
 
             <label for="Status">SELESAI / BELUM</label>
-            <select id="Status">
-              <option value="">-- pilih --</option>
-              <option value="SELESAI">SELESAI</option>
-              <option value="BELUM">BELUM</option>
-            </select>
+            <!-- Make Status consistent with Petugas: input + PILIH button that opens status popup -->
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input id="Status" type="text" placeholder="Pilih Selesai atau Belum"/>
+              <button type="button" class="btn ghost" onclick="openStatusPopup('Status')" title="Pilih status">PILIH</button>
+            </div>
 
             <label for="Keterangan">KETERANGAN (tambahan)</label>
             <input id="Keterangan" type="text"/>
@@ -421,11 +421,11 @@
                 </div>
 
                 <label>SELESAI / BELUM</label>
-                <select id="Edit_Status">
-                  <option value="">-- pilih --</option>
-                  <option value="SELESAI">SELESAI</option>
-                  <option value="BELUM">BELUM</option>
-                </select>
+                <!-- Modal status selection: input + pilih button -->
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <input type="text" id="Edit_Status" placeholder="Pilih Selesai atau Belum"/>
+                  <button type="button" class="btn ghost" onclick="openStatusPopup('Edit_Status')" title="Pilih status">PILIH</button>
+                </div>
 
                 <label>KETERANGAN</label>
                 <input type="text" id="Edit_Keterangan"/>
@@ -490,6 +490,21 @@
       </div>
       <div style="margin-top:12px; text-align:right;">
         <button class="btn ghost" onclick="closePetugasPopup()">BATAL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Popup (new) -->
+  <div id="statusPopupBg" class="modal-bg" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="statusPopupTitle" style="width:320px; max-width:96vw;">
+      <h4 id="statusPopupTitle">Pilih Status</h4>
+      <div class="smallnote">Pilih antara "SELESAI" atau "BELUM".</div>
+      <div class="status-list" id="statusOptions" role="list">
+        <div class="opt" role="listitem" tabindex="0" onclick="selectStatus('SELESAI')" onkeydown="if(event.key==='Enter'){ selectStatus('SELESAI'); }"> <span>SELESAI</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectStatus('BELUM')" onkeydown="if(event.key==='Enter'){ selectStatus('BELUM'); }"> <span>BELUM</span> <span class="muted">Pilih</span> </div>
+      </div>
+      <div style="margin-top:12px; text-align:right;">
+        <button class="btn ghost" onclick="closeStatusPopup()">BATAL</button>
       </div>
     </div>
   </div>
@@ -681,8 +696,7 @@
     attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
     // auto-scroll handlers kept from previous implementation if needed
     attachAutoScrollForInputs();
-    // petugas popup: ensure keyboard Enter selects focused option
-    // nothing else required here; choose button opens popup
+    // petugas/status popup: keyboard handling done inside popup functions
   }
 
   // preserve previous auto-scroll utility (unchanged behaviour)
@@ -1018,11 +1032,50 @@
   document.getElementById('petugasPopupBg').addEventListener('click', function(e){
     if(e.target && e.target.id === 'petugasPopupBg') closePetugasPopup();
   });
-  // ESC to close petugas popup
+
+  // Status popup logic (new)
+  let _statusTargetInputId = null;
+  function openStatusPopup(inputId){
+    _statusTargetInputId = inputId || null;
+    const bg = document.getElementById('statusPopupBg');
+    if(!bg) return;
+    bg.classList.add('show');
+    bg.setAttribute('aria-hidden','false');
+    setTimeout(()=>{
+      const firstOpt = document.querySelector('#statusOptions .opt');
+      if(firstOpt) firstOpt.focus();
+    },50);
+  }
+  function closeStatusPopup(){
+    const bg = document.getElementById('statusPopupBg');
+    if(!bg) return;
+    bg.classList.remove('show');
+    bg.setAttribute('aria-hidden','true');
+    if(_statusTargetInputId){
+      const el = document.getElementById(_statusTargetInputId);
+      if(el) el.focus();
+    }
+    _statusTargetInputId = null;
+  }
+  function selectStatus(value){
+    if(_statusTargetInputId){
+      const el = document.getElementById(_statusTargetInputId);
+      if(el) el.value = value;
+    }
+    closeStatusPopup();
+  }
+  // close status popup by clicking background
+  document.getElementById('statusPopupBg').addEventListener('click', function(e){
+    if(e.target && e.target.id === 'statusPopupBg') closeStatusPopup();
+  });
+
+  // ESC to close popups/modals/toasts
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){
-      const bg = document.getElementById('petugasPopupBg');
-      if(bg && bg.classList.contains('show')){ closePetugasPopup(); return; }
+      const petugasBg = document.getElementById('petugasPopupBg');
+      if(petugasBg && petugasBg.classList.contains('show')){ closePetugasPopup(); return; }
+      const statusBg = document.getElementById('statusPopupBg');
+      if(statusBg && statusBg.classList.contains('show')){ closeStatusPopup(); return; }
       const modal = document.getElementById('modalBg');
       if(modal && modal.classList.contains('show')){ closeModal(); return; }
       const toast = document.getElementById('savedToast');
