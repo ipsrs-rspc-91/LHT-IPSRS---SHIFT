@@ -99,11 +99,16 @@
     textarea { min-height:140px; resize:vertical; }
     input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 8px 24px rgba(10,120,220,0.12); transform:translateY(-1px); }
 
-    /* Combined row for Pukul + NoLK */
+    /* Combined row for Pukul + NoLK
+       Make both columns same width/height so they look symmetric */
     .row-inline { display:flex; gap:10px; align-items:flex-start; }
-    .row-inline .col { flex: 1; min-width:0; }
-    .row-inline .col.small { flex: 0 0 140px; } /* for pukul */
-    .row-inline .col.xsmall { flex: 0 0 120px; } /* for NoLK */
+    .row-inline .col { min-width:0; }
+    .row-inline .col.small { flex: 0 0 150px; }   /* Pukul width */
+    .row-inline .col.xsmall { flex: 0 0 150px; }  /* NoLK width (match) */
+
+    /* styling for enforced text-time input */
+    .time-input { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace; letter-spacing:0.6px; text-align:center; }
+    .time-input::placeholder { color: var(--muted-2); font-style:italic; }
 
     .big-save { margin-top:18px; padding:16px; border-radius:12px; background:linear-gradient(90deg,#06a84f,#2fc26a); color:white; font-weight:800; font-size:15px; text-align:center; cursor:pointer; border:0; box-shadow: 0 10px 30px rgba(34,185,87,0.12); }
     .smallnote { font-size:13px; color:var(--muted); margin-top:8px; }
@@ -128,6 +133,8 @@
     #savedToast.show { display:flex; }
     .toast { background:#fff; border-radius:12px; padding:18px 20px; min-width:260px; max-width:90%; box-shadow: 0 18px 40px rgba(10,20,60,0.16); border:1px solid rgba(10,20,40,0.06); text-align:center; }
 
+    .input-error { border-color: var(--danger) !important; box-shadow: 0 6px 20px rgba(224,36,36,0.08); }
+
     @media (max-width:900px){
       .topbar .title { font-size:14px; }
     }
@@ -136,6 +143,7 @@
       .card { padding:12px; border-radius:10px; }
       .big-save { padding:14px; font-size:15px; }
       .grid { gap:10px; }
+      .row-inline .col.small, .row-inline .col.xsmall { flex: 1 1 0; } /* responsive: stack/fill on small screens */
     }
   </style>
 </head>
@@ -181,9 +189,10 @@
             <!-- Combined row: PUKUL + NO. LK in same line -->
             <div class="row-inline" style="margin-top:6px;">
               <div class="col small">
-                <!-- Note: indicate 24-hour format -->
-                <label for="Pukul">PUKUL (format 24 jam)</label>
-                <input id="Pukul" type="time" title="Gunakan format 24 jam (HH:MM)" />
+                <!-- changed to text-based time input with JS enforcement -->
+                <label for="Pukul">PUKUL (24 jam)</label>
+                <input id="Pukul" class="time-input" type="text" placeholder="HH:MM" maxlength="5" aria-describedby="pukulHelp" />
+                <div id="pukulHelp" class="smallnote" style="margin-top:6px;">Masukkan waktu format 24-jam, mis. 08:30 atau 14:05</div>
               </div>
               <div class="col xsmall">
                 <label for="NoLK">NO. LK</label>
@@ -382,8 +391,8 @@
                 <label>RUANG</label>
                 <input type="text" id="Edit_Ruang"/>
 
-                <label>PUKUL (format 24 jam)</label>
-                <input type="time" id="Edit_Pukul" title="Gunakan format 24 jam (HH:MM)"/>
+                <label>PUKUL (24 jam)</label>
+                <input id="Edit_Pukul" class="time-input" type="text" placeholder="HH:MM" maxlength="5" />
                 <label>NO. LK</label>
                 <input type="text" id="Edit_NoLK"/>
 
@@ -457,7 +466,7 @@
   </div>
 
 <script>
-  // --- updateTopbarHeight: hitung tinggi topbar dan set CSS variable agar container tidak tertutup ---
+  // update topbar height
   function updateTopbarHeight() {
     const topbar = document.getElementById('topbar');
     if (!topbar) return;
@@ -473,13 +482,16 @@
     window._updateTopbarTimeout = setTimeout(() => { updateTopbarHeight(); window._updateTopbarTimeout = null; }, 100);
   });
 
-  // API URL (Google Apps Script Web App)
   const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
 
-  // GLOBAL
   let rawData = [], viewData = [], sortMode = "DOWN";
 
-  function setMsg(id, text){ const el=document.getElementById(id); if(el) el.innerText = text; }
+  function setMsg(id, text, isError = false){
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.innerText = text;
+    if(isError) el.classList.add('input-error'); else el.classList.remove('input-error');
+  }
 
   function showPage(name){
     document.getElementById("pageInput").style.display = (name==='input') ? '' : 'none';
@@ -487,10 +499,7 @@
     const pill = document.getElementById("judulBulanDesktop"); if (pill) pill.style.display = (name==='laporan') ? 'inline-block' : 'none';
     const btnLaporan = document.getElementById("btnLaporan"), btnInput = document.getElementById("btnInput");
     if (btnLaporan && btnInput) { if (name==='input'){ btnLaporan.style.display='inline-flex'; btnInput.style.display='none'; } else { btnLaporan.style.display='none'; btnInput.style.display='inline-flex'; } }
-    if (name==='input') {
-      // ensure auto-scroll handlers attached when entering input page
-      attachAutoScrollForInputs();
-    }
+    if (name==='input') attachAutoHandlers();
     if (name==='laporan') loadReportsBySelectedMonth();
   }
 
@@ -506,95 +515,232 @@
   function normalizeText(x){ return (x||'').toString().trim(); }
   function toDateKey(t){ const tt=normalizeText(t); if(tt.length>=10) return tt.substring(0,10).replaceAll('-',''); return '00000000'; }
 
-  // --- TIME NORMALIZATION: ensure Pukul is stored/displayed in 24-hour "HH:MM" format ---
-  function normalizeTimeTo24(value){
-    if(!value) return '';
-    let v = value.toString().trim();
-    // If already in "HH:MM:SS" -> trim seconds
-    const hhmmss = v.match(/^(\d{1,2}):(\d{2}):\d{2}$/);
-    if(hhmmss){
-      const hh = String(parseInt(hhmmss[1],10)).padStart(2,'0');
-      const mm = hhmmss[2];
-      return `${hh}:${mm}`;
-    }
-    // If matches "HH:MM" (24h) -> normalize padding
-    const hhmm = v.match(/^(\d{1,2}):(\d{2})$/);
-    if(hhmm){
-      const hh = String(parseInt(hhmm[1],10)).padStart(2,'0');
-      const mm = hhmm[2];
-      return `${hh}:${mm}`;
-    }
-    // If contains AM/PM like "2:30 PM" or "02:30pm"
-    const ampm = v.match(/^(\d{1,2})(?::(\d{2}))?\s*([ap]m)$/i);
-    if(ampm){
-      let h = parseInt(ampm[1],10);
-      const m = (ampm[2] || '00').padStart(2,'0');
-      const suffix = ampm[3].toLowerCase();
-      if(suffix === 'pm' && h < 12) h += 12;
-      if(suffix === 'am' && h === 12) h = 0;
-      return `${String(h).padStart(2,'0')}:${m}`;
-    }
-    // If just an hour like "2 PM" or "14"
-    const hourOnlyAmPm = v.match(/^(\d{1,2})\s*([ap]m)$/i);
-    if(hourOnlyAmPm){
-      let h = parseInt(hourOnlyAmPm[1],10);
-      const suffix = hourOnlyAmPm[2].toLowerCase();
-      if(suffix === 'pm' && h < 12) h += 12;
-      if(suffix === 'am' && h === 12) h = 0;
-      return `${String(h).padStart(2,'0')}:00`;
-    }
-    const hourOnly = v.match(/^(\d{1,2})$/);
-    if(hourOnly){
-      const h = parseInt(hourOnly[1],10);
-      return `${String(h).padStart(2,'0')}:00`;
-    }
-    // Fallback: return original trimmed (best-effort)
-    return v;
+  // --- new strict HH:MM enforcement for time inputs (text-based) ---
+  function sanitizeTimeDigits(s){
+    return (s||'').replace(/[^\d]/g,'').slice(0,4); // allow up to 4 digits: HHMM
   }
 
-  function getInputPayload(){ return {
-    action:'add',
-    Tanggal:document.getElementById("Tanggal").value,
-    Pelapor:document.getElementById("Pelapor").value,
-    Ruang:document.getElementById("Ruang").value,
-    // ensure Pukul normalized to 24h "HH:MM"
-    Pukul: normalizeTimeTo24(document.getElementById("Pukul").value),
-    NoLK:document.getElementById("NoLK").value,
-    MasalahKegiatan:document.getElementById("MasalahKegiatan").value,
-    Tindakan:document.getElementById("Tindakan").value,
-    Petugas:document.getElementById("Petugas").value,
-    Status:document.getElementById("Status").value,
-    Keterangan:document.getElementById("Keterangan").value,
-    Kategori:document.getElementById("Kategori").value,
-    AreaKerja:document.getElementById("AreaKerja").value,
-    Item:document.getElementById("Item").value,
-    SparePartUnit:document.getElementById("SparePartUnit").value,
-    Type:document.getElementById("Type").value,
-    Jumlah:document.getElementById("Jumlah").value
-  }; }
+  function formatHHMMFromDigits(digits){
+    if(!digits) return '';
+    if(digits.length <= 2) return digits;
+    return digits.slice(0,2) + ':' + digits.slice(2);
+  }
+
+  function clampToValidHHMM(hh, mm){
+    let H = parseInt(hh,10);
+    let M = parseInt(mm,10);
+    if(isNaN(H)) H = 0;
+    if(isNaN(M)) M = 0;
+    if(H < 0) H = 0; if(H > 23) H = 23;
+    if(M < 0) M = 0; if(M > 59) M = 59;
+    return `${String(H).padStart(2,'0')}:${String(M).padStart(2,'0')}`;
+  }
+
+  function tryNormalizeHHMM(value){
+    if(!value) return '';
+    const v = value.toString().trim();
+    // if already HH:MM and valid
+    const m = v.match(/^(\d{1,2}):(\d{2})$/);
+    if(m){
+      const hh = parseInt(m[1],10), mm = parseInt(m[2],10);
+      if(hh>=0 && hh<=23 && mm>=0 && mm<=59) return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+    }
+    // strip non-digit and format
+    const digits = sanitizeTimeDigits(v);
+    if(digits.length === 4){
+      return clampToValidHHMM(digits.slice(0,2), digits.slice(2));
+    }
+    if(digits.length === 3){
+      // e.g. 830 -> 08:30
+      return clampToValidHHMM(digits.slice(0,1), digits.slice(1));
+    }
+    if(digits.length === 2){
+      // treat as hour -> :00
+      return clampToValidHHMM(digits, '0');
+    }
+    if(digits.length === 1){
+      return clampToValidHHMM(digits, '0');
+    }
+    // fallback: try parse AM/PM via Date
+    const ampm = v.match(/^(\d{1,2})(?::(\d{1,2}))?\s*([ap]\.?m\.?)$/i);
+    if(ampm){
+      let h = parseInt(ampm[1],10);
+      const m2 = ampm[2] ? parseInt(ampm[2],10) : 0;
+      const suffix = ampm[3].toLowerCase().replace(/\./g,'');
+      if(suffix === 'pm' && h < 12) h += 12;
+      if(suffix === 'am' && h === 12) h = 0;
+      if(h>=0 && h<=23 && m2>=0 && m2<=59) return `${String(h).padStart(2,'0')}:${String(m2).padStart(2,'0')}`;
+    }
+    return '';
+  }
+
+  function isValidHHMM(v){
+    if(!v) return false;
+    return /^([01]\d|2[0-3]):([0-5]\d)$/.test(v);
+  }
+
+  function attachTimeInputBehavior(el, helperMsgId){
+    if(!el) return;
+    // input handler: allow digits and auto-insert colon
+    const onInput = (e) => {
+      const pos = el.selectionStart;
+      const raw = el.value;
+      const digits = sanitizeTimeDigits(raw);
+      let formatted = formatHHMMFromDigits(digits);
+      el.value = formatted;
+      // remove error style while typing
+      el.classList.remove('input-error');
+      if(helperMsgId) setMsg(helperMsgId, '', false);
+      // try to restore caret reasonably (simple approach)
+      try { el.setSelectionRange(el.value.length, el.value.length); } catch(err){}
+    };
+    const onBlur = (e) => {
+      const normalized = tryNormalizeHHMM(el.value);
+      if(normalized && isValidHHMM(normalized)){
+        el.value = normalized;
+        el.classList.remove('input-error');
+        if(helperMsgId) setMsg(helperMsgId, '', false);
+      } else if(el.value.trim() === ''){
+        el.classList.remove('input-error');
+        if(helperMsgId) setMsg(helperMsgId, '', false);
+      } else {
+        el.classList.add('input-error');
+        if(helperMsgId) setMsg(helperMsgId, "Format waktu tidak valid. Gunakan HH:MM (24 jam), contoh 08:30 atau 14:05.", true);
+      }
+    };
+    const onKeyDown = (e) => {
+      // only allow digits, colon, control keys
+      const allowed = ['Backspace','Tab','ArrowLeft','ArrowRight','Delete','Home','End'];
+      if(allowed.includes(e.key)) return;
+      if(/^[0-9:]$/.test(e.key)) return;
+      e.preventDefault();
+    };
+    el.addEventListener('input', onInput);
+    el.addEventListener('blur', onBlur);
+    el.addEventListener('keydown', onKeyDown);
+    // paste handler to normalize pasted strings
+    el.addEventListener('paste', (ev) => {
+      ev.preventDefault();
+      const text = (ev.clipboardData || window.clipboardData).getData('text') || '';
+      const normalized = tryNormalizeHHMM(text) || text.replace(/[^\d:]/g,'').slice(0,5);
+      el.value = normalized;
+      el.dispatchEvent(new Event('input'));
+      el.dispatchEvent(new Event('blur'));
+    });
+    // store handlers to allow removal if needed
+    el._timeHandlers = { onInput, onBlur, onKeyDown };
+  }
+
+  function detachTimeInputBehavior(el){
+    if(!el || !el._timeHandlers) return;
+    el.removeEventListener('input', el._timeHandlers.onInput);
+    el.removeEventListener('blur', el._timeHandlers.onBlur);
+    el.removeEventListener('keydown', el._timeHandlers.onKeyDown);
+    delete el._timeHandlers;
+  }
+
+  function attachAutoHandlers(){
+    // call when page/input appears
+    attachTimeInputBehavior(document.getElementById('Pukul'), 'msg');
+    attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
+    // auto-scroll handlers kept from previous implementation if needed
+    attachAutoScrollForInputs();
+  }
+
+  // preserve previous auto-scroll utility (unchanged behaviour)
+  function scrollIntoViewWithOffset(el, offset = 12) {
+    if (!el) return;
+    const topbar = document.getElementById('topbar');
+    const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
+    const rect = el.getBoundingClientRect();
+    const absoluteTop = window.scrollY + rect.top;
+    const target = Math.max(0, absoluteTop - headerHeight - offset);
+    window.scrollTo({ top: target, behavior: 'smooth' });
+  }
+  function attachAutoScrollForInputs() {
+    const selector = '#pageInput input, #pageInput textarea, #pageInput select';
+    const inputs = document.querySelectorAll(selector);
+    inputs.forEach(el => {
+      if (el._autoScrollHandler) el.removeEventListener('focus', el._autoScrollHandler);
+      const handler = (e) => {
+        const pageInput = document.getElementById('pageInput');
+        if (pageInput && pageInput.style.display === 'none') return;
+        const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 450 : 120;
+        setTimeout(() => { scrollIntoViewWithOffset(e.target, 12); }, delay);
+      };
+      el.addEventListener('focus', handler);
+      el._autoScrollHandler = handler;
+    });
+  }
+
+  // small helpers used by existing logic
+  function normalizeTimeTo24(value){
+    // attempt to normalize incoming API values to HH:MM
+    const t = tryNormalizeHHMM(normalizeText(value));
+    return t || normalizeText(value);
+  }
+
+  function getInputPayload(){ 
+    const pukVal = document.getElementById("Pukul").value.trim();
+    return {
+      action:'add',
+      Tanggal:document.getElementById("Tanggal").value,
+      Pelapor:document.getElementById("Pelapor").value,
+      Ruang:document.getElementById("Ruang").value,
+      Pukul: isValidHHMM(pukVal) ? pukVal : '',
+      NoLK:document.getElementById("NoLK").value,
+      MasalahKegiatan:document.getElementById("MasalahKegiatan").value,
+      Tindakan:document.getElementById("Tindakan").value,
+      Petugas:document.getElementById("Petugas").value,
+      Status:document.getElementById("Status").value,
+      Keterangan:document.getElementById("Keterangan").value,
+      Kategori:document.getElementById("Kategori").value,
+      AreaKerja:document.getElementById("AreaKerja").value,
+      Item:document.getElementById("Item").value,
+      SparePartUnit:document.getElementById("SparePartUnit").value,
+      Type:document.getElementById("Type").value,
+      Jumlah:document.getElementById("Jumlah").value
+    }; 
+  }
 
   async function saveData(){
     try{
       setMsg("msg","Menyimpan data...");
-      const payload=getInputPayload();
-      if(!payload.Tanggal){ setMsg("msg","❌ Tanggal wajib diisi."); return; }
-      const res=await fetch(API_URL, {method:'POST', body: JSON.stringify(payload)});
-      const json=await res.json();
+      const payload = getInputPayload();
+      if(!payload.Tanggal){ setMsg("msg","❌ Tanggal wajib diisi.", true); return; }
+      const pukEl = document.getElementById('Pukul');
+      if(pukEl && pukEl.classList.contains('input-error')){
+        setMsg("msg","❌ Format PUKUL tidak valid. Perbaiki sebelum menyimpan.", true);
+        return;
+      }
+      // If not valid and not empty, block
+      if(pukEl && pukEl.value.trim() && !isValidHHMM(pukEl.value.trim())){
+        setMsg("msg","❌ Format PUKUL tidak valid. Gunakan HH:MM (24 jam).", true);
+        pukEl.classList.add('input-error');
+        return;
+      }
+      const res = await fetch(API_URL, { method:'POST', body: JSON.stringify(payload) });
+      const json = await res.json();
       if(json.ok){
         setMsg("msg","✅ Data tersimpan.");
         clearInputForm();
         showSavedPopup("Data sudah tersimpan","Berhasil");
       } else {
-        setMsg("msg","❌ Gagal: "+json.msg);
+        setMsg("msg","❌ Gagal: "+json.msg, true);
         showSavedPopup("Gagal menyimpan: "+(json.msg||""),"Gagal");
       }
     }catch(err){
-      setMsg("msg","❌ Error: "+err.message);
+      setMsg("msg","❌ Error: "+err.message, true);
       showSavedPopup("Error: "+err.message,"Gagal");
     }
   }
 
-  function clearInputForm(){ document.querySelectorAll("#pageInput input, #pageInput textarea, #pageInput select").forEach(el=>el.value=''); }
+  function clearInputForm(){ 
+    document.querySelectorAll("#pageInput input, #pageInput textarea, #pageInput select").forEach(el=>{
+      el.value = '';
+      el.classList.remove('input-error');
+    }); 
+  }
 
   async function loadReportsBySelectedMonth(){
     try{
@@ -603,11 +749,10 @@
       setMsg("msgReport","Memuat laporan bulan "+bulan+" ...");
       const res=await fetch(API_URL+"?action=get&bulan="+bulan);
       const json=await res.json();
-      if(!json.ok){ rawData=[]; viewData=[]; renderReportTable(); setMsg("msgReport","❌ Gagal load: "+json.msg); return; }
+      if(!json.ok){ rawData=[]; viewData=[]; renderReportTable(); setMsg("msgReport","❌ Gagal load: "+json.msg, true); return; }
       rawData=(json.data||[]).map(x=>{
         x.ID=normalizeText(x.ID); x.Tanggal=normalizeText(x.Tanggal); x.Pelapor=normalizeText(x.Pelapor);
         x.Ruang=normalizeText(x.Ruang);
-        // Normalize Pukul from incoming data to 24h format
         x.Pukul=normalizeTimeTo24(normalizeText(x.Pukul));
         x.NoLK=normalizeText(x.NoLK);
         x.MasalahKegiatan=normalizeText(x.MasalahKegiatan); x.Tindakan=normalizeText(x.Tindakan);
@@ -619,7 +764,7 @@
       buildFilterOptionsFromData(rawData);
       applyFilters();
     }catch(err){
-      rawData=[]; viewData=[]; renderReportTable(); setMsg("msgReport","❌ Error: "+err.message);
+      rawData=[]; viewData=[]; renderReportTable(); setMsg("msgReport","❌ Error: "+err.message, true);
     }
   }
 
@@ -724,8 +869,9 @@
     document.getElementById("Edit_Tanggal").value=r.Tanggal||"";
     document.getElementById("Edit_Pelapor").value=r.Pelapor||"";
     document.getElementById("Edit_Ruang").value=r.Ruang||"";
-    // Ensure Edit_Pukul is provided in 24h format
-    document.getElementById("Edit_Pukul").value=normalizeTimeTo24(r.Pukul||"");
+    // put normalized HH:MM (if possible)
+    document.getElementById("Edit_Pukul").value = isValidHHMM(normalizeTimeTo24(r.Pukul||"")) ? normalizeTimeTo24(r.Pukul||"") : (r.Pukul||"");
+    if(!isValidHHMM(document.getElementById("Edit_Pukul").value) && document.getElementById("Edit_Pukul").value) document.getElementById("Edit_Pukul").classList.add('input-error'); else document.getElementById("Edit_Pukul").classList.remove('input-error');
     document.getElementById("Edit_NoLK").value=r.NoLK||"";
     document.getElementById("Edit_MasalahKegiatan").value=r.MasalahKegiatan||"";
     document.getElementById("Edit_Tindakan").value=r.Tindakan||"";
@@ -738,6 +884,8 @@
     document.getElementById("Edit_SparePartUnit").value=r.SparePartUnit||"";
     document.getElementById("Edit_Type").value=r.Type||"";
     document.getElementById("Edit_Jumlah").value=r.Jumlah||"";
+    // Ensure handlers attached (in case modal opened later)
+    attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
   }
   function openEditModalFromCard(e,id){ e.stopPropagation(); const row=viewData.find(x=>x.ID===id)||rawData.find(x=>x.ID===id); if(row) openEditModal(row); }
   function closeModal(){ document.getElementById("modalBg").classList.remove("show"); }
@@ -745,14 +893,19 @@
   async function saveEdit(){
     try{
       setMsg("msgEdit","Menyimpan update...");
+      const editPukulEl = document.getElementById("Edit_Pukul");
+      if(editPukulEl && editPukulEl.classList.contains('input-error')){
+        setMsg("msgEdit","❌ Format PUKUL tidak valid. Perbaiki sebelum menyimpan.", true);
+        return;
+      }
+      const editPukul = editPukulEl && editPukulEl.value.trim() && isValidHHMM(editPukulEl.value.trim()) ? editPukulEl.value.trim() : '';
       const payload={
         action:"update",
         ID:document.getElementById("Edit_ID").value,
         Tanggal:document.getElementById("Edit_Tanggal").value,
         Pelapor:document.getElementById("Edit_Pelapor").value,
         Ruang:document.getElementById("Edit_Ruang").value,
-        // normalize Edit_Pukul as well
-        Pukul: normalizeTimeTo24(document.getElementById("Edit_Pukul").value),
+        Pukul: editPukul,
         NoLK:document.getElementById("Edit_NoLK").value,
         MasalahKegiatan:document.getElementById("Edit_MasalahKegiatan").value,
         Tindakan:document.getElementById("Edit_Tindakan").value,
@@ -766,12 +919,12 @@
         Type:document.getElementById("Edit_Type").value,
         Jumlah:document.getElementById("Edit_Jumlah").value
       };
-      if(!payload.ID){ setMsg("msgEdit","❌ ID kosong, tidak bisa update."); return; }
+      if(!payload.ID){ setMsg("msgEdit","❌ ID kosong, tidak bisa update.", true); return; }
       const res=await fetch(API_URL, {method:"POST", body: JSON.stringify(payload)});
       const json=await res.json();
       if(json.ok){ setMsg("msgEdit","✅ Update berhasil"); closeModal(); loadReportsBySelectedMonth(); showSavedPopup("Update berhasil","Berhasil"); }
-      else{ setMsg("msgEdit","❌ Gagal: "+json.msg); showSavedPopup("Gagal update: "+(json.msg||""),"Gagal"); }
-    }catch(err){ setMsg("msgEdit","❌ Error: "+err.message); showSavedPopup("Error: "+err.message,"Gagal"); }
+      else{ setMsg("msgEdit","❌ Gagal: "+json.msg, true); showSavedPopup("Gagal update: "+(json.msg||""),"Gagal"); }
+    }catch(err){ setMsg("msgEdit","❌ Error: "+err.message, true); showSavedPopup("Error: "+err.message,"Gagal"); }
   }
 
   // close modal by clicking background
@@ -790,40 +943,14 @@
     const first=document.querySelector("#pageInput input, #pageInput textarea, #pageInput select"); if(first) first.focus();
   }
 
-  // --- Auto-scroll focused input to visible area (respect header) ---
-  function scrollIntoViewWithOffset(el, offset = 12) {
-    if (!el) return;
-    const topbar = document.getElementById('topbar');
-    const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
-    const rect = el.getBoundingClientRect();
-    const absoluteTop = window.scrollY + rect.top;
-    const target = Math.max(0, absoluteTop - headerHeight - offset);
-    window.scrollTo({ top: target, behavior: 'smooth' });
-  }
-
-  function attachAutoScrollForInputs() {
-    const selector = '#pageInput input, #pageInput textarea, #pageInput select';
-    const inputs = document.querySelectorAll(selector);
-    inputs.forEach(el => {
-      if (el._autoScrollHandler) el.removeEventListener('focus', el._autoScrollHandler);
-      const handler = (e) => {
-        const pageInput = document.getElementById('pageInput');
-        if (pageInput && pageInput.style.display === 'none') return;
-        const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 450 : 120;
-        setTimeout(() => { scrollIntoViewWithOffset(e.target, 12); }, delay);
-      };
-      el.addEventListener('focus', handler);
-      el._autoScrollHandler = handler;
-    });
-  }
-
+  // keep responsive handlers
   window.addEventListener('resize', () => {
     if (window._autoScrollTimeout) clearTimeout(window._autoScrollTimeout);
-    window._autoScrollTimeout = setTimeout(() => { attachAutoScrollForInputs(); window._autoScrollTimeout = null; }, 150);
+    window._autoScrollTimeout = setTimeout(() => { attachAutoHandlers(); window._autoScrollTimeout = null; }, 150);
   });
-  window.addEventListener('orientationchange', () => { setTimeout(attachAutoScrollForInputs, 300); });
+  window.addEventListener('orientationchange', () => { setTimeout(attachAutoHandlers, 300); });
 
-  // ensure clicking label also scrolls (improves UX)
+  // label click -> scroll
   document.addEventListener('click', (e) => {
     const lbl = e.target.closest('label');
     if (!lbl) return;
@@ -835,7 +962,6 @@
     }
   });
 
-  // Small helper to toggle rekap panel
   function toggleRekap(){
     const p = document.getElementById('panelRekap');
     if(!p) return;
@@ -845,7 +971,7 @@
   // INIT
   buildMonthOptions();
   updateTopbarHeight();
-  attachAutoScrollForInputs();
+  attachAutoHandlers();
   showPage('input');
 
 </script>
