@@ -181,8 +181,9 @@
             <!-- Combined row: PUKUL + NO. LK in same line -->
             <div class="row-inline" style="margin-top:6px;">
               <div class="col small">
-                <label for="Pukul">PUKUL</label>
-                <input id="Pukul" type="time" />
+                <!-- Note: indicate 24-hour format -->
+                <label for="Pukul">PUKUL (format 24 jam)</label>
+                <input id="Pukul" type="time" title="Gunakan format 24 jam (HH:MM)" />
               </div>
               <div class="col xsmall">
                 <label for="NoLK">NO. LK</label>
@@ -381,8 +382,8 @@
                 <label>RUANG</label>
                 <input type="text" id="Edit_Ruang"/>
 
-                <label>PUKUL</label>
-                <input type="time" id="Edit_Pukul"/>
+                <label>PUKUL (format 24 jam)</label>
+                <input type="time" id="Edit_Pukul" title="Gunakan format 24 jam (HH:MM)"/>
                 <label>NO. LK</label>
                 <input type="text" id="Edit_NoLK"/>
 
@@ -505,12 +506,59 @@
   function normalizeText(x){ return (x||'').toString().trim(); }
   function toDateKey(t){ const tt=normalizeText(t); if(tt.length>=10) return tt.substring(0,10).replaceAll('-',''); return '00000000'; }
 
+  // --- TIME NORMALIZATION: ensure Pukul is stored/displayed in 24-hour "HH:MM" format ---
+  function normalizeTimeTo24(value){
+    if(!value) return '';
+    let v = value.toString().trim();
+    // If already in "HH:MM:SS" -> trim seconds
+    const hhmmss = v.match(/^(\d{1,2}):(\d{2}):\d{2}$/);
+    if(hhmmss){
+      const hh = String(parseInt(hhmmss[1],10)).padStart(2,'0');
+      const mm = hhmmss[2];
+      return `${hh}:${mm}`;
+    }
+    // If matches "HH:MM" (24h) -> normalize padding
+    const hhmm = v.match(/^(\d{1,2}):(\d{2})$/);
+    if(hhmm){
+      const hh = String(parseInt(hhmm[1],10)).padStart(2,'0');
+      const mm = hhmm[2];
+      return `${hh}:${mm}`;
+    }
+    // If contains AM/PM like "2:30 PM" or "02:30pm"
+    const ampm = v.match(/^(\d{1,2})(?::(\d{2}))?\s*([ap]m)$/i);
+    if(ampm){
+      let h = parseInt(ampm[1],10);
+      const m = (ampm[2] || '00').padStart(2,'0');
+      const suffix = ampm[3].toLowerCase();
+      if(suffix === 'pm' && h < 12) h += 12;
+      if(suffix === 'am' && h === 12) h = 0;
+      return `${String(h).padStart(2,'0')}:${m}`;
+    }
+    // If just an hour like "2 PM" or "14"
+    const hourOnlyAmPm = v.match(/^(\d{1,2})\s*([ap]m)$/i);
+    if(hourOnlyAmPm){
+      let h = parseInt(hourOnlyAmPm[1],10);
+      const suffix = hourOnlyAmPm[2].toLowerCase();
+      if(suffix === 'pm' && h < 12) h += 12;
+      if(suffix === 'am' && h === 12) h = 0;
+      return `${String(h).padStart(2,'0')}:00`;
+    }
+    const hourOnly = v.match(/^(\d{1,2})$/);
+    if(hourOnly){
+      const h = parseInt(hourOnly[1],10);
+      return `${String(h).padStart(2,'0')}:00`;
+    }
+    // Fallback: return original trimmed (best-effort)
+    return v;
+  }
+
   function getInputPayload(){ return {
     action:'add',
     Tanggal:document.getElementById("Tanggal").value,
     Pelapor:document.getElementById("Pelapor").value,
     Ruang:document.getElementById("Ruang").value,
-    Pukul:document.getElementById("Pukul").value,
+    // ensure Pukul normalized to 24h "HH:MM"
+    Pukul: normalizeTimeTo24(document.getElementById("Pukul").value),
     NoLK:document.getElementById("NoLK").value,
     MasalahKegiatan:document.getElementById("MasalahKegiatan").value,
     Tindakan:document.getElementById("Tindakan").value,
@@ -558,7 +606,10 @@
       if(!json.ok){ rawData=[]; viewData=[]; renderReportTable(); setMsg("msgReport","❌ Gagal load: "+json.msg); return; }
       rawData=(json.data||[]).map(x=>{
         x.ID=normalizeText(x.ID); x.Tanggal=normalizeText(x.Tanggal); x.Pelapor=normalizeText(x.Pelapor);
-        x.Ruang=normalizeText(x.Ruang); x.Pukul=normalizeText(x.Pukul); x.NoLK=normalizeText(x.NoLK);
+        x.Ruang=normalizeText(x.Ruang);
+        // Normalize Pukul from incoming data to 24h format
+        x.Pukul=normalizeTimeTo24(normalizeText(x.Pukul));
+        x.NoLK=normalizeText(x.NoLK);
         x.MasalahKegiatan=normalizeText(x.MasalahKegiatan); x.Tindakan=normalizeText(x.Tindakan);
         x.Petugas=normalizeText(x.Petugas); x.Status=normalizeText(x.Status); x.Keterangan=normalizeText(x.Keterangan);
         x.Kategori=normalizeText(x.Kategori); x.AreaKerja=normalizeText(x.AreaKerja); x.Item=normalizeText(x.Item);
@@ -670,14 +721,23 @@
     const r=row; document.getElementById("modalBg").classList.add("show"); setMsg("msgEdit","");
     document.getElementById("Edit_ID").value=r.ID||""; document.getElementById("EditID").innerText=r.ID||"-";
     document.getElementById("EditSheet").innerText=r._Sheet? "Sheet: "+r._Sheet : "Sheet: (bulan)";
-    document.getElementById("Edit_Tanggal").value=r.Tanggal||""; document.getElementById("Edit_Pelapor").value=r.Pelapor||"";
-    document.getElementById("Edit_Ruang").value=r.Ruang||""; document.getElementById("Edit_Pukul").value=r.Pukul||"";
-    document.getElementById("Edit_NoLK").value=r.NoLK||""; document.getElementById("Edit_MasalahKegiatan").value=r.MasalahKegiatan||"";
-    document.getElementById("Edit_Tindakan").value=r.Tindakan||""; document.getElementById("Edit_Petugas").value=r.Petugas||"";
-    document.getElementById("Edit_Status").value=r.Status||""; document.getElementById("Edit_Keterangan").value=r.Keterangan||"";
-    document.getElementById("Edit_Kategori").value=r.Kategori||""; document.getElementById("Edit_AreaKerja").value=r.AreaKerja||"";
-    document.getElementById("Edit_Item").value=r.Item||""; document.getElementById("Edit_SparePartUnit").value=r.SparePartUnit||"";
-    document.getElementById("Edit_Type").value=r.Type||""; document.getElementById("Edit_Jumlah").value=r.Jumlah||"";
+    document.getElementById("Edit_Tanggal").value=r.Tanggal||"";
+    document.getElementById("Edit_Pelapor").value=r.Pelapor||"";
+    document.getElementById("Edit_Ruang").value=r.Ruang||"";
+    // Ensure Edit_Pukul is provided in 24h format
+    document.getElementById("Edit_Pukul").value=normalizeTimeTo24(r.Pukul||"");
+    document.getElementById("Edit_NoLK").value=r.NoLK||"";
+    document.getElementById("Edit_MasalahKegiatan").value=r.MasalahKegiatan||"";
+    document.getElementById("Edit_Tindakan").value=r.Tindakan||"";
+    document.getElementById("Edit_Petugas").value=r.Petugas||"";
+    document.getElementById("Edit_Status").value=r.Status||"";
+    document.getElementById("Edit_Keterangan").value=r.Keterangan||"";
+    document.getElementById("Edit_Kategori").value=r.Kategori||"";
+    document.getElementById("Edit_AreaKerja").value=r.AreaKerja||"";
+    document.getElementById("Edit_Item").value=r.Item||"";
+    document.getElementById("Edit_SparePartUnit").value=r.SparePartUnit||"";
+    document.getElementById("Edit_Type").value=r.Type||"";
+    document.getElementById("Edit_Jumlah").value=r.Jumlah||"";
   }
   function openEditModalFromCard(e,id){ e.stopPropagation(); const row=viewData.find(x=>x.ID===id)||rawData.find(x=>x.ID===id); if(row) openEditModal(row); }
   function closeModal(){ document.getElementById("modalBg").classList.remove("show"); }
@@ -691,7 +751,8 @@
         Tanggal:document.getElementById("Edit_Tanggal").value,
         Pelapor:document.getElementById("Edit_Pelapor").value,
         Ruang:document.getElementById("Edit_Ruang").value,
-        Pukul:document.getElementById("Edit_Pukul").value,
+        // normalize Edit_Pukul as well
+        Pukul: normalizeTimeTo24(document.getElementById("Edit_Pukul").value),
         NoLK:document.getElementById("Edit_NoLK").value,
         MasalahKegiatan:document.getElementById("Edit_MasalahKegiatan").value,
         Tindakan:document.getElementById("Edit_Tindakan").value,
@@ -773,6 +834,13 @@
       setTimeout(() => { scrollIntoViewWithOffset(target, 12); }, 170);
     }
   });
+
+  // Small helper to toggle rekap panel
+  function toggleRekap(){
+    const p = document.getElementById('panelRekap');
+    if(!p) return;
+    p.style.display = (p.style.display === 'none' || p.style.display==='') ? 'block' : 'none';
+  }
 
   // INIT
   buildMonthOptions();
