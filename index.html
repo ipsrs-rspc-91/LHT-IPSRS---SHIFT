@@ -214,28 +214,22 @@
             <label for="Tindakan">TINDAKAN</label>
             <textarea id="Tindakan" placeholder="Tindakan yang dilakukan"></textarea>
 
-            <!-- MOVED: Spare Part / Unit, Type, Jumlah are now placed after Tindakan -->
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <div style="flex:1;">
-                <label for="SparePartUnit">SPARE PART / UNIT</label>
-                <input id="SparePartUnit" type="text"/>
-              </div>
-              <div style="width:110px;">
-                <label for="Type">TYPE</label>
-                <input id="Type" type="text"/>
-              </div>
-              <div style="width:100px;">
-                <label for="Jumlah">JUMLAH</label>
-                <input id="Jumlah" type="number" min="0"/>
-              </div>
-            </div>
-
             <div class="smallnote">* Jika ada penggantian spare part/unit baru.</div>
           </div>
         </div>
 
         <div class="panel-right">
           <div class="form-section">
+            <!-- MOVED: each spare input on its own row, placed above Petugas -->
+            <label for="SparePartUnit">SPARE PART / UNIT</label>
+            <input id="SparePartUnit" type="text"/>
+
+            <label for="Type">TYPE</label>
+            <input id="Type" type="text"/>
+
+            <label for="Jumlah">JUMLAH</label>
+            <input id="Jumlah" type="number" min="0"/>
+
             <label for="Petugas">PETUGAS</label>
             <!-- Popup chooser: input + button to open popup (replaces simple datalist UX) -->
             <div style="display:flex; gap:8px; align-items:center;">
@@ -261,8 +255,6 @@
 
             <label for="Item">ITEM</label>
             <input id="Item" type="text"/>
-
-            <!-- Removed SparePart/Type/Jumlah from here (moved to left) -->
 
             <!-- Keep the inline/save button inside the panel (no floating button) -->
             <div class="big-save" onclick="saveData()">SIMPAN DATA BARU (SHIFT)</div>
@@ -420,34 +412,26 @@
                 <label>TINDAKAN</label>
                 <textarea id="Edit_Tindakan"></textarea>
 
-                <!-- MOVED: edit spare part/type/jumlah placed after tindakan in modal left column -->
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                  <div style="flex:1;">
-                    <label>SPARE PART / UNIT</label>
-                    <input type="text" id="Edit_SparePartUnit"/>
-                  </div>
-                  <div style="width:110px;">
-                    <label>TYPE</label>
-                    <input type="text" id="Edit_Type"/>
-                  </div>
-                  <div style="width:100px;">
-                    <label>JUMLAH</label>
-                    <input type="number" id="Edit_Jumlah"/>
-                  </div>
-                </div>
-
               </div>
 
               <div>
+                <!-- MOVED: edit spare inputs above Edit_Petugas, each on its own line -->
+                <label>SPARE PART / UNIT</label>
+                <input type="text" id="Edit_SparePartUnit"/>
+
+                <label>TYPE</label>
+                <input type="text" id="Edit_Type"/>
+
+                <label>JUMLAH</label>
+                <input type="number" id="Edit_Jumlah"/>
+
                 <label>PETUGAS</label>
-                <!-- Modal edit also has a choose button to open the petugas popup -->
                 <div style="display:flex; gap:8px; align-items:center;">
                   <input type="text" id="Edit_Petugas" placeholder="Pilih atau ketik nama petugas"/>
                   <button type="button" class="btn ghost" onclick="openPetugasPopup('Edit_Petugas')" title="Pilih petugas">PILIH</button>
                 </div>
 
                 <label>SELESAI / BELUM</label>
-                <!-- Modal status selection: input + pilih button -->
                 <div style="display:flex; gap:8px; align-items:center;">
                   <input type="text" id="Edit_Status" placeholder="Pilih Selesai atau Belum"/>
                   <button type="button" class="btn ghost" onclick="openStatusPopup('Edit_Status')" title="Pilih status">PILIH</button>
@@ -465,7 +449,7 @@
                 <label>ITEM</label>
                 <input type="text" id="Edit_Item"/>
 
-                <div class="modal-actions">
+                <div class="modal-actions" style="margin-top:8px;">
                   <button class="btn primary" onclick="saveEdit()">SIMPAN UPDATE</button>
                   <button class="btn ghost" onclick="closeModal()">BATAL</button>
                 </div>
@@ -489,7 +473,7 @@
     </div>
   </div>
 
-  <!-- Petugas Popup (new) -->
+  <!-- Petugas Popup -->
   <div id="petugasPopupBg" class="modal-bg" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="petugasPopupTitle" style="width:320px; max-width:96vw;">
       <h4 id="petugasPopupTitle">Pilih Petugas</h4>
@@ -505,7 +489,7 @@
     </div>
   </div>
 
-  <!-- Status Popup (new) -->
+  <!-- Status Popup -->
   <div id="statusPopupBg" class="modal-bg" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="statusPopupTitle" style="width:320px; max-width:96vw;">
       <h4 id="statusPopupTitle">Pilih Status</h4>
@@ -520,7 +504,7 @@
     </div>
   </div>
 
-  <!-- Datalist kept as fallback (optional) -->
+  <!-- Datalist kept as fallback -->
   <datalist id="PetugasList">
     <option value="Pantiarso"></option>
     <option value="Agung"></option>
