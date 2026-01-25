@@ -510,6 +510,86 @@
     </div>
   </div>
 
+  <!-- Kategori Popup -->
+<div id="kategoriPopupBg" class="modal-bg" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="kategoriPopupTitle" style="width:420px; max-width:96vw;">
+    <h4 id="kategoriPopupTitle">Pilih Kategori</h4>
+    <div class="smallnote">Pilih salah satu kategori untuk mengisi kolom.</div>
+
+    <div class="status-list" id="kategoriOptions" role="list">
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('PERBAIKAN DENGAN PENGGANTIAN SPARE PART BARU')" onkeydown="if(event.key==='Enter'){ selectKategori('PERBAIKAN DENGAN PENGGANTIAN SPARE PART BARU'); }">
+        <span>PERBAIKAN DENGAN PENGGANTIAN SPARE PART BARU</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('PENGGANTIAN ATAU PEMASANGAN UNIT /ALAT BARU (PERBAIKAN ATAU PASANG BARU)')" onkeydown="if(event.key==='Enter'){ selectKategori('PENGGANTIAN ATAU PEMASANGAN UNIT /ALAT BARU (PERBAIKAN ATAU PASANG BARU)'); }">
+        <span>PENGGANTIAN ATAU PEMASANGAN UNIT /ALAT BARU (PERBAIKAN ATAU PASANG BARU)</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('PERMINTAAN PELAYANAN ( DILUAR PEMELIHARAAN DAN PERBAIKAN)')" onkeydown="if(event.key==='Enter'){ selectKategori('PERMINTAAN PELAYANAN ( DILUAR PEMELIHARAAN DAN PERBAIKAN)'); }">
+        <span>PERMINTAAN PELAYANAN ( DILUAR PEMELIHARAAN DAN PERBAIKAN)</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('MONITORING DAN EVALUASI PEKERJAAN (INTERNAL)')" onkeydown="if(event.key==='Enter'){ selectKategori('MONITORING DAN EVALUASI PEKERJAAN (INTERNAL)'); }">
+        <span>MONITORING DAN EVALUASI PEKERJAAN (INTERNAL)</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('MONITORING DAN EVALUASI PEKERJAAN (PIHAK KE-3)')" onkeydown="if(event.key==='Enter'){ selectKategori('MONITORING DAN EVALUASI PEKERJAAN (PIHAK KE-3)'); }">
+        <span>MONITORING DAN EVALUASI PEKERJAAN (PIHAK KE-3)</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('RAPAT / PERTEMUAN / SOSIALISASI / PELATIHAN')" onkeydown="if(event.key==='Enter'){ selectKategori('RAPAT / PERTEMUAN / SOSIALISASI / PELATIHAN'); }">
+        <span>RAPAT / PERTEMUAN / SOSIALISASI / PELATIHAN</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('DISPOSISI / MEMO')" onkeydown="if(event.key==='Enter'){ selectKategori('DISPOSISI / MEMO'); }">
+        <span>DISPOSISI / MEMO</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('PROJEK RENOVASI')" onkeydown="if(event.key==='Enter'){ selectKategori('PROJEK RENOVASI'); }">
+        <span>PROJEK RENOVASI</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('DISINFEKTAN')" onkeydown="if(event.key==='Enter'){ selectKategori('DISINFEKTAN'); }">
+        <span>DISINFEKTAN</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('ANALISA')" onkeydown="if(event.key==='Enter'){ selectKategori('ANALISA'); }">
+        <span>ANALISA</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('AIR BERSIH')" onkeydown="if(event.key==='Enter'){ selectKategori('AIR BERSIH'); }">
+        <span>AIR BERSIH</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('CEK LIST HARIAN')" onkeydown="if(event.key==='Enter'){ selectKategori('CEK LIST HARIAN'); }">
+        <span>CEK LIST HARIAN</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('CEK LIST MINGGUAN')" onkeydown="if(event.key==='Enter'){ selectKategori('CEK LIST MINGGUAN'); }">
+        <span>CEK LIST MINGGUAN</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('CEK LIST BULANAN')" onkeydown="if(event.key==='Enter'){ selectKategori('CEK LIST BULANAN'); }">
+        <span>CEK LIST BULANAN</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('TEKNIK BERSIH')" onkeydown="if(event.key==='Enter'){ selectKategori('TEKNIK BERSIH'); }">
+        <span>TEKNIK BERSIH</span> <span class="muted">Pilih</span>
+      </div>
+
+      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('UMUM / LAIN-nya.')" onkeydown="if(event.key==='Enter'){ selectKategori('UMUM / LAIN-nya.'); }">
+        <span>UMUM / LAIN-nya.</span> <span class="muted">Pilih</span>
+      </div>
+    </div>
+
+    <div style="margin-top:12px; text-align:right;">
+      <button class="btn ghost" onclick="closeKategoriPopup()">BATAL</button>
+    </div>
+  </div>
+</div>
+
+
+  
   <!-- Datalist kept as fallback -->
   <datalist id="PetugasList">
     <option value="Pantiarso"></option>
