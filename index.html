@@ -678,14 +678,25 @@
   }
 
   function scrollToLabelAndInput(inputEl) {
-    if (!inputEl) return;
-    const labelEl = getLabelForInput(inputEl);
-    if (labelEl) {
-      scrollIntoViewWithOffset(labelEl, 16);
-    } else {
-      scrollIntoViewWithOffset(inputEl, 16);
-    }
+  if (!inputEl) return;
+
+  // ✅ FIX KHUSUS: Status (SELESAI/BELUM)
+  // supaya kotak inputnya pasti kelihatan
+  if (inputEl.id === "Status" || inputEl.id === "Edit_Status") {
+    scrollIntoViewWithOffset(inputEl, 10);
+    return;
   }
+
+  const labelEl = getLabelForInput(inputEl);
+
+  // ✅ normal (label + input terlihat)
+  if (labelEl) {
+    scrollIntoViewWithOffset(labelEl, 16);
+  } else {
+    scrollIntoViewWithOffset(inputEl, 16);
+  }
+}
+
 
   // --- strict HH:MM enforcement for time inputs (text-based) ---
   function sanitizeTimeDigits(s){
