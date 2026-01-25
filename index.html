@@ -608,6 +608,22 @@
 
   let rawData = [], viewData = [], sortMode = "DOWN";
 
+  // ✅ FIX FINAL: cegah auto-scroll melawan scroll manual user
+  let _userIsScrolling = false;
+  let _userScrollTimeout = null;
+
+  function markUserScrolling(){
+    _userIsScrolling = true;
+    if(_userScrollTimeout) clearTimeout(_userScrollTimeout);
+    _userScrollTimeout = setTimeout(() => {
+      _userIsScrolling = false;
+    }, 800);
+  }
+
+  window.addEventListener('wheel', markUserScrolling, {passive:true});
+  window.addEventListener('touchmove', markUserScrolling, {passive:true});
+  window.addEventListener('scroll', markUserScrolling, {passive:true});
+
   function setMsg(id, text, isError = false){
     const el=document.getElementById(id);
     if(!el) return;
@@ -661,15 +677,15 @@
   function normalizeText(x){ return (x||'').toString().trim(); }
   function toDateKey(t){ const tt=normalizeText(t); if(tt.length>=10) return tt.substring(0,10).replaceAll('-',''); return '00000000'; }
 
-  // ✅ SCROLL HELPER (FIX: label+input visible)
+  // ✅ SCROLL HELPER (FINAL + ada jeda 1 kotak)
   function scrollIntoViewWithOffset(el, offset = 18) {
     if (!el) return;
 
     const topbar = document.getElementById('topbar');
     const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
 
-    // ✅ TAMBAHAN: JEDA 1 KOTAK sebelum label (agar label tidak hilang)
-    const extraGap = 70; // bisa 60-90 sesuai selera
+    // ✅ JEDA 1 KOTAK supaya label tidak hilang
+    const extraGap = 70; // bisa 60-90
 
     const rect = el.getBoundingClientRect();
     const absoluteTop = window.scrollY + rect.top;
@@ -868,7 +884,7 @@
     attachQuickScrollHandlersForInputs();
   }
 
-  // ✅ FIXED: auto scroll focus => scroll to LABEL first
+  // ✅ FINAL FIX: auto scroll focus => TIDAK melawan scroll manual user
   function attachAutoScrollForInputs() {
     const selector = '#pageInput input, #pageInput textarea, #pageInput select';
     const inputs = document.querySelectorAll(selector);
@@ -880,9 +896,13 @@
         const pageInput = document.getElementById('pageInput');
         if (pageInput && pageInput.style.display === 'none') return;
 
+        // ✅ jika user sedang scroll manual, jangan paksa auto-scroll
+        if (_userIsScrolling) return;
+
         const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 450 : 120;
 
         setTimeout(() => {
+          if (_userIsScrolling) return; // cek lagi setelah delay
           scrollToLabelAndInput(e.target);
         }, delay);
       };
@@ -892,13 +912,16 @@
     });
   }
 
-  // ✅ BONUS: klik langsung scroll cepat supaya label terlihat sebelum keyboard naik
+  // ✅ FINAL FIX: pointerdown tidak memaksa scroll kalau user sedang geser layar
   document.addEventListener('pointerdown', (e) => {
     const target = e.target;
     if (!target) return;
 
     const pageInput = document.getElementById('pageInput');
     if (!pageInput || pageInput.style.display === 'none') return;
+
+    // ✅ jika user sedang scroll manual, jangan auto-scroll
+    if (_userIsScrolling) return;
 
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
     if (tag === 'input' || tag === 'textarea' || tag === 'select') {
