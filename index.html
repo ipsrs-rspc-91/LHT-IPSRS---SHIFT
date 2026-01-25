@@ -244,13 +244,13 @@
             <label for="Petugas">PETUGAS</label>
             <!-- Popup chooser: input + button to open popup (replaces simple datalist UX) -->
             <div style="display:flex; gap:8px; align-items:center;">
-              <input id="Petugas" type="text" placeholder="Pilih atau ketik nama petugas"/>
+              <input id="Petugas" type="text" placeholder="Pilih atau ketik nama petugas" list="PetugasList"/>
               <button type="button" class="btn ghost" onclick="openPetugasPopup('Petugas')" title="Pilih petugas">PILIH</button>
             </div>
 
             <label for="Kategori">KATEGORI</label>
             <div style="display:flex; gap:8px; align-items:center;">
-            <input id="Kategori" type="text" placeholder="Pilih atau ketik kategori"/>
+            <input id="Kategori" type="text" placeholder="Pilih atau ketik kategori" list="KategoriList"/>
             <button type="button" class="btn ghost" onclick="openKategoriPopup('Kategori')" title="Pilih kategori">PILIH</button>
             </div>
 
@@ -436,7 +436,7 @@
 
                 <label>PETUGAS</label>
                 <div style="display:flex; gap:8px; align-items:center;">
-                  <input type="text" id="Edit_Petugas" placeholder="Pilih atau ketik nama petugas"/>
+                  <input type="text" id="Edit_Petugas" placeholder="Pilih atau ketik nama petugas" list="PetugasList"/>
                   <button type="button" class="btn ghost" onclick="openPetugasPopup('Edit_Petugas')" title="Pilih petugas">PILIH</button>
                 </div>
 
@@ -447,7 +447,10 @@
                 </div>
 
                 <label>KATEGORI</label>
-                <input type="text" id="Edit_Kategori"/>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <input type="text" id="Edit_Kategori" list="KategoriList"/>
+                  <button type="button" class="btn ghost" onclick="openKategoriPopup('Edit_Kategori')" title="Pilih kategori">PILIH</button>
+                </div>
 
                 <label>AREA KERJA</label>
                 <input type="text" id="Edit_AreaKerja"/>
@@ -511,91 +514,26 @@
   </div>
 
   <!-- Kategori Popup -->
-<div id="kategoriPopupBg" class="modal-bg" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="kategoriPopupTitle" style="width:420px; max-width:96vw;">
-    <h4 id="kategoriPopupTitle">Pilih Kategori</h4>
-    <div class="smallnote">Pilih salah satu kategori untuk mengisi kolom.</div>
-
-    <div class="status-list" id="kategoriOptions" role="list">
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('PERBAIKAN DENGAN PENGGANTIAN SPARE PART BARU')" onkeydown="if(event.key==='Enter'){ selectKategori('PERBAIKAN DENGAN PENGGANTIAN SPARE PART BARU'); }">
-        <span>PERBAIKAN DENGAN PENGGANTIAN SPARE PART BARU</span> <span class="muted">Pilih</span>
+  <div id="kategoriPopupBg" class="modal-bg" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="kategoriPopupTitle" style="width:360px; max-width:96vw;">
+      <h4 id="kategoriPopupTitle">Pilih Kategori</h4>
+      <div class="smallnote">Pilih salah satu kategori untuk mengisi kolom.</div>
+      <div class="petugas-list" id="kategoriOptions" role="list" style="max-height:50vh; overflow:auto;"></div>
+      <div style="margin-top:12px; text-align:right;">
+        <button class="btn ghost" onclick="closeKategoriPopup()">BATAL</button>
       </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('PENGGANTIAN ATAU PEMASANGAN UNIT /ALAT BARU (PERBAIKAN ATAU PASANG BARU)')" onkeydown="if(event.key==='Enter'){ selectKategori('PENGGANTIAN ATAU PEMASANGAN UNIT /ALAT BARU (PERBAIKAN ATAU PASANG BARU)'); }">
-        <span>PENGGANTIAN ATAU PEMASANGAN UNIT /ALAT BARU (PERBAIKAN ATAU PASANG BARU)</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('PERMINTAAN PELAYANAN ( DILUAR PEMELIHARAAN DAN PERBAIKAN)')" onkeydown="if(event.key==='Enter'){ selectKategori('PERMINTAAN PELAYANAN ( DILUAR PEMELIHARAAN DAN PERBAIKAN)'); }">
-        <span>PERMINTAAN PELAYANAN ( DILUAR PEMELIHARAAN DAN PERBAIKAN)</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('MONITORING DAN EVALUASI PEKERJAAN (INTERNAL)')" onkeydown="if(event.key==='Enter'){ selectKategori('MONITORING DAN EVALUASI PEKERJAAN (INTERNAL)'); }">
-        <span>MONITORING DAN EVALUASI PEKERJAAN (INTERNAL)</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('MONITORING DAN EVALUASI PEKERJAAN (PIHAK KE-3)')" onkeydown="if(event.key==='Enter'){ selectKategori('MONITORING DAN EVALUASI PEKERJAAN (PIHAK KE-3)'); }">
-        <span>MONITORING DAN EVALUASI PEKERJAAN (PIHAK KE-3)</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('RAPAT / PERTEMUAN / SOSIALISASI / PELATIHAN')" onkeydown="if(event.key==='Enter'){ selectKategori('RAPAT / PERTEMUAN / SOSIALISASI / PELATIHAN'); }">
-        <span>RAPAT / PERTEMUAN / SOSIALISASI / PELATIHAN</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('DISPOSISI / MEMO')" onkeydown="if(event.key==='Enter'){ selectKategori('DISPOSISI / MEMO'); }">
-        <span>DISPOSISI / MEMO</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('PROJEK RENOVASI')" onkeydown="if(event.key==='Enter'){ selectKategori('PROJEK RENOVASI'); }">
-        <span>PROJEK RENOVASI</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('DISINFEKTAN')" onkeydown="if(event.key==='Enter'){ selectKategori('DISINFEKTAN'); }">
-        <span>DISINFEKTAN</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('ANALISA')" onkeydown="if(event.key==='Enter'){ selectKategori('ANALISA'); }">
-        <span>ANALISA</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('AIR BERSIH')" onkeydown="if(event.key==='Enter'){ selectKategori('AIR BERSIH'); }">
-        <span>AIR BERSIH</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('CEK LIST HARIAN')" onkeydown="if(event.key==='Enter'){ selectKategori('CEK LIST HARIAN'); }">
-        <span>CEK LIST HARIAN</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('CEK LIST MINGGUAN')" onkeydown="if(event.key==='Enter'){ selectKategori('CEK LIST MINGGUAN'); }">
-        <span>CEK LIST MINGGUAN</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('CEK LIST BULANAN')" onkeydown="if(event.key==='Enter'){ selectKategori('CEK LIST BULANAN'); }">
-        <span>CEK LIST BULANAN</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('TEKNIK BERSIH')" onkeydown="if(event.key==='Enter'){ selectKategori('TEKNIK BERSIH'); }">
-        <span>TEKNIK BERSIH</span> <span class="muted">Pilih</span>
-      </div>
-
-      <div class="opt" role="listitem" tabindex="0" onclick="selectKategori('UMUM / LAIN-nya.')" onkeydown="if(event.key==='Enter'){ selectKategori('UMUM / LAIN-nya.'); }">
-        <span>UMUM / LAIN-nya.</span> <span class="muted">Pilih</span>
-      </div>
-    </div>
-
-    <div style="margin-top:12px; text-align:right;">
-      <button class="btn ghost" onclick="closeKategoriPopup()">BATAL</button>
     </div>
   </div>
-</div>
 
-
-  
   <!-- Datalist kept as fallback -->
   <datalist id="PetugasList">
     <option value="Pantiarso"></option>
     <option value="Agung"></option>
     <option value="Rusdi"></option>
   </datalist>
+
+  <!-- Kategori datalist (static choices provided) -->
+  <datalist id="KategoriList"></datalist>
 
 <script>
   // update topbar height
@@ -615,6 +553,26 @@
   });
 
   const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
+
+  // STATIC list of kategori (from user request)
+  const STATIC_KATEGORI = [
+    "PERBAIKAN DENGAN PENGGANTIAN SPARE PART BARU",
+    "PENGGANTIAN ATAU PEMASANGAN UNIT /ALAT BARU (PERBAIKAN ATAU PASANG BARU)",
+    "PERMINTAAN PELAYANAN ( DILUAR PEMELIHARAAN DAN PERBAIKAN)",
+    "MONITORING DAN EVALUASI PEKERJAAN (INTERNAL)",
+    "MONITORING DAN EVALUASI PEKERJAAN (PIHAK KE-3)",
+    "RAPAT / PERTEMUAN / SOSIALISASI / PELATIHAN",
+    "DISPOSISI / MEMO",
+    "PROJEK RENOVASI",
+    "DISINFEKTAN",
+    "ANALISA",
+    "AIR BERSIH",
+    "CEK LIST HARIAN",
+    "CEK LIST MINGGUAN",
+    "CEK LIST BULANAN",
+    "TEKNIK BERSIH",
+    "UMUM / LAIN-nya"
+  ];
 
   let rawData = [], viewData = [], sortMode = "DOWN";
 
@@ -905,10 +863,12 @@
   function escapeHtml(text){ return (text||'').toString().replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
 
   function buildFilterOptionsFromData(data){
-    const kategoriList=uniqueSorted(data.map(x=>x.Kategori));
+    const kategoriList = uniqueSorted(data.map(x=>x.Kategori));
     const areaList=uniqueSorted(data.map(x=>x.AreaKerja));
     const itemList=uniqueSorted(data.map(x=>x.Item));
-    const fk=document.getElementById("FilterKategori"); fk.innerHTML=`<option value="ALL">SEMUA DATA</option>`; kategoriList.forEach(v=>fk.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+    // Combine static kategori options with those found in data (no duplicates)
+    const combinedKategori = uniqueSorted([...(STATIC_KATEGORI||[]), ...kategoriList]);
+    const fk=document.getElementById("FilterKategori"); fk.innerHTML=`<option value="ALL">SEMUA DATA</option>`; combinedKategori.forEach(v=>fk.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
     const fa=document.getElementById("FilterAreaKerja"); fa.innerHTML=`<option value="ALL">SEMUA DATA</option>`; areaList.forEach(v=>fa.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
     const fi=document.getElementById("FilterItem"); fi.innerHTML=`<option value="ALL">SEMUA DATA</option>`; itemList.forEach(v=>fi.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
     document.getElementById("FilterStatus").value="ALL";
@@ -1150,6 +1110,70 @@
     if(e.target && e.target.id === 'statusPopupBg') closeStatusPopup();
   });
 
+  // Kategori popup logic (new)
+  let _kategoriTargetInputId = null;
+  function buildKategoriDatalistAndPopup(){
+    // populate datalist
+    const dl = document.getElementById('KategoriList');
+    if(dl){
+      dl.innerHTML = '';
+      for(const k of STATIC_KATEGORI){
+        const opt = document.createElement('option');
+        opt.value = k;
+        dl.appendChild(opt);
+      }
+    }
+    // populate kategoriOptions in popup
+    const listEl = document.getElementById('kategoriOptions');
+    if(listEl){
+      listEl.innerHTML = '';
+      STATIC_KATEGORI.forEach(k=>{
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.setAttribute('role','listitem');
+        div.tabIndex = 0;
+        div.innerHTML = `<span>${escapeHtml(k)}</span><span class="muted">Pilih</span>`;
+        div.addEventListener('click', ()=> selectKategori(k));
+        div.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter') selectKategori(k); });
+        listEl.appendChild(div);
+      });
+    }
+  }
+
+  function openKategoriPopup(inputId){
+    _kategoriTargetInputId = inputId || null;
+    const bg = document.getElementById('kategoriPopupBg');
+    if(!bg) return;
+    bg.classList.add('show');
+    bg.setAttribute('aria-hidden','false');
+    setTimeout(()=>{
+      const firstOpt = document.querySelector('#kategoriOptions .opt');
+      if(firstOpt) firstOpt.focus();
+    },50);
+  }
+  function closeKategoriPopup(){
+    const bg = document.getElementById('kategoriPopupBg');
+    if(!bg) return;
+    bg.classList.remove('show');
+    bg.setAttribute('aria-hidden','true');
+    if(_kategoriTargetInputId){
+      const el = document.getElementById(_kategoriTargetInputId);
+      if(el) el.focus();
+    }
+    _kategoriTargetInputId = null;
+  }
+  function selectKategori(value){
+    if(_kategoriTargetInputId){
+      const el = document.getElementById(_kategoriTargetInputId);
+      if(el) el.value = value;
+    }
+    closeKategoriPopup();
+  }
+  // close kategori popup by clicking background
+  document.getElementById('kategoriPopupBg').addEventListener('click', function(e){
+    if(e.target && e.target.id === 'kategoriPopupBg') closeKategoriPopup();
+  });
+
   // ESC to close popups/modals/toasts
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){
@@ -1157,6 +1181,8 @@
       if(petugasBg && petugasBg.classList.contains('show')){ closePetugasPopup(); return; }
       const statusBg = document.getElementById('statusPopupBg');
       if(statusBg && statusBg.classList.contains('show')){ closeStatusPopup(); return; }
+      const kategoriBg = document.getElementById('kategoriPopupBg');
+      if(kategoriBg && kategoriBg.classList.contains('show')){ closeKategoriPopup(); return; }
       const modal = document.getElementById('modalBg');
       if(modal && modal.classList.contains('show')){ closeModal(); return; }
       const toast = document.getElementById('savedToast');
@@ -1192,6 +1218,7 @@
   // INIT
   buildMonthOptions();
   updateTopbarHeight();
+  buildKategoriDatalistAndPopup();
   attachAutoHandlers();
   showPage('input');
 
