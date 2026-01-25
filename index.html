@@ -680,16 +680,28 @@
   function scrollToLabelAndInput(inputEl) {
   if (!inputEl) return;
 
-  // ✅ FIX KHUSUS: Status (SELESAI/BELUM)
-  // supaya kotak inputnya pasti kelihatan
+  // ✅ FIX KHUSUS: Status (SELESAI/BELUM) -> LABEL + INPUT wajib terlihat
   if (inputEl.id === "Status" || inputEl.id === "Edit_Status") {
-    scrollIntoViewWithOffset(inputEl, 10);
+    const labelEl = getLabelForInput(inputEl);
+
+    // Step 1: scroll ke label dulu
+    if (labelEl) {
+      scrollIntoViewWithOffset(labelEl, 12);
+    } else {
+      scrollIntoViewWithOffset(inputEl, 12);
+    }
+
+    // Step 2: pastikan inputnya tetap kelihatan
+    setTimeout(() => {
+      scrollIntoViewWithOffset(inputEl, 6);
+    }, 180);
+
     return;
   }
 
   const labelEl = getLabelForInput(inputEl);
 
-  // ✅ normal (label + input terlihat)
+  // ✅ normal field lain: label + input
   if (labelEl) {
     scrollIntoViewWithOffset(labelEl, 16);
   } else {
@@ -697,6 +709,7 @@
   }
 }
 
+  
 
   // --- strict HH:MM enforcement for time inputs (text-based) ---
   function sanitizeTimeDigits(s){
