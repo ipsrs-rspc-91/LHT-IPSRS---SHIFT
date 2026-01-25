@@ -608,7 +608,7 @@
 
   let rawData = [], viewData = [], sortMode = "DOWN";
 
-  // ✅ FINAL FIX: cegah auto-scroll melawan scroll manual user
+  // ✅ FINAL FIX: cegah auto-scroll melawan scroll manual user (TANPA event scroll)
   let _userIsScrolling = false;
   let _userScrollTimeout = null;
 
@@ -620,8 +620,8 @@
     }, 800);
   }
   window.addEventListener('wheel', markUserScrolling, {passive:true});
+  window.addEventListener('touchstart', markUserScrolling, {passive:true});
   window.addEventListener('touchmove', markUserScrolling, {passive:true});
-  window.addEventListener('scroll', markUserScrolling, {passive:true});
 
   function setMsg(id, text, isError = false){
     const el=document.getElementById(id);
@@ -817,7 +817,7 @@
     attachQuickScrollHandlersForInputs();
   }
 
-  // ✅ FINAL FIX: auto scroll focus => tidak melawan scroll manual user
+  // ✅ FINAL FIX: auto scroll focus => tetap bergerak saat klik input
   function attachAutoScrollForInputs() {
     const selector = '#pageInput input, #pageInput textarea, #pageInput select';
     const inputs = document.querySelectorAll(selector);
@@ -828,7 +828,6 @@
       const handler = (e) => {
         const pageInput = document.getElementById('pageInput');
         if (pageInput && pageInput.style.display === 'none') return;
-        if (_userIsScrolling) return;
 
         const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 450 : 120;
 
@@ -843,7 +842,6 @@
     });
   }
 
-  // ✅ FINAL FIX: pointerdown tidak memaksa scroll saat user geser layar
   document.addEventListener('pointerdown', (e) => {
     const target = e.target;
     if (!target) return;
@@ -851,34 +849,33 @@
     const pageInput = document.getElementById('pageInput');
     if (!pageInput || pageInput.style.display === 'none') return;
 
-    if (_userIsScrolling) return;
-
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
     if (tag === 'input' || tag === 'textarea' || tag === 'select') {
-      scrollToLabelAndInput(target);
+      setTimeout(() => {
+        if (_userIsScrolling) return;
+        scrollToLabelAndInput(target);
+      }, 50);
     }
   });
 
-  // ✅ FINAL FIX: khusus Status/Petugas/Kategori/AreaKerja
-  // JANGAN dipaksa scroll ke tombol SIMPAN saat fokus
+  // ✅ FINAL FIX: Status/Petugas/Kategori/AreaKerja => scroll ke label, bukan ke tombol simpan
   function attachQuickScrollHandlersForInputs() {
-    const disableAutoSaveScrollOnFocus = ['Status','Petugas','Kategori','AreaKerja'];
-
-    disableAutoSaveScrollOnFocus.forEach(id=>{
+    const ids = ['Status','Petugas','Kategori','AreaKerja'];
+    ids.forEach(id=>{
       const el = document.getElementById(id);
       if(!el) return;
 
       if(el._ensureHandler) {
         el.removeEventListener('focus', el._ensureHandler);
         el.removeEventListener('click', el._ensureHandler);
-        el.removeEventListener('pointerdown', el._ensureHandler);
-        el.removeEventListener('touchstart', el._ensureHandler);
         el._ensureHandler = null;
       }
 
       const h = (e) => {
-        if (_userIsScrolling) return;
-        scrollToLabelAndInput(el);
+        setTimeout(() => {
+          if (_userIsScrolling) return;
+          scrollToLabelAndInput(el);
+        }, 140);
       };
 
       el.addEventListener('focus', h, {passive:true});
@@ -886,12 +883,11 @@
       el._ensureHandler = h;
     });
 
-    // tombol "PILIH" boleh bantu tampilkan simpan (halus)
     const btnMap = [
-      ['btnPilihStatus','Status'],
-      ['btnPilihPetugas','Petugas'],
-      ['btnPilihKategori','Kategori'],
-      ['btnPilihArea','AreaKerja']
+      ['btnPilihStatus'],
+      ['btnPilihPetugas'],
+      ['btnPilihKategori'],
+      ['btnPilihArea']
     ];
 
     btnMap.forEach(([btnId])=>{
