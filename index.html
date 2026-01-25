@@ -249,7 +249,11 @@
             </div>
 
             <label for="Kategori">KATEGORI</label>
-            <input id="Kategori" type="text"/>
+            <div style="display:flex; gap:8px; align-items:center;">
+            <input id="Kategori" type="text" placeholder="Pilih atau ketik kategori"/>
+            <button type="button" class="btn ghost" onclick="openKategoriPopup('Kategori')" title="Pilih kategori">PILIH</button>
+            </div>
+
 
             <label for="AreaKerja">AREA KERJA</label>
             <input id="AreaKerja" type="text"/>
