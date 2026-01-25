@@ -779,95 +779,63 @@
   }
 
   // Scroll helper to bring the save button into view reliably on mobile.
-  // Calls multiple attempts to handle virtual keyboard resizing.
-  function scrollIntoViewWithOffset(el, offset = 12) {
-    if (!el) return;
-    const topbar = document.getElementById('topbar');
-    const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
-    const rect = el.getBoundingClientRect();
-    const absoluteTop = window.scrollY + rect.top;
-    const target = Math.max(0, absoluteTop - headerHeight - offset);
-    window.scrollTo({ top: target, behavior: 'smooth' });
-  }
-
-  function ensureSaveVisible(immediate = true) {
+  // Also ensures the label of the target input remains visible under the header.
+  function ensureSaveVisible(targetInputId=null, immediate=true) {
     const btn = document.querySelector('.big-save');
-    if (!btn) return;
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    // Immediate attempt
-    if (immediate) {
-      try { btn.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
-      scrollIntoViewWithOffset(btn, 12);
+    if(!btn) return;
+    const header = document.getElementById('topbar');
+    const headerHeight = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+    const marginTop = 8; // margin to keep label below header
+    const marginBottom = 12;
+
+    // first: bring save button into center (or bottom) of viewport
+    try { btn.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
+    // also apply manual scroll offset attempt
+    const rect = btn.getBoundingClientRect();
+    const desired = window.scrollY + rect.top - (window.innerHeight - rect.height) + marginBottom;
+    if(desired > window.scrollY) {
+      window.scrollTo({ top: desired, behavior: 'smooth' });
     }
-    // Multiple retries with increasing delay to handle keyboard showing/hiding
-    const attempts = isMobile ? [60, 300, 700] : [40, 120];
-    attempts.forEach((delay, i) => {
+
+    // schedule correction attempts to handle keyboard show/hide and viewport changes
+    const attempts = [80, 260, 700];
+    attempts.forEach((delay) => {
       setTimeout(() => {
-        try { btn.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
-        scrollIntoViewWithOffset(btn, 12);
-      }, delay);
-    });
-  }
-
-  function attachQuickScrollHandlersForInputs() {
-    // input ids in the main form that should ensure save is visible
-    const ids = ['Status','Petugas','Kategori','AreaKerja','Item'];
-    ids.forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-      // remove existing handlers to avoid duplicates
-      if(el._ensureHandler) {
-        el.removeEventListener('focus', el._ensureHandler);
-        el.removeEventListener('click', el._ensureHandler);
-        el.removeEventListener('pointerdown', el._ensureHandler);
-        el.removeEventListener('touchstart', el._ensureHandler);
-      }
-      const h = (e) => {
-        // small immediate call, then retries happen inside ensureSaveVisible
-        ensureSaveVisible(true);
-      };
-      el.addEventListener('focus', h, {passive:true});
-      el.addEventListener('click', h, {passive:true});
-      el.addEventListener('pointerdown', h, {passive:true});
-      el.addEventListener('touchstart', h, {passive:true});
-      el._ensureHandler = h;
-    });
-
-    // Also hook the "PILIH" buttons to ensure scroll happens before popup open
-    const btnMap = [
-      ['btnPilihStatus','Status'],
-      ['btnPilihPetugas','Petugas'],
-      ['btnPilihKategori','Kategori'],
-      ['btnPilihArea','AreaKerja']
-    ];
-    btnMap.forEach(([btnId, inputId])=>{
-      const b = document.getElementById(btnId);
-      if(!b) return;
-      if(b._ensureHandler) { b.removeEventListener('pointerdown', b._ensureHandler); }
-      const hb = (e) => { ensureSaveVisible(true); /* let popup function still run after */ };
-      b.addEventListener('pointerdown', hb, {passive:true});
-      b._ensureHandler = hb;
-    });
-
-    // As fallback: capture any touchstart/pointerdown inside pageInput and rerun if target is an input we care about
-    const pageInput = document.getElementById('pageInput');
-    if(pageInput) {
-      if(pageInput._globalHandler) pageInput.removeEventListener('pointerdown', pageInput._globalHandler);
-      const globalH = (ev) => {
-        const t = ev.target;
-        if(!t) return;
-        const tag = t.tagName && t.tagName.toLowerCase();
-        if(tag === 'input' || tag === 'textarea' || tag === 'select' || t.closest('button')) {
-          const relevant = ['Status','Petugas','Kategori','AreaKerja','Item'];
-          const focusedId = (t.id) ? t.id : (t.closest('input') && t.closest('input').id) ? t.closest('input').id : null;
-          if(relevant.includes(focusedId) || relevant.includes(t.id) || relevant.includes(t.getAttribute('for'))) {
-            ensureSaveVisible(false);
+        // if we have a target input id, try to keep its label visible
+        if(targetInputId) {
+          const label = document.querySelector('label[for="'+targetInputId+'"]');
+          const targetEl = document.getElementById(targetInputId);
+          // choose label if available else use element itself
+          const ref = label || targetEl;
+          if(ref) {
+            const refRect = ref.getBoundingClientRect();
+            // if label top is above header area, scroll down (i.e., reduce scrollY) so label is just below header
+            if(refRect.top < headerHeight + marginTop) {
+              const delta = (headerHeight + marginTop) - refRect.top;
+              // scrollBy negative to move page down so label moves below header
+              window.scrollBy({ top: -delta, behavior: 'smooth' });
+              return;
+            }
+            // if label is far below and save still not visible, ensure save visible
+            const saveRect = btn.getBoundingClientRect();
+            if(saveRect.bottom > window.innerHeight - marginBottom) {
+              const need = saveRect.bottom - (window.innerHeight - marginBottom);
+              window.scrollBy({ top: need, behavior: 'smooth' });
+            }
+          }
+        } else {
+          // If no target specified, ensure save visible by small adjustments
+          const saveRect = btn.getBoundingClientRect();
+          if(saveRect.bottom > window.innerHeight - marginBottom) {
+            const need = saveRect.bottom - (window.innerHeight - marginBottom);
+            window.scrollBy({ top: need, behavior: 'smooth' });
+          } else if(saveRect.top < headerHeight + marginTop) {
+            const need = (headerHeight + marginTop) - saveRect.top;
+            window.scrollBy({ top: -need, behavior: 'smooth' });
           }
         }
-      };
-      pageInput.addEventListener('pointerdown', globalH, {passive:true});
-      pageInput._globalHandler = globalH;
-    }
+      }, delay);
+    });
   }
 
   function attachAutoHandlers(){
@@ -876,8 +844,37 @@
     attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
     // auto-scroll handlers kept from previous implementation if needed
     attachAutoScrollForInputs();
-    // quick scroll handlers for the specific inputs
-    attachQuickScrollHandlersForInputs();
+
+    // quick handlers for special fields so save button is visible but label stays visible
+    const fields = ['Status','Petugas','Kategori','AreaKerja','Item'];
+    fields.forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      // remove previous to avoid duplicates
+      if(el._quickHandler) {
+        el.removeEventListener('focus', el._quickHandler);
+        el.removeEventListener('click', el._quickHandler);
+        el.removeEventListener('pointerdown', el._quickHandler);
+        el.removeEventListener('touchstart', el._quickHandler);
+      }
+      const h = (e) => ensureSaveVisible(id, true);
+      el.addEventListener('focus', h, {passive:true});
+      el.addEventListener('click', h, {passive:true});
+      el.addEventListener('pointerdown', h, {passive:true});
+      el.addEventListener('touchstart', h, {passive:true});
+      el._quickHandler = h;
+    });
+
+    // hook PILIH buttons to call ensureSaveVisible with the proper input id before opening popup
+    const map = [['btnPilihStatus','Status'], ['btnPilihPetugas','Petugas'], ['btnPilihKategori','Kategori'], ['btnPilihArea','AreaKerja']];
+    map.forEach(([btnId,inputId])=>{
+      const b = document.getElementById(btnId);
+      if(!b) return;
+      if(b._pbHandler) b.removeEventListener('pointerdown', b._pbHandler);
+      const hb = (e) => ensureSaveVisible(inputId, true);
+      b.addEventListener('pointerdown', hb, {passive:true});
+      b._pbHandler = hb;
+    });
   }
 
   // preserve previous auto-scroll utility (unchanged behaviour)
@@ -1182,7 +1179,7 @@
   // Petugas popup logic (new)
   let _petugasTargetInputId = null;
   function openPetugasPopup(inputId){
-    ensureSaveVisible(true);
+    ensureSaveVisible(inputId, true);
     _petugasTargetInputId = inputId || null;
     const bg = document.getElementById('petugasPopupBg');
     if(!bg) return;
@@ -1221,7 +1218,7 @@
   // Status popup logic (new)
   let _statusTargetInputId = null;
   function openStatusPopup(inputId){
-    ensureSaveVisible(true);
+    ensureSaveVisible(inputId, true);
     _statusTargetInputId = inputId || null;
     const bg = document.getElementById('statusPopupBg');
     if(!bg) return;
@@ -1286,7 +1283,7 @@
   }
 
   function openKategoriPopup(inputId){
-    ensureSaveVisible(true);
+    ensureSaveVisible(inputId, true);
     _kategoriTargetInputId = inputId || null;
     const bg = document.getElementById('kategoriPopupBg');
     if(!bg) return;
@@ -1351,7 +1348,7 @@
   }
 
   function openAreaPopup(inputId){
-    ensureSaveVisible(true);
+    ensureSaveVisible(inputId, true);
     _areaTargetInputId = inputId || null;
     const bg = document.getElementById('areaPopupBg');
     if(!bg) return;
