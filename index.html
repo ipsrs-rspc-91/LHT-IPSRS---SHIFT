@@ -194,14 +194,14 @@
             <!-- Combined row: PUKUL + NO. LK in same line -->
             <div class="row-inline" style="margin-top:6px;">
               <div class="col small">
-                <!-- changed to text-based time input with JS enforcement -->
+                <!-- changed to text-based time input with JS enforcement; inputmode set to numeric -->
                 <label for="Pukul">PUKUL (24 jam)</label>
-                <input id="Pukul" class="time-input" type="text" placeholder="HH:MM" maxlength="5" aria-describedby="pukulHelp" />
+                <input id="Pukul" class="time-input" type="text" inputmode="numeric" pattern="\d*" placeholder="HH:MM" maxlength="5" aria-describedby="pukulHelp" />
                 <div id="pukulHelp" class="smallnote" style="margin-top:6px;">Masukkan waktu format 24-jam, mis. 08:30 atau 14:05</div>
               </div>
               <div class="col xsmall">
                 <label for="NoLK">NO. LK</label>
-                <input id="NoLK" type="text" />
+                <input id="NoLK" type="text" inputmode="numeric" pattern="\d*" />
               </div>
             </div>
 
@@ -228,7 +228,7 @@
             <input id="Type" type="text"/>
 
             <label for="Jumlah">JUMLAH</label>
-            <input id="Jumlah" type="number" min="0"/>
+            <input id="Jumlah" type="number" inputmode="numeric" pattern="\d*" min="0"/>
 
             <!-- KETERANGAN moved to be immediately below JUMLAH -->
             <label for="Keterangan">KETERANGAN (tambahan)</label>
@@ -409,9 +409,9 @@
                 <input type="text" id="Edit_Ruang"/>
 
                 <label>PUKUL (24 jam)</label>
-                <input id="Edit_Pukul" class="time-input" type="text" placeholder="HH:MM" maxlength="5" />
+                <input id="Edit_Pukul" class="time-input" type="text" inputmode="numeric" pattern="\d*" placeholder="HH:MM" maxlength="5" />
                 <label>NO. LK</label>
-                <input type="text" id="Edit_NoLK"/>
+                <input type="text" id="Edit_NoLK" inputmode="numeric" pattern="\d*"/>
 
                 <label>MASALAH / KEGIATAN</label>
                 <textarea id="Edit_MasalahKegiatan"></textarea>
@@ -430,7 +430,7 @@
                 <input type="text" id="Edit_Type"/>
 
                 <label>JUMLAH</label>
-                <input type="number" id="Edit_Jumlah"/>
+                <input type="number" id="Edit_Jumlah" inputmode="numeric" pattern="\d*"/>
 
                 <!-- Edit Keterangan moved to be immediately below Edit_Jumlah -->
                 <label>KETERANGAN</label>
