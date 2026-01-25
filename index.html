@@ -664,11 +664,18 @@
   // ✅ SCROLL HELPER (FIX: label+input visible)
   function scrollIntoViewWithOffset(el, offset = 18) {
     if (!el) return;
+
     const topbar = document.getElementById('topbar');
     const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
+
+    // ✅ TAMBAHAN: JEDA 1 KOTAK sebelum label (agar label tidak hilang)
+    const extraGap = 70; // bisa 60-90 sesuai selera
+
     const rect = el.getBoundingClientRect();
     const absoluteTop = window.scrollY + rect.top;
-    const target = Math.max(0, absoluteTop - headerHeight - offset);
+
+    const target = Math.max(0, absoluteTop - headerHeight - offset - extraGap);
+
     window.scrollTo({ top: target, behavior: 'smooth' });
   }
 
@@ -678,38 +685,14 @@
   }
 
   function scrollToLabelAndInput(inputEl) {
-  if (!inputEl) return;
-
-  // ✅ FIX KHUSUS: Status (SELESAI/BELUM) -> LABEL + INPUT wajib terlihat
-  if (inputEl.id === "Status" || inputEl.id === "Edit_Status") {
+    if (!inputEl) return;
     const labelEl = getLabelForInput(inputEl);
-
-    // Step 1: scroll ke label dulu
     if (labelEl) {
-      scrollIntoViewWithOffset(labelEl, 12);
+      scrollIntoViewWithOffset(labelEl, 16);
     } else {
-      scrollIntoViewWithOffset(inputEl, 12);
+      scrollIntoViewWithOffset(inputEl, 16);
     }
-
-    // Step 2: pastikan inputnya tetap kelihatan
-    setTimeout(() => {
-      scrollIntoViewWithOffset(inputEl, 6);
-    }, 180);
-
-    return;
   }
-
-  const labelEl = getLabelForInput(inputEl);
-
-  // ✅ normal field lain: label + input
-  if (labelEl) {
-    scrollIntoViewWithOffset(labelEl, 16);
-  } else {
-    scrollIntoViewWithOffset(inputEl, 16);
-  }
-}
-
-  
 
   // --- strict HH:MM enforcement for time inputs (text-based) ---
   function sanitizeTimeDigits(s){
