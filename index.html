@@ -254,9 +254,11 @@
             <button type="button" class="btn ghost" onclick="openKategoriPopup('Kategori')" title="Pilih kategori">PILIH</button>
             </div>
 
-
             <label for="AreaKerja">AREA KERJA</label>
-            <input id="AreaKerja" type="text"/>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input id="AreaKerja" type="text" placeholder="Pilih atau ketik area kerja" list="AreaList"/>
+              <button type="button" class="btn ghost" onclick="openAreaPopup('AreaKerja')" title="Pilih area kerja">PILIH</button>
+            </div>
 
             <label for="Item">ITEM</label>
             <input id="Item" type="text"/>
@@ -453,7 +455,10 @@
                 </div>
 
                 <label>AREA KERJA</label>
-                <input type="text" id="Edit_AreaKerja"/>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <input type="text" id="Edit_AreaKerja" list="AreaList"/>
+                  <button type="button" class="btn ghost" onclick="openAreaPopup('Edit_AreaKerja')" title="Pilih area kerja">PILIH</button>
+                </div>
 
                 <label>ITEM</label>
                 <input type="text" id="Edit_Item"/>
@@ -525,6 +530,18 @@
     </div>
   </div>
 
+  <!-- Area Popup -->
+  <div id="areaPopupBg" class="modal-bg" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="areaPopupTitle" style="width:420px; max-width:96vw;">
+      <h4 id="areaPopupTitle">Pilih Area Kerja</h4>
+      <div class="smallnote">Pilih salah satu area kerja untuk mengisi kolom.</div>
+      <div class="petugas-list" id="areaOptions" role="list" style="max-height:60vh; overflow:auto;"></div>
+      <div style="margin-top:12px; text-align:right;">
+        <button class="btn ghost" onclick="closeAreaPopup()">BATAL</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Datalist kept as fallback -->
   <datalist id="PetugasList">
     <option value="Pantiarso"></option>
@@ -534,6 +551,9 @@
 
   <!-- Kategori datalist (static choices provided) -->
   <datalist id="KategoriList"></datalist>
+
+  <!-- Area datalist (static choices provided) -->
+  <datalist id="AreaList"></datalist>
 
 <script>
   // update topbar height
@@ -572,6 +592,35 @@
     "CEK LIST BULANAN",
     "TEKNIK BERSIH",
     "UMUM / LAIN-nya"
+  ];
+
+  // STATIC list of Area Kerja (from user request)
+  const STATIC_AREA = [
+    "GENERAL MAINTENANCE",
+    "SIPIL  ( Sanitary)",
+    "SIPIL  ( Umum 1 )",
+    "SIPIl   ( Umum 2 )",
+    "SIPIL  ( Kontruksi Bangunan )",
+    "M.E. ( Umum )",
+    "M.E. ( Penerangan )",
+    "M.E. ( Kelistrikan )",
+    "M.E. ( AC / Tata Udara / CHILLER )",
+    "M.E. ( Telekomunikasi / MA. TV )",
+    "M.E. ( Sistem Air Besih )",
+    "M.E. ( Boiler /Air Panas )",
+    "M.E. ( Genset )",
+    "M.E. ( Fire Alarm )",
+    "M.E. ( Laundry )",
+    "M.E. ( Lift  / Eskalator )",
+    "M.E. ( Hydrant )",
+    "ELEKTROMEDIK  ( Alat Medis )",
+    "ELEKTROMEDIK  ( Umum )",
+    "ELEKTROMEDIK  ( Gas Medis )",
+    "KESLING ( Umum )",
+    "KESLING ( Sistem IPAL )",
+    "KITCHEN /DAPUR",
+    "CEK LIST M.E. / UTILITI",
+    "UMUM / Dan Lain - Lain"
   ];
 
   let rawData = [], viewData = [], sortMode = "DOWN";
@@ -864,12 +913,13 @@
 
   function buildFilterOptionsFromData(data){
     const kategoriList = uniqueSorted(data.map(x=>x.Kategori));
-    const areaList=uniqueSorted(data.map(x=>x.AreaKerja));
+    const areaList = uniqueSorted(data.map(x=>x.AreaKerja));
     const itemList=uniqueSorted(data.map(x=>x.Item));
     // Combine static kategori options with those found in data (no duplicates)
     const combinedKategori = uniqueSorted([...(STATIC_KATEGORI||[]), ...kategoriList]);
+    const combinedArea = uniqueSorted([...(STATIC_AREA||[]), ...areaList]);
     const fk=document.getElementById("FilterKategori"); fk.innerHTML=`<option value="ALL">SEMUA DATA</option>`; combinedKategori.forEach(v=>fk.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
-    const fa=document.getElementById("FilterAreaKerja"); fa.innerHTML=`<option value="ALL">SEMUA DATA</option>`; areaList.forEach(v=>fa.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+    const fa=document.getElementById("FilterAreaKerja"); fa.innerHTML=`<option value="ALL">SEMUA DATA</option>`; combinedArea.forEach(v=>fa.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
     const fi=document.getElementById("FilterItem"); fi.innerHTML=`<option value="ALL">SEMUA DATA</option>`; itemList.forEach(v=>fi.innerHTML+=`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
     document.getElementById("FilterStatus").value="ALL";
   }
@@ -1174,6 +1224,70 @@
     if(e.target && e.target.id === 'kategoriPopupBg') closeKategoriPopup();
   });
 
+  // Area popup logic (new)
+  let _areaTargetInputId = null;
+  function buildAreaDatalistAndPopup(){
+    // populate datalist
+    const dl = document.getElementById('AreaList');
+    if(dl){
+      dl.innerHTML = '';
+      for(const a of STATIC_AREA){
+        const opt = document.createElement('option');
+        opt.value = a;
+        dl.appendChild(opt);
+      }
+    }
+    // populate areaOptions in popup
+    const listEl = document.getElementById('areaOptions');
+    if(listEl){
+      listEl.innerHTML = '';
+      STATIC_AREA.forEach(a=>{
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.setAttribute('role','listitem');
+        div.tabIndex = 0;
+        div.innerHTML = `<span>${escapeHtml(a)}</span><span class="muted">Pilih</span>`;
+        div.addEventListener('click', ()=> selectArea(a));
+        div.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter') selectArea(a); });
+        listEl.appendChild(div);
+      });
+    }
+  }
+
+  function openAreaPopup(inputId){
+    _areaTargetInputId = inputId || null;
+    const bg = document.getElementById('areaPopupBg');
+    if(!bg) return;
+    bg.classList.add('show');
+    bg.setAttribute('aria-hidden','false');
+    setTimeout(()=>{
+      const firstOpt = document.querySelector('#areaOptions .opt');
+      if(firstOpt) firstOpt.focus();
+    },50);
+  }
+  function closeAreaPopup(){
+    const bg = document.getElementById('areaPopupBg');
+    if(!bg) return;
+    bg.classList.remove('show');
+    bg.setAttribute('aria-hidden','true');
+    if(_areaTargetInputId){
+      const el = document.getElementById(_areaTargetInputId);
+      if(el) el.focus();
+    }
+    _areaTargetInputId = null;
+  }
+  function selectArea(value){
+    if(_areaTargetInputId){
+      const el = document.getElementById(_areaTargetInputId);
+      if(el) el.value = value;
+    }
+    closeAreaPopup();
+  }
+  // close area popup by clicking background
+  document.getElementById('areaPopupBg').addEventListener('click', function(e){
+    if(e.target && e.target.id === 'areaPopupBg') closeAreaPopup();
+  });
+
   // ESC to close popups/modals/toasts
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){
@@ -1183,6 +1297,8 @@
       if(statusBg && statusBg.classList.contains('show')){ closeStatusPopup(); return; }
       const kategoriBg = document.getElementById('kategoriPopupBg');
       if(kategoriBg && kategoriBg.classList.contains('show')){ closeKategoriPopup(); return; }
+      const areaBg = document.getElementById('areaPopupBg');
+      if(areaBg && areaBg.classList.contains('show')){ closeAreaPopup(); return; }
       const modal = document.getElementById('modalBg');
       if(modal && modal.classList.contains('show')){ closeModal(); return; }
       const toast = document.getElementById('savedToast');
@@ -1219,6 +1335,7 @@
   buildMonthOptions();
   updateTopbarHeight();
   buildKategoriDatalistAndPopup();
+  buildAreaDatalistAndPopup();
   attachAutoHandlers();
   showPage('input');
 
