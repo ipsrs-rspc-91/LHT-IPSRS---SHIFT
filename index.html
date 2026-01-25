@@ -238,26 +238,26 @@
             <!-- Make Status consistent with Petugas: input + PILIH button that opens status popup -->
             <div style="display:flex; gap:8px; align-items:center;">
               <input id="Status" type="text" placeholder="Pilih Selesai atau Belum"/>
-              <button type="button" class="btn ghost" onclick="openStatusPopup('Status')" title="Pilih status">PILIH</button>
+              <button id="btnPilihStatus" type="button" class="btn ghost" onclick="openStatusPopup('Status')" title="Pilih status">PILIH</button>
             </div>
 
             <label for="Petugas">PETUGAS</label>
             <!-- Popup chooser: input + button to open popup (replaces simple datalist UX) -->
             <div style="display:flex; gap:8px; align-items:center;">
               <input id="Petugas" type="text" placeholder="Pilih atau ketik nama petugas" list="PetugasList"/>
-              <button type="button" class="btn ghost" onclick="openPetugasPopup('Petugas')" title="Pilih petugas">PILIH</button>
+              <button id="btnPilihPetugas" type="button" class="btn ghost" onclick="openPetugasPopup('Petugas')" title="Pilih petugas">PILIH</button>
             </div>
 
             <label for="Kategori">KATEGORI</label>
             <div style="display:flex; gap:8px; align-items:center;">
             <input id="Kategori" type="text" placeholder="Pilih atau ketik kategori" list="KategoriList"/>
-            <button type="button" class="btn ghost" onclick="openKategoriPopup('Kategori')" title="Pilih kategori">PILIH</button>
+            <button id="btnPilihKategori" type="button" class="btn ghost" onclick="openKategoriPopup('Kategori')" title="Pilih kategori">PILIH</button>
             </div>
 
             <label for="AreaKerja">AREA KERJA</label>
             <div style="display:flex; gap:8px; align-items:center;">
               <input id="AreaKerja" type="text" placeholder="Pilih atau ketik area kerja" list="AreaList"/>
-              <button type="button" class="btn ghost" onclick="openAreaPopup('AreaKerja')" title="Pilih area kerja">PILIH</button>
+              <button id="btnPilihArea" type="button" class="btn ghost" onclick="openAreaPopup('AreaKerja')" title="Pilih area kerja">PILIH</button>
             </div>
 
             <label for="Item">ITEM</label>
@@ -457,8 +457,8 @@
                 <label>AREA KERJA</label>
                 <div style="display:flex; gap:8px; align-items:center;">
                   <input type="text" id="Edit_AreaKerja" list="AreaList"/>
-                  <button type="button" class="btn ghost" onclick="openAreaPopup('Edit_AreaKerja')" title="Pilih area kerja">PILIH</button
-></div>
+                  <button type="button" class="btn ghost" onclick="openAreaPopup('Edit_AreaKerja')" title="Pilih area kerja">PILIH</button>
+                </div>
 
                 <label>ITEM</label>
                 <input type="text" id="Edit_Item"/>
@@ -778,14 +778,96 @@
     delete el._timeHandlers;
   }
 
-  // Scroll helper to bring the save button into view
-  function scrollToSaveButton(delay = 120) {
+  // Scroll helper to bring the save button into view reliably on mobile.
+  // Calls multiple attempts to handle virtual keyboard resizing.
+  function scrollIntoViewWithOffset(el, offset = 12) {
+    if (!el) return;
+    const topbar = document.getElementById('topbar');
+    const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
+    const rect = el.getBoundingClientRect();
+    const absoluteTop = window.scrollY + rect.top;
+    const target = Math.max(0, absoluteTop - headerHeight - offset);
+    window.scrollTo({ top: target, behavior: 'smooth' });
+  }
+
+  function ensureSaveVisible(immediate = true) {
     const btn = document.querySelector('.big-save');
     if (!btn) return;
-    // small delay to allow mobile keyboard/show transitions to start
-    setTimeout(() => {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // Immediate attempt
+    if (immediate) {
+      try { btn.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
       scrollIntoViewWithOffset(btn, 12);
-    }, delay);
+    }
+    // Multiple retries with increasing delay to handle keyboard showing/hiding
+    const attempts = isMobile ? [60, 300, 700] : [40, 120];
+    attempts.forEach((delay, i) => {
+      setTimeout(() => {
+        try { btn.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
+        scrollIntoViewWithOffset(btn, 12);
+      }, delay);
+    });
+  }
+
+  function attachQuickScrollHandlersForInputs() {
+    // input ids in the main form that should ensure save is visible
+    const ids = ['Status','Petugas','Kategori','AreaKerja','Item'];
+    ids.forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      // remove existing handlers to avoid duplicates
+      if(el._ensureHandler) {
+        el.removeEventListener('focus', el._ensureHandler);
+        el.removeEventListener('click', el._ensureHandler);
+        el.removeEventListener('pointerdown', el._ensureHandler);
+        el.removeEventListener('touchstart', el._ensureHandler);
+      }
+      const h = (e) => {
+        // small immediate call, then retries happen inside ensureSaveVisible
+        ensureSaveVisible(true);
+      };
+      el.addEventListener('focus', h, {passive:true});
+      el.addEventListener('click', h, {passive:true});
+      el.addEventListener('pointerdown', h, {passive:true});
+      el.addEventListener('touchstart', h, {passive:true});
+      el._ensureHandler = h;
+    });
+
+    // Also hook the "PILIH" buttons to ensure scroll happens before popup open
+    const btnMap = [
+      ['btnPilihStatus','Status'],
+      ['btnPilihPetugas','Petugas'],
+      ['btnPilihKategori','Kategori'],
+      ['btnPilihArea','AreaKerja']
+    ];
+    btnMap.forEach(([btnId, inputId])=>{
+      const b = document.getElementById(btnId);
+      if(!b) return;
+      if(b._ensureHandler) { b.removeEventListener('pointerdown', b._ensureHandler); }
+      const hb = (e) => { ensureSaveVisible(true); /* let popup function still run after */ };
+      b.addEventListener('pointerdown', hb, {passive:true});
+      b._ensureHandler = hb;
+    });
+
+    // As fallback: capture any touchstart/pointerdown inside pageInput and rerun if target is an input we care about
+    const pageInput = document.getElementById('pageInput');
+    if(pageInput) {
+      if(pageInput._globalHandler) pageInput.removeEventListener('pointerdown', pageInput._globalHandler);
+      const globalH = (ev) => {
+        const t = ev.target;
+        if(!t) return;
+        const tag = t.tagName && t.tagName.toLowerCase();
+        if(tag === 'input' || tag === 'textarea' || tag === 'select' || t.closest('button')) {
+          const relevant = ['Status','Petugas','Kategori','AreaKerja','Item'];
+          const focusedId = (t.id) ? t.id : (t.closest('input') && t.closest('input').id) ? t.closest('input').id : null;
+          if(relevant.includes(focusedId) || relevant.includes(t.id) || relevant.includes(t.getAttribute('for'))) {
+            ensureSaveVisible(false);
+          }
+        }
+      };
+      pageInput.addEventListener('pointerdown', globalH, {passive:true});
+      pageInput._globalHandler = globalH;
+    }
   }
 
   function attachAutoHandlers(){
@@ -794,22 +876,8 @@
     attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
     // auto-scroll handlers kept from previous implementation if needed
     attachAutoScrollForInputs();
-
-    // ensure the special inputs also trigger scroll-to-save when focused / clicked
-    const quickScrollIds = ['Status','Petugas','Kategori','AreaKerja','Item'];
-    quickScrollIds.forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-      // remove previous handlers to avoid duplicates
-      if(el._quickScrollHandler) el.removeEventListener('focus', el._quickScrollHandler);
-      const handler = (e) => { scrollToSaveButton(120); };
-      el.addEventListener('focus', handler);
-      el.addEventListener('click', handler);
-      el._quickScrollHandler = handler;
-    });
-
-    // also make sure edit fields in modal (if present) do not interfere (we only target main form)
-    attachAutoScrollForInputs(); // keep existing behavior
+    // quick scroll handlers for the specific inputs
+    attachQuickScrollHandlersForInputs();
   }
 
   // preserve previous auto-scroll utility (unchanged behaviour)
@@ -1114,8 +1182,7 @@
   // Petugas popup logic (new)
   let _petugasTargetInputId = null;
   function openPetugasPopup(inputId){
-    // ensure save button visible before popup opens
-    scrollToSaveButton(80);
+    ensureSaveVisible(true);
     _petugasTargetInputId = inputId || null;
     const bg = document.getElementById('petugasPopupBg');
     if(!bg) return;
@@ -1154,8 +1221,7 @@
   // Status popup logic (new)
   let _statusTargetInputId = null;
   function openStatusPopup(inputId){
-    // ensure save button visible before popup opens
-    scrollToSaveButton(80);
+    ensureSaveVisible(true);
     _statusTargetInputId = inputId || null;
     const bg = document.getElementById('statusPopupBg');
     if(!bg) return;
@@ -1220,8 +1286,7 @@
   }
 
   function openKategoriPopup(inputId){
-    // ensure save button visible before popup opens
-    scrollToSaveButton(80);
+    ensureSaveVisible(true);
     _kategoriTargetInputId = inputId || null;
     const bg = document.getElementById('kategoriPopupBg');
     if(!bg) return;
@@ -1286,8 +1351,7 @@
   }
 
   function openAreaPopup(inputId){
-    // ensure save button visible before popup opens
-    scrollToSaveButton(80);
+    ensureSaveVisible(true);
     _areaTargetInputId = inputId || null;
     const bg = document.getElementById('areaPopupBg');
     if(!bg) return;
