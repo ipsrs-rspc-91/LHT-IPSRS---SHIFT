@@ -82,7 +82,7 @@
     .container {
       max-width:1100px;
       margin: 18px auto;
-      padding: calc(var(--topbar-height) + 16px) 14px 32px; /* top padding = header height + gap */
+      padding: calc(var(--topbar-height) + 16px) 14px 32px;
     }
 
     .card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow: 0 8px 22px rgba(20,30,60,0.06); border:1px solid rgba(10,20,40,0.04); }
@@ -608,7 +608,7 @@
 
   let rawData = [], viewData = [], sortMode = "DOWN";
 
-  // ✅ FIX FINAL: cegah auto-scroll melawan scroll manual user
+  // ✅ FINAL FIX: cegah auto-scroll melawan scroll manual user
   let _userIsScrolling = false;
   let _userScrollTimeout = null;
 
@@ -619,7 +619,6 @@
       _userIsScrolling = false;
     }, 800);
   }
-
   window.addEventListener('wheel', markUserScrolling, {passive:true});
   window.addEventListener('touchmove', markUserScrolling, {passive:true});
   window.addEventListener('scroll', markUserScrolling, {passive:true});
@@ -677,19 +676,16 @@
   function normalizeText(x){ return (x||'').toString().trim(); }
   function toDateKey(t){ const tt=normalizeText(t); if(tt.length>=10) return tt.substring(0,10).replaceAll('-',''); return '00000000'; }
 
-  // ✅ SCROLL HELPER (FINAL + ada jeda 1 kotak)
+  // ✅ FINAL SCROLL HELPER (label & input tidak ketutup header + ada jeda 1 kotak)
   function scrollIntoViewWithOffset(el, offset = 18) {
     if (!el) return;
-
     const topbar = document.getElementById('topbar');
     const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
 
-    // ✅ JEDA 1 KOTAK supaya label tidak hilang
-    const extraGap = 70; // bisa 60-90
+    const extraGap = 95; // ✅ JEDA 1 KOTAK (bisa 70-110)
 
     const rect = el.getBoundingClientRect();
     const absoluteTop = window.scrollY + rect.top;
-
     const target = Math.max(0, absoluteTop - headerHeight - offset - extraGap);
 
     window.scrollTo({ top: target, behavior: 'smooth' });
@@ -703,24 +699,17 @@
   function scrollToLabelAndInput(inputEl) {
     if (!inputEl) return;
     const labelEl = getLabelForInput(inputEl);
-    if (labelEl) {
-      scrollIntoViewWithOffset(labelEl, 16);
-    } else {
-      scrollIntoViewWithOffset(inputEl, 16);
-    }
+    if (labelEl) scrollIntoViewWithOffset(labelEl, 16);
+    else scrollIntoViewWithOffset(inputEl, 16);
   }
 
   // --- strict HH:MM enforcement for time inputs (text-based) ---
-  function sanitizeTimeDigits(s){
-    return (s||'').replace(/[^\d]/g,'').slice(0,4);
-  }
-
+  function sanitizeTimeDigits(s){ return (s||'').replace(/[^\d]/g,'').slice(0,4); }
   function formatHHMMFromDigits(digits){
     if(!digits) return '';
     if(digits.length <= 2) return digits;
     return digits.slice(0,2) + ':' + digits.slice(2);
   }
-
   function clampToValidHHMM(hh, mm){
     let H = parseInt(hh,10);
     let M = parseInt(mm,10);
@@ -730,7 +719,6 @@
     if(M < 0) M = 0; if(M > 59) M = 59;
     return `${String(H).padStart(2,'0')}:${String(M).padStart(2,'0')}`;
   }
-
   function tryNormalizeHHMM(value){
     if(!value) return '';
     const v = value.toString().trim();
@@ -740,18 +728,11 @@
       if(hh>=0 && hh<=23 && mm>=0 && mm<=59) return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
     }
     const digits = sanitizeTimeDigits(v);
-    if(digits.length === 4){
-      return clampToValidHHMM(digits.slice(0,2), digits.slice(2));
-    }
-    if(digits.length === 3){
-      return clampToValidHHMM(digits.slice(0,1), digits.slice(1));
-    }
-    if(digits.length === 2){
-      return clampToValidHHMM(digits, '0');
-    }
-    if(digits.length === 1){
-      return clampToValidHHMM(digits, '0');
-    }
+    if(digits.length === 4) return clampToValidHHMM(digits.slice(0,2), digits.slice(2));
+    if(digits.length === 3) return clampToValidHHMM(digits.slice(0,1), digits.slice(1));
+    if(digits.length === 2) return clampToValidHHMM(digits, '0');
+    if(digits.length === 1) return clampToValidHHMM(digits, '0');
+
     const ampm = v.match(/^(\d{1,2})(?::(\d{1,2}))?\s*([ap]\.?m\.?)$/i);
     if(ampm){
       let h = parseInt(ampm[1],10);
@@ -763,20 +744,14 @@
     }
     return '';
   }
-
-  function isValidHHMM(v){
-    if(!v) return false;
-    return /^([01]\d|2[0-3]):([0-5]\d)$/.test(v);
-  }
+  function isValidHHMM(v){ return !!v && /^([01]\d|2[0-3]):([0-5]\d)$/.test(v); }
 
   function attachTimeInputBehavior(el, helperMsgId){
     if(!el) return;
 
     const onInput = (e) => {
-      const raw = el.value;
-      const digits = sanitizeTimeDigits(raw);
-      let formatted = formatHHMMFromDigits(digits);
-      el.value = formatted;
+      const digits = sanitizeTimeDigits(el.value);
+      el.value = formatHHMMFromDigits(digits);
       el.classList.remove('input-error');
       if(helperMsgId) setMsg(helperMsgId, '', false);
       try { el.setSelectionRange(el.value.length, el.value.length); } catch(err){}
@@ -820,61 +795,19 @@
     el._timeHandlers = { onInput, onBlur, onKeyDown };
   }
 
-  // Ensure save visible (unchanged)
+  // Ensure save visible (dipakai ringan saja)
   function ensureSaveVisible(immediate = true) {
     const btn = document.querySelector('.big-save');
     if (!btn) return;
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (immediate) {
       try { btn.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
       scrollIntoViewWithOffset(btn, 12);
-    }
-
-    const attempts = isMobile ? [60, 300, 700] : [40, 120];
-    attempts.forEach((delay) => {
+    } else {
       setTimeout(() => {
         try { btn.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
-        scrollIntoViewWithOffset(btn, 12);
-      }, delay);
-    });
-  }
-
-  function attachQuickScrollHandlersForInputs() {
-    const ids = ['Status','Petugas','Kategori','AreaKerja','Item'];
-    ids.forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-
-      if(el._ensureHandler) {
-        el.removeEventListener('focus', el._ensureHandler);
-        el.removeEventListener('click', el._ensureHandler);
-        el.removeEventListener('pointerdown', el._ensureHandler);
-        el.removeEventListener('touchstart', el._ensureHandler);
-      }
-
-      const h = (e) => { ensureSaveVisible(true); };
-      el.addEventListener('focus', h, {passive:true});
-      el.addEventListener('click', h, {passive:true});
-      el.addEventListener('pointerdown', h, {passive:true});
-      el.addEventListener('touchstart', h, {passive:true});
-      el._ensureHandler = h;
-    });
-
-    const btnMap = [
-      ['btnPilihStatus','Status'],
-      ['btnPilihPetugas','Petugas'],
-      ['btnPilihKategori','Kategori'],
-      ['btnPilihArea','AreaKerja']
-    ];
-    btnMap.forEach(([btnId])=>{
-      const b = document.getElementById(btnId);
-      if(!b) return;
-      if(b._ensureHandler) { b.removeEventListener('pointerdown', b._ensureHandler); }
-      const hb = (e) => { ensureSaveVisible(true); };
-      b.addEventListener('pointerdown', hb, {passive:true});
-      b._ensureHandler = hb;
-    });
+      }, 80);
+    }
   }
 
   function attachAutoHandlers(){
@@ -884,7 +817,7 @@
     attachQuickScrollHandlersForInputs();
   }
 
-  // ✅ FINAL FIX: auto scroll focus => TIDAK melawan scroll manual user
+  // ✅ FINAL FIX: auto scroll focus => tidak melawan scroll manual user
   function attachAutoScrollForInputs() {
     const selector = '#pageInput input, #pageInput textarea, #pageInput select';
     const inputs = document.querySelectorAll(selector);
@@ -895,14 +828,12 @@
       const handler = (e) => {
         const pageInput = document.getElementById('pageInput');
         if (pageInput && pageInput.style.display === 'none') return;
-
-        // ✅ jika user sedang scroll manual, jangan paksa auto-scroll
         if (_userIsScrolling) return;
 
         const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 450 : 120;
 
         setTimeout(() => {
-          if (_userIsScrolling) return; // cek lagi setelah delay
+          if (_userIsScrolling) return;
           scrollToLabelAndInput(e.target);
         }, delay);
       };
@@ -912,7 +843,7 @@
     });
   }
 
-  // ✅ FINAL FIX: pointerdown tidak memaksa scroll kalau user sedang geser layar
+  // ✅ FINAL FIX: pointerdown tidak memaksa scroll saat user geser layar
   document.addEventListener('pointerdown', (e) => {
     const target = e.target;
     if (!target) return;
@@ -920,7 +851,6 @@
     const pageInput = document.getElementById('pageInput');
     if (!pageInput || pageInput.style.display === 'none') return;
 
-    // ✅ jika user sedang scroll manual, jangan auto-scroll
     if (_userIsScrolling) return;
 
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
@@ -928,6 +858,58 @@
       scrollToLabelAndInput(target);
     }
   });
+
+  // ✅ FINAL FIX: khusus Status/Petugas/Kategori/AreaKerja
+  // JANGAN dipaksa scroll ke tombol SIMPAN saat fokus
+  function attachQuickScrollHandlersForInputs() {
+    const disableAutoSaveScrollOnFocus = ['Status','Petugas','Kategori','AreaKerja'];
+
+    disableAutoSaveScrollOnFocus.forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+
+      if(el._ensureHandler) {
+        el.removeEventListener('focus', el._ensureHandler);
+        el.removeEventListener('click', el._ensureHandler);
+        el.removeEventListener('pointerdown', el._ensureHandler);
+        el.removeEventListener('touchstart', el._ensureHandler);
+        el._ensureHandler = null;
+      }
+
+      const h = (e) => {
+        if (_userIsScrolling) return;
+        scrollToLabelAndInput(el);
+      };
+
+      el.addEventListener('focus', h, {passive:true});
+      el.addEventListener('click', h, {passive:true});
+      el._ensureHandler = h;
+    });
+
+    // tombol "PILIH" boleh bantu tampilkan simpan (halus)
+    const btnMap = [
+      ['btnPilihStatus','Status'],
+      ['btnPilihPetugas','Petugas'],
+      ['btnPilihKategori','Kategori'],
+      ['btnPilihArea','AreaKerja']
+    ];
+
+    btnMap.forEach(([btnId])=>{
+      const b = document.getElementById(btnId);
+      if(!b) return;
+
+      if(b._ensureHandler) { b.removeEventListener('pointerdown', b._ensureHandler); }
+
+      const hb = (e) => {
+        setTimeout(() => {
+          ensureSaveVisible(false);
+        }, 120);
+      };
+
+      b.addEventListener('pointerdown', hb, {passive:true});
+      b._ensureHandler = hb;
+    });
+  }
 
   function normalizeTimeTo24(value){
     const t = tryNormalizeHHMM(normalizeText(value));
@@ -1045,8 +1027,17 @@
     }
   }
 
-  function uniqueSorted(arr){ const set=new Set(arr.filter(x=>normalizeText(x)!='')); return Array.from(set).sort((a,b)=>a.localeCompare(b)); }
-  function escapeHtml(text){ return (text||'').toString().replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
+  function uniqueSorted(arr){
+    const set=new Set(arr.filter(x=>normalizeText(x)!=''));
+    return Array.from(set).sort((a,b)=>a.localeCompare(b));
+  }
+  function escapeHtml(text){
+    return (text||'').toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;");
+  }
 
   function buildFilterOptionsFromData(data){
     const kategoriList = uniqueSorted(data.map(x=>x.Kategori));
@@ -1315,7 +1306,6 @@
   // Petugas popup logic
   let _petugasTargetInputId = null;
   function openPetugasPopup(inputId){
-    ensureSaveVisible(true);
     _petugasTargetInputId = inputId || null;
     const bg = document.getElementById('petugasPopupBg');
     if(!bg) return;
@@ -1351,7 +1341,6 @@
   // Status popup logic
   let _statusTargetInputId = null;
   function openStatusPopup(inputId){
-    ensureSaveVisible(true);
     _statusTargetInputId = inputId || null;
     const bg = document.getElementById('statusPopupBg');
     if(!bg) return;
@@ -1362,8 +1351,6 @@
       if(firstOpt) firstOpt.focus();
     },50);
   }
-  function closeStatusPopupopupBg(){}
-
   function closeStatusPopup(){
     const bg = document.getElementById('statusPopupBg');
     if(!bg) return;
@@ -1415,7 +1402,6 @@
   }
 
   function openKategoriPopup(inputId){
-    ensureSaveVisible(true);
     _kategoriTargetInputId = inputId || null;
     const bg = document.getElementById('kategoriPopupBg');
     if(!bg) return;
@@ -1477,7 +1463,6 @@
   }
 
   function openAreaPopup(inputId){
-    ensureSaveVisible(true);
     _areaTargetInputId = inputId || null;
     const bg = document.getElementById('areaPopupBg');
     if(!bg) return;
@@ -1557,7 +1542,6 @@
   buildAreaDatalistAndPopup();
   attachAutoHandlers();
   showPage('input');
-
 </script>
 </body>
 </html>
