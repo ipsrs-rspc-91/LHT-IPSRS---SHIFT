@@ -457,8 +457,8 @@
                 <label>AREA KERJA</label>
                 <div style="display:flex; gap:8px; align-items:center;">
                   <input type="text" id="Edit_AreaKerja" list="AreaList"/>
-                  <button type="button" class="btn ghost" onclick="openAreaPopup('Edit_AreaKerja')" title="Pilih area kerja">PILIH</button>
-                </div>
+                  <button type="button" class="btn ghost" onclick="openAreaPopup('Edit_AreaKerja')" title="Pilih area kerja">PILIH</button
+></div>
 
                 <label>ITEM</label>
                 <input type="text" id="Edit_Item"/>
@@ -778,13 +778,38 @@
     delete el._timeHandlers;
   }
 
+  // Scroll helper to bring the save button into view
+  function scrollToSaveButton(delay = 120) {
+    const btn = document.querySelector('.big-save');
+    if (!btn) return;
+    // small delay to allow mobile keyboard/show transitions to start
+    setTimeout(() => {
+      scrollIntoViewWithOffset(btn, 12);
+    }, delay);
+  }
+
   function attachAutoHandlers(){
     // call when page/input appears
     attachTimeInputBehavior(document.getElementById('Pukul'), 'msg');
     attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
     // auto-scroll handlers kept from previous implementation if needed
     attachAutoScrollForInputs();
-    // petugas/status popup: keyboard handling done inside popup functions
+
+    // ensure the special inputs also trigger scroll-to-save when focused / clicked
+    const quickScrollIds = ['Status','Petugas','Kategori','AreaKerja','Item'];
+    quickScrollIds.forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      // remove previous handlers to avoid duplicates
+      if(el._quickScrollHandler) el.removeEventListener('focus', el._quickScrollHandler);
+      const handler = (e) => { scrollToSaveButton(120); };
+      el.addEventListener('focus', handler);
+      el.addEventListener('click', handler);
+      el._quickScrollHandler = handler;
+    });
+
+    // also make sure edit fields in modal (if present) do not interfere (we only target main form)
+    attachAutoScrollForInputs(); // keep existing behavior
   }
 
   // preserve previous auto-scroll utility (unchanged behaviour)
@@ -1089,6 +1114,8 @@
   // Petugas popup logic (new)
   let _petugasTargetInputId = null;
   function openPetugasPopup(inputId){
+    // ensure save button visible before popup opens
+    scrollToSaveButton(80);
     _petugasTargetInputId = inputId || null;
     const bg = document.getElementById('petugasPopupBg');
     if(!bg) return;
@@ -1127,6 +1154,8 @@
   // Status popup logic (new)
   let _statusTargetInputId = null;
   function openStatusPopup(inputId){
+    // ensure save button visible before popup opens
+    scrollToSaveButton(80);
     _statusTargetInputId = inputId || null;
     const bg = document.getElementById('statusPopupBg');
     if(!bg) return;
@@ -1191,6 +1220,8 @@
   }
 
   function openKategoriPopup(inputId){
+    // ensure save button visible before popup opens
+    scrollToSaveButton(80);
     _kategoriTargetInputId = inputId || null;
     const bg = document.getElementById('kategoriPopupBg');
     if(!bg) return;
@@ -1255,6 +1286,8 @@
   }
 
   function openAreaPopup(inputId){
+    // ensure save button visible before popup opens
+    scrollToSaveButton(80);
     _areaTargetInputId = inputId || null;
     const bg = document.getElementById('areaPopupBg');
     if(!bg) return;
