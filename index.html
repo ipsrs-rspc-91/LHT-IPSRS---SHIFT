@@ -474,11 +474,30 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="petugasPopupTitle" style="width:320px; max-width:96vw;">
       <h4 id="petugasPopupTitle">Pilih Petugas</h4>
       <div class="smallnote">Pilih salah satu nama petugas untuk mengisi kolom.</div>
+
       <div class="petugas-list" id="petugasOptions" role="list">
+        <!-- ✅ PETUGAS LIST (UPDATED) -->
         <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Pantiarso')" onkeydown="if(event.key==='Enter'){ selectPetugas('Pantiarso'); }"> <span>Pantiarso</span> <span class="muted">Pilih</span> </div>
         <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Agung')" onkeydown="if(event.key==='Enter'){ selectPetugas('Agung'); }"> <span>Agung</span> <span class="muted">Pilih</span> </div>
         <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Rusdi')" onkeydown="if(event.key==='Enter'){ selectPetugas('Rusdi'); }"> <span>Rusdi</span> <span class="muted">Pilih</span> </div>
+
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Katolo')" onkeydown="if(event.key==='Enter'){ selectPetugas('Katolo'); }"> <span>Katolo</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Setu')" onkeydown="if(event.key==='Enter'){ selectPetugas('Setu'); }"> <span>Setu</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Kabul')" onkeydown="if(event.key==='Enter'){ selectPetugas('Kabul'); }"> <span>Kabul</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Sunandar')" onkeydown="if(event.key==='Enter'){ selectPetugas('Sunandar'); }"> <span>Sunandar</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Wawan')" onkeydown="if(event.key==='Enter'){ selectPetugas('Wawan'); }"> <span>Wawan</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Teguh')" onkeydown="if(event.key==='Enter'){ selectPetugas('Teguh'); }"> <span>Teguh</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Sulaiman')" onkeydown="if(event.key==='Enter'){ selectPetugas('Sulaiman'); }"> <span>Sulaiman</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Sobur')" onkeydown="if(event.key==='Enter'){ selectPetugas('Sobur'); }"> <span>Sobur</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Suryanto')" onkeydown="if(event.key==='Enter'){ selectPetugas('Suryanto'); }"> <span>Suryanto</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Suryadi')" onkeydown="if(event.key==='Enter'){ selectPetugas('Suryadi'); }"> <span>Suryadi</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Adang')" onkeydown="if(event.key==='Enter'){ selectPetugas('Adang'); }"> <span>Adang</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Fahmi')" onkeydown="if(event.key==='Enter'){ selectPetugas('Fahmi'); }"> <span>Fahmi</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Heri')" onkeydown="if(event.key==='Enter'){ selectPetugas('Heri'); }"> <span>Heri</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Iswarianto')" onkeydown="if(event.key==='Enter'){ selectPetugas('Iswarianto'); }"> <span>Iswarianto</span> <span class="muted">Pilih</span> </div>
+        <div class="opt" role="listitem" tabindex="0" onclick="selectPetugas('Raihan')" onkeydown="if(event.key==='Enter'){ selectPetugas('Raihan'); }"> <span>Raihan</span> <span class="muted">Pilih</span> </div>
       </div>
+
       <div style="margin-top:12px; text-align:right;">
         <button class="btn ghost" onclick="closePetugasPopup()">BATAL</button>
       </div>
@@ -524,10 +543,27 @@
     </div>
   </div>
 
+  <!-- ✅ DATALIST PETUGAS (UPDATED) -->
   <datalist id="PetugasList">
     <option value="Pantiarso"></option>
     <option value="Agung"></option>
     <option value="Rusdi"></option>
+
+    <option value="Katolo"></option>
+    <option value="Setu"></option>
+    <option value="Kabul"></option>
+    <option value="Sunandar"></option>
+    <option value="Wawan"></option>
+    <option value="Teguh"></option>
+    <option value="Sulaiman"></option>
+    <option value="Sobur"></option>
+    <option value="Suryanto"></option>
+    <option value="Suryadi"></option>
+    <option value="Adang"></option>
+    <option value="Fahmi"></option>
+    <option value="Heri"></option>
+    <option value="Iswarianto"></option>
+    <option value="Raihan"></option>
   </datalist>
 
   <datalist id="KategoriList"></datalist>
