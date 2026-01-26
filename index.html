@@ -1604,7 +1604,18 @@
       setMsg("msg","Menyimpan data...");
       const payload = getInputPayload();
 
-      if(!payload.Tanggal){ setMsg("msg","❌ Tanggal wajib diisi.", true); return; }
+      // ✅ VALIDASI WAJIB ISI (FINAL)
+      if(!payload.Tanggal){ setMsg("msg","❌ Tanggal wajib diisi.", true); scrollToLabelAndInput(document.getElementById("Tanggal")); return; }
+      if(!payload.Pukul){ setMsg("msg","❌ Pukul wajib diisi.", true); scrollToLabelAndInput(document.getElementById("Pukul")); return; }
+      if(!payload.Ruang){ setMsg("msg","❌ Ruang wajib diisi.", true); scrollToLabelAndInput(document.getElementById("Ruang")); return; }
+      if(!payload.MasalahKegiatan){ setMsg("msg","❌ Masalah/Kegiatan wajib diisi.", true); scrollToLabelAndInput(document.getElementById("MasalahKegiatan")); return; }
+      if(!payload.Tindakan){ setMsg("msg","❌ Tindakan wajib diisi.", true); scrollToLabelAndInput(document.getElementById("Tindakan")); return; }
+      if(!payload.Status){ setMsg("msg","❌ Status (Selesai/Belum) wajib dipilih.", true); scrollToLabelAndInput(document.getElementById("Status")); return; }
+      if(!payload.Petugas){ setMsg("msg","❌ Petugas wajib dipilih.", true); scrollToLabelAndInput(document.getElementById("Petugas")); return; }
+      if(!payload.Kategori){ setMsg("msg","❌ Kategori wajib dipilih.", true); scrollToLabelAndInput(document.getElementById("Kategori")); return; }
+      if(!payload.AreaKerja){ setMsg("msg","❌ Area Kerja wajib dipilih.", true); scrollToLabelAndInput(document.getElementById("AreaKerja")); return; }
+      if(!payload.Item){ setMsg("msg","❌ Item wajib dipilih.", true); scrollToLabelAndInput(document.getElementById("Item")); return; }
+
 
       const pukEl = document.getElementById('Pukul');
       if(pukEl && pukEl.classList.contains('input-error')){
