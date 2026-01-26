@@ -26,21 +26,40 @@
       --glass: rgba(255,255,255,0.6);
       --radius:12px;
       --shadow: 0 6px 18px rgba(20,30,60,0.06);
-      --topbar-height: 72px;
+
+      --topbar-height: 72px; /* updated by JS */
       --topbar-z: 12000;
       --modal-z: 10000;
       --toast-z: 11000;
+
+      /* ✅ AUTO SCALE clamp() (SERAGAM DI BERBAGAI HP) */
+      --fs-base: clamp(14px, 1.05vw + 10px, 16px);
+      --fs-small: clamp(12px, 0.85vw + 9px, 14px);
+      --pad-input: clamp(12px, 1.2vw, 16px);
+      --pad-card: clamp(12px, 1.6vw, 18px);
+      --pad-btn-y: clamp(8px, 1.0vw, 10px);
+      --pad-btn-x: clamp(10px, 1.1vw, 14px);
+      --radius-soft: clamp(10px, 1.2vw, 14px);
     }
 
     *{box-sizing:border-box;}
-    html,body{height:100%; margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; background:var(--bg); color:var(--text);}
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background:var(--bg);
+      color:var(--text);
+      font-size:var(--fs-base);
+    }
     a{color:inherit;}
 
+    /* ✅ FIX: muted class tidak boleh hilang */
+    .muted { color: var(--muted); }
+
+    /* ===== TOPBAR (fixed) ===== */
     .topbar {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: var(--topbar-height);
       display:flex;
       align-items:center;
@@ -54,96 +73,211 @@
       backdrop-filter: blur(4px);
     }
     .topbar .brand { display:flex; gap:10px; align-items:center; }
-    .topbar .title { font-weight:700; font-size:16px; color:#042f66; line-height:1; }
-    .topbar .subtitle { font-size:12px; color:var(--muted); margin-top:2px; }
+    .topbar .title { font-weight:800; font-size:clamp(14px, 1.2vw + 10px, 16px); color:#042f66; line-height:1; }
+    .topbar .subtitle { font-size:var(--fs-small); color:var(--muted); margin-top:2px; }
 
     .action-panel {
       display:flex; gap:8px; align-items:center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.95));
-      padding:6px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);
+      background: rgba(255,255,255,0.95);
+      padding:6px; border-radius:12px;
+      border:1px solid rgba(10,20,40,0.06);
       box-shadow: 0 6px 20px rgba(10,20,60,0.06);
     }
 
     .btn {
       display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px; border-radius:10px; background:var(--card); border:1px solid var(--border-weak);
-      cursor:pointer; font-weight:700; color:#062b57; box-shadow:none; font-size:13px;
+      padding: var(--pad-btn-y) var(--pad-btn-x);
+      border-radius:10px;
+      background:var(--card);
+      border:1px solid var(--border-weak);
+      cursor:pointer;
+      font-weight:800;
+      color:#062b57;
+      box-shadow:none;
+      font-size:clamp(12px, 0.95vw + 8px, 13px);
       transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+      user-select:none;
     }
+    .btn:active{ transform: translateY(1px); opacity:0.95; }
     .btn.primary { background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:0; box-shadow: 0 10px 28px rgba(10,120,220,0.12); }
-    .btn.ghost { background:transparent; border:1px solid rgba(10,20,40,0.06); color:var(--muted); font-weight:700; }
+    .btn.ghost { background:transparent; border:1px solid rgba(10,20,40,0.06); color:var(--muted); font-weight:800; }
     .btn svg { width:16px; height:16px; display:block; fill:currentColor; opacity:0.95; }
     .btn .btn-label { display:inline-block; white-space:nowrap; }
 
-    .pill { background:var(--card); border-radius:999px; padding:6px 12px; font-size:13px; border:1px solid var(--border); color:var(--muted); font-weight:700; }
+    .pill {
+      background:var(--card);
+      border-radius:999px;
+      padding:6px 12px;
+      font-size:clamp(12px, 0.95vw + 8px, 13px);
+      border:1px solid var(--border);
+      color:var(--muted);
+      font-weight:800;
+      user-select:none;
+    }
 
+    /* ===== LAYOUT ===== */
     .container {
       max-width:1100px;
       margin: 18px auto;
       padding: calc(var(--topbar-height) + 16px) 14px 32px;
     }
 
-    .card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow: 0 8px 22px rgba(20,30,60,0.06); border:1px solid rgba(10,20,40,0.04); }
+    .card {
+      background:var(--card);
+      border-radius:var(--radius-soft);
+      padding: var(--pad-card);
+      box-shadow: 0 8px 22px rgba(20,30,60,0.06);
+      border:1px solid rgba(10,20,40,0.04);
+    }
+
     .grid { display:grid; grid-template-columns: 1fr 420px; gap:14px; }
     @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
 
-    .form-col label { display:block; font-weight:700; margin-top:12px; color:#042a57; font-size:13px; letter-spacing:0.2px; }
+    .form-col label, .panel-right label {
+      display:block;
+      font-weight:900;
+      margin-top:12px;
+      color:#042a57;
+      font-size:clamp(12px, 0.95vw + 8px, 13px);
+      letter-spacing:0.2px;
+    }
+
     input, textarea, select {
-      width:100%; margin-top:8px; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
-      background: #ffffff; font-size:15px; color:var(--text); box-shadow: 0 4px 12px rgba(10,20,40,0.03);
-      transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease; -webkit-appearance:none; appearance:none;
+      width:100%;
+      margin-top:8px;
+      padding: var(--pad-input);
+      border-radius: var(--radius-soft);
+      border:1px solid var(--border);
+      background: #ffffff;
+      font-size: var(--fs-base);
+      color:var(--text);
+      box-shadow: 0 4px 12px rgba(10,20,40,0.03);
+      transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease;
+      -webkit-appearance:none; appearance:none;
     }
     textarea { min-height:140px; resize:vertical; }
-    input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 8px 24px rgba(10,120,220,0.12); transform:translateY(-1px); }
+    input:focus, textarea:focus, select:focus {
+      outline:none;
+      border-color:var(--accent);
+      box-shadow:0 8px 24px rgba(10,120,220,0.12);
+      transform:translateY(-1px);
+    }
 
     .row-inline { display:flex; gap:10px; align-items:flex-start; }
     .row-inline .col { min-width:0; }
     .row-inline .col.small { flex: 0 0 150px; }
     .row-inline .col.xsmall { flex: 0 0 150px; }
 
-    .time-input { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace; letter-spacing:0.6px; text-align:center; }
+    .time-input {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+      letter-spacing:0.6px;
+      text-align:center;
+    }
     .time-input::placeholder { color: var(--muted-2); font-style:italic; }
 
-    .big-save { margin-top:18px; padding:16px; border-radius:12px; background:linear-gradient(90deg,#06a84f,#2fc26a); color:white; font-weight:800; font-size:15px; text-align:center; cursor:pointer; border:0; box-shadow: 0 10px 30px rgba(34,185,87,0.12); }
-    .smallnote { font-size:13px; color:var(--muted); margin-top:8px; }
+    .big-save {
+      margin-top:18px;
+      padding: clamp(14px, 1.6vw, 16px);
+      border-radius: var(--radius-soft);
+      background:linear-gradient(90deg,#06a84f,#2fc26a);
+      color:white;
+      font-weight:900;
+      font-size:clamp(14px, 1.1vw + 10px, 15px);
+      text-align:center;
+      cursor:pointer;
+      border:0;
+      box-shadow: 0 10px 30px rgba(34,185,87,0.12);
+      user-select:none;
+    }
+    .big-save:active{ transform: translateY(1px); opacity:0.95; }
 
+    .smallnote { font-size:var(--fs-small); color:var(--muted); margin-top:8px; }
     .panel-right { display:flex; flex-direction:column; gap:10px; }
 
-    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:clamp(12px, 0.95vw + 8px, 13px); }
     th, td { padding:10px 8px; border-bottom:1px solid rgba(10,20,40,0.06); text-align:left; vertical-align:top; }
-    thead th { color:#fff; background:var(--accent); font-weight:700; position:sticky; top: calc(var(--topbar-height)); z-index: calc(var(--topbar-z) - 1); }
+    thead th { color:#fff; background:var(--accent); font-weight:800; position:sticky; top: calc(var(--topbar-height)); z-index: calc(var(--topbar-z) - 1); }
     tbody tr:hover { background:#f3fbff; cursor:pointer; }
 
-    .status-badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; color:#fff; }
+    .status-badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; color:#fff; }
     .status-done { background:var(--success); }
     .status-pending { background:var(--danger); }
 
-    .modal-bg { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(6,10,20,0.45); z-index: var(--modal-z); padding:16px; }
+    /* modal / toast */
+    .modal-bg {
+      position:fixed; inset:0;
+      display:none;
+      align-items:center; justify-content:center;
+      background:rgba(6,10,20,0.45);
+      z-index: var(--modal-z);
+      padding:16px;
+    }
     .modal-bg.show { display:flex; }
-    .modal { width:min(980px,96vw); max-height:92vh; overflow:auto; border-radius:14px; background:linear-gradient(180deg,#ffffff,#fbfdff); padding:18px; border:1px solid var(--border); box-shadow: 0 30px 80px rgba(10,20,60,0.25); }
+    .modal {
+      width:min(980px,96vw);
+      max-height:92vh;
+      overflow:auto;
+      border-radius:14px;
+      background:linear-gradient(180deg,#ffffff,#fbfdff);
+      padding:18px;
+      border:1px solid var(--border);
+      box-shadow: 0 30px 80px rgba(10,20,60,0.25);
+    }
 
     #savedToast { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index: var(--toast-z); }
     #savedToast.show { display:flex; }
-    .toast { background:#fff; border-radius:12px; padding:18px 20px; min-width:260px; max-width:90%; box-shadow: 0 18px 40px rgba(10,20,60,0.16); border:1px solid rgba(10,20,40,0.06); text-align:center; }
+    .toast {
+      background:#fff;
+      border-radius:12px;
+      padding:18px 20px;
+      min-width:260px;
+      max-width:90%;
+      box-shadow: 0 18px 40px rgba(10,20,60,0.16);
+      border:1px solid rgba(10,20,40,0.06);
+      text-align:center;
+    }
 
     .input-error { border-color: var(--danger) !important; box-shadow: 0 6px 20px rgba(224,36,36,0.08); }
 
     .petugas-list, .status-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
-    .petugas-list .opt, .status-list .opt { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:10px; background:linear-gradient(180deg,#fafcff,#fff); border:1px solid rgba(10,20,40,0.05); cursor:pointer; }
+    .petugas-list .opt, .status-list .opt {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:8px 10px;
+      border-radius:10px;
+      background:linear-gradient(180deg,#fafcff,#fff);
+      border:1px solid rgba(10,20,40,0.05);
+      cursor:pointer;
+      user-select:none;
+    }
     .petugas-list .opt:hover, .status-list .opt:hover { background:#f0fbff; }
 
-    @media (max-width:900px){
-      .topbar .title { font-size:14px; }
+    /* mobile report card style */
+    .card-item{
+      background: #fff;
+      border:1px solid rgba(10,20,40,0.06);
+      border-radius:14px;
+      padding:14px;
+      margin-top:10px;
+      box-shadow: 0 8px 22px rgba(20,30,60,0.06);
     }
+    .card-item .row{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .card-item .title{ font-weight:900; margin-top:4px; }
+    .card-item .meta{ color:var(--muted); font-size:var(--fs-small); margin-top:6px; }
+    .card-item .desc{ margin-top:10px; color:#0b2448; font-size:var(--fs-base); }
+    .card-item .card-actions{ margin-top:12px; display:flex; justify-content:flex-end; }
+
+    /* ✅ iPhone anti zoom (input minimal 16px) */
     @media (max-width:700px) {
-      input, textarea, select { padding:14px 14px; font-size:16px; border-width:1.5px; }
-      .card { padding:12px; border-radius:10px; }
-      .big-save { padding:14px; font-size:15px; }
+      input, textarea, select{ font-size:16px !important; }
+      .card { padding:12px; }
       .grid { gap:10px; }
       .row-inline .col.small, .row-inline .col.xsmall { flex: 1 1 0; }
     }
   </style>
 </head>
+
 <body>
 
   <div class="topbar" id="topbar">
@@ -183,6 +317,7 @@
             <label for="Pelapor">PELAPOR</label>
             <input id="Pelapor" type="text" placeholder="Nama pelapor"/>
 
+            <!-- Combined row: PUKUL + NO. LK -->
             <div class="row-inline" style="margin-top:6px;">
               <div class="col small">
                 <label for="Pukul">PUKUL (24 jam)</label>
@@ -261,8 +396,8 @@
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
           <div>
-            <div style="font-weight:800; font-size:18px; color:#042a57;">LAPORAN HARIAN IPSRS (SHIFT)</div>
-            <div class="info-row" style="margin-top:6px;">
+            <div style="font-weight:900; font-size:18px; color:#042a57;">LAPORAN HARIAN IPSRS (SHIFT)</div>
+            <div class="info-row" style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap;">
               <div id="infoBulanPill" class="pill">Bulan: -</div>
               <div id="infoTotalPill" class="pill">Total: 0</div>
             </div>
@@ -290,14 +425,14 @@
           </div>
         </div>
 
-        <div class="filters" style="margin-top:12px;">
+        <div class="filters" style="margin-top:12px; display:flex; gap:12px; flex-wrap:wrap;">
           <div style="display:flex; gap:8px; align-items:center;">
             <b>BULAN</b>
             <select id="FilterBulan" onchange="loadReportsBySelectedMonth()"></select>
           </div>
 
-          <div style="display:flex; gap:8px; align-items:center;">
-            <b>SLSI/BLM/KET</b>
+          <div style="display:flex; gap:8px; align-items:center; background: var(--yellow); padding:8px 10px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);">
+            <b>SLSI/BLM</b>
             <select id="FilterStatus" onchange="applyFilters()">
               <option value="ALL">SEMUA DATA</option>
               <option value="SELESAI">SELESAI</option>
@@ -305,21 +440,21 @@
             </select>
           </div>
 
-          <div style="display:flex; gap:8px; align-items:center;">
+          <div style="display:flex; gap:8px; align-items:center; background: var(--yellow); padding:8px 10px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);">
             <b>KATEGORI</b>
             <select id="FilterKategori" onchange="applyFilters()">
               <option value="ALL">SEMUA DATA</option>
             </select>
           </div>
 
-          <div style="display:flex; gap:8px; align-items:center;">
-            <b>AREA KERJA</b>
+          <div style="display:flex; gap:8px; align-items:center; background: var(--yellow); padding:8px 10px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);">
+            <b>AREA</b>
             <select id="FilterAreaKerja" onchange="applyFilters()">
               <option value="ALL">SEMUA DATA</option>
             </select>
           </div>
 
-          <div style="display:flex; gap:8px; align-items:center;">
+          <div style="display:flex; gap:8px; align-items:center; background: var(--yellow); padding:8px 10px; border-radius:12px; border:1px solid rgba(10,20,40,0.06);">
             <b>ITEM</b>
             <select id="FilterItem" onchange="applyFilters()">
               <option value="ALL">SEMUA DATA</option>
@@ -353,7 +488,7 @@
           <div id="mobileList"></div>
         </div>
 
-        <div id="panelRekap" style="display:none;">
+        <div id="panelRekap" style="display:none; margin-top:14px;">
           <b>REKAP SPARE PART / UNIT (AUTO SUM JUMLAH)</b>
           <div class="smallnote">Rekap dihitung dari data yang sedang tampil (sesuai filter).</div>
           <div style="overflow:auto; margin-top:8px;">
@@ -372,6 +507,7 @@
 
         <div id="msgReport" class="muted" style="margin-top:10px;"></div>
 
+        <!-- MODAL EDIT -->
         <div id="modalBg" class="modal-bg" aria-hidden="true">
           <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <h3 id="modalTitle">EDIT LAPORAN</h3>
@@ -395,6 +531,7 @@
 
                 <label>PUKUL (24 jam)</label>
                 <input id="Edit_Pukul" class="time-input" type="text" inputmode="numeric" pattern="\d*" placeholder="HH:MM" maxlength="5" />
+
                 <label>NO. LK</label>
                 <input type="text" id="Edit_NoLK" inputmode="numeric" pattern="\d*"/>
 
@@ -445,7 +582,7 @@
                 <label>ITEM</label>
                 <input type="text" id="Edit_Item"/>
 
-                <div class="modal-actions" style="margin-top:8px;">
+                <div class="modal-actions" style="margin-top:10px; display:flex; gap:8px; justify-content:flex-end;">
                   <button class="btn primary" onclick="saveEdit()">SIMPAN UPDATE</button>
                   <button class="btn ghost" onclick="closeModal()">BATAL</button>
                 </div>
@@ -454,6 +591,7 @@
             </div>
           </div>
         </div>
+        <!-- END MODAL EDIT -->
 
       </div>
     </div>
@@ -465,7 +603,7 @@
     <div class="toast" id="savedToastInner">
       <h4 id="savedToastTitle">Berhasil</h4>
       <p id="savedToastMsg">Data sudah tersimpan.</p>
-      <button id="savedToastOk" class="ok" type="button" onclick="hideSavedPopup()">OK</button>
+      <button id="savedToastOk" class="btn primary" type="button" onclick="hideSavedPopup()">OK</button>
     </div>
   </div>
 
@@ -524,6 +662,7 @@
     </div>
   </div>
 
+  <!-- Datalist fallback -->
   <datalist id="PetugasList">
     <option value="Pantiarso"></option>
     <option value="Agung"></option>
@@ -534,6 +673,9 @@
   <datalist id="AreaList"></datalist>
 
 <script>
+  // ==============================
+  // ✅ TOPBAR HEIGHT UPDATE
+  // ==============================
   function updateTopbarHeight() {
     const topbar = document.getElementById('topbar');
     if (!topbar) return;
@@ -546,9 +688,15 @@
   window.addEventListener('load', updateTopbarHeight);
   window.addEventListener('resize', () => {
     if (window._updateTopbarTimeout) clearTimeout(window._updateTopbarTimeout);
-    window._updateTopbarTimeout = setTimeout(() => { updateTopbarHeight(); window._updateTopbarTimeout = null; }, 100);
+    window._updateTopbarTimeout = setTimeout(() => {
+      updateTopbarHeight();
+      window._updateTopbarTimeout = null;
+    }, 120);
   });
 
+  // ==============================
+  // ✅ API URL
+  // ==============================
   const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
 
   const STATIC_KATEGORI = [
@@ -600,20 +748,34 @@
 
   let rawData = [], viewData = [], sortMode = "DOWN";
 
-  // ✅ FIX FINAL: user scroll hanya saat benar-benar geser (touchmove/wheel)
+  // ==============================
+  // ✅ SCROLL SYSTEM FINAL (ANTI BALIK KEBAWAH)
+  // ==============================
   let _userIsScrolling = false;
   let _userScrollTimeout = null;
 
   function markUserScrolling(){
     _userIsScrolling = true;
     if(_userScrollTimeout) clearTimeout(_userScrollTimeout);
-    _userScrollTimeout = setTimeout(() => {
-      _userIsScrolling = false;
-    }, 600);
+    _userScrollTimeout = setTimeout(() => { _userIsScrolling = false; }, 700);
   }
   window.addEventListener('wheel', markUserScrolling, {passive:true});
   window.addEventListener('touchmove', markUserScrolling, {passive:true});
 
+  // kunci auto scroll hanya saat event fokus/klik (biar tidak "narik" waktu user sedang scroll manual)
+  let _autoScrollLockUntil = 0;
+  function lockAutoScroll(ms=450){
+    _autoScrollLockUntil = Date.now() + ms;
+  }
+  function autoScrollAllowed(){
+    if(_userIsScrolling) return false;
+    if(Date.now() < _autoScrollLockUntil) return false;
+    return true;
+  }
+
+  // ==============================
+  // ✅ UTIL
+  // ==============================
   function setMsg(id, text, isError = false){
     const el=document.getElementById(id);
     if(!el) return;
@@ -621,24 +783,73 @@
     if(isError) el.classList.add('input-error'); else el.classList.remove('input-error');
   }
 
+  function normalizeText(x){ return (x||'').toString().trim(); }
+  function toDateKey(t){
+    const tt=normalizeText(t);
+    if(tt.length>=10) return tt.substring(0,10).replaceAll('-','');
+    return '00000000';
+  }
+
+  function escapeHtml(text){
+    return (text||'').toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;");
+  }
+
+  function uniqueSorted(arr){
+    const set=new Set(arr.filter(x=>normalizeText(x)!=''));
+    return Array.from(set).sort((a,b)=>a.localeCompare(b));
+  }
+
+  // ==============================
+  // ✅ PAGE SWITCH
+  // ==============================
   function showPage(name){
     document.getElementById("pageInput").style.display = (name==='input') ? '' : 'none';
     document.getElementById("pageLaporan").style.display = (name==='laporan') ? '' : 'none';
-    const pill = document.getElementById("judulBulanDesktop"); if (pill) pill.style.display = (name==='laporan') ? 'inline-block' : 'none';
-    const btnLaporan = document.getElementById("btnLaporan"), btnInput = document.getElementById("btnInput");
-    if (btnLaporan && btnInput) { if (name==='input'){ btnLaporan.style.display='inline-flex'; btnInput.style.display='none'; } else { btnLaporan.style.display='none'; btnInput.style.display='inline-flex'; } }
+
+    const pill = document.getElementById("judulBulanDesktop");
+    if (pill) pill.style.display = (name==='laporan') ? 'inline-block' : 'none';
+
+    const btnLaporan = document.getElementById("btnLaporan"),
+          btnInput = document.getElementById("btnInput");
+
+    if (btnLaporan && btnInput) {
+      if (name==='input'){
+        btnLaporan.style.display='inline-flex';
+        btnInput.style.display='none';
+      } else {
+        btnLaporan.style.display='none';
+        btnInput.style.display='inline-flex';
+      }
+    }
+
     if (name==='input') attachAutoHandlers();
     if (name==='laporan') loadReportsBySelectedMonth();
   }
 
-  function getCurrentMonthYYYYMM(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+  // ==============================
+  // ✅ MONTH PICKER
+  // ==============================
+  function getCurrentMonthYYYYMM(){
+    const d=new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+
   function setJudulBulan(yyyymm){
-    const bulanNama={"01":"JANUARI","02":"FEBRUARI","03":"MARET","04":"APRIL","05":"MEI","06":"JUNI","07":"JULI","08":"AGUSTUS","09":"SEPTEMBER","10":"OKTOBER","11":"NOVEMBER","12":"DESEMBER"};
+    const bulanNama={
+      "01":"JANUARI","02":"FEBRUARI","03":"MARET","04":"APRIL","05":"MEI","06":"JUNI",
+      "07":"JULI","08":"AGUSTUS","09":"SEPTEMBER","10":"OKTOBER","11":"NOVEMBER","12":"DESEMBER"
+    };
     const year=yyyymm.substring(0,4);
     const month=yyyymm.substring(5,7);
     const nama=bulanNama[month]||yyyymm;
+
     const b=document.getElementById("infoBulanPill");
     if(b) b.innerText=`Bulan: ${nama} ${year}`;
+
     const dd=document.getElementById("judulBulanDesktop");
     if(dd){
       dd.innerText=`BULAN ${nama} ${year}`;
@@ -648,6 +859,7 @@
 
   function buildMonthOptions(){
     const select=document.getElementById("FilterBulan");
+    if(!select) return;
     select.innerHTML='';
     const now=new Date();
     for(let i=0;i<36;i++){
@@ -664,15 +876,16 @@
     setJudulBulan(select.value);
   }
 
-  function normalizeText(x){ return (x||'').toString().trim(); }
-  function toDateKey(t){ const tt=normalizeText(t); if(tt.length>=10) return tt.substring(0,10).replaceAll('-',''); return '00000000'; }
-
-  // ✅ FINAL: scroll label + ada jarak (1 kotak)
+  // ==============================
+  // ✅ SCROLL FINAL (LABEL TIDAK HILANG + ADA JEDA)
+  // ==============================
   function scrollIntoViewWithOffset(el, offset = 18) {
     if (!el) return;
     const topbar = document.getElementById('topbar');
     const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
-    const extraGap = 95;
+
+    // ✅ extraGap = "1 kotak jeda" supaya label tidak ketutup topbar
+    const extraGap = 90;
 
     const rect = el.getBoundingClientRect();
     const absoluteTop = window.scrollY + rect.top;
@@ -689,17 +902,55 @@
   function scrollToLabelAndInput(inputEl) {
     if (!inputEl) return;
     const labelEl = getLabelForInput(inputEl);
-    if (labelEl) scrollIntoViewWithOffset(labelEl, 16);
-    else scrollIntoViewWithOffset(inputEl, 16);
+    if (labelEl) scrollIntoViewWithOffset(labelEl, 14);
+    else scrollIntoViewWithOffset(inputEl, 14);
   }
 
-  // --- strict HH:MM enforcement for time inputs ---
+  // ✅ khusus bagian bawah (Status s/d Save) -> pastikan field & tombol tampil 1 halaman
+  function scrollBottomSectionSmart(targetEl){
+    if(!targetEl) return;
+
+    const topbar = document.getElementById('topbar');
+    const headerHeight = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
+
+    const btn = document.querySelector('.big-save');
+    const safeExtraTop = 95;
+    const safeExtraBottom = 140; // ruang untuk keyboard
+
+    // target = labelnya
+    const labelEl = getLabelForInput(targetEl) || targetEl;
+
+    const rectTop = labelEl.getBoundingClientRect();
+    const absoluteTop = window.scrollY + rectTop.top;
+
+    let targetTop = Math.max(0, absoluteTop - headerHeight - safeExtraTop);
+
+    // jika tombol save ada, pastikan juga tidak terpotong
+    if(btn){
+      const btnRect = btn.getBoundingClientRect();
+      const btnAbsBottom = window.scrollY + btnRect.bottom;
+
+      const viewportBottom = window.scrollY + window.innerHeight;
+      if(btnAbsBottom > viewportBottom - safeExtraBottom){
+        const diff = btnAbsBottom - (viewportBottom - safeExtraBottom);
+        targetTop = Math.max(0, targetTop + diff);
+      }
+    }
+
+    window.scrollTo({ top: targetTop, behavior:'smooth' });
+  }
+
+  // ==============================
+  // ✅ TIME INPUT BEHAVIOR (HH:MM)
+  // ==============================
   function sanitizeTimeDigits(s){ return (s||'').replace(/[^\d]/g,'').slice(0,4); }
+
   function formatHHMMFromDigits(digits){
     if(!digits) return '';
     if(digits.length <= 2) return digits;
     return digits.slice(0,2) + ':' + digits.slice(2);
   }
+
   function clampToValidHHMM(hh, mm){
     let H = parseInt(hh,10);
     let M = parseInt(mm,10);
@@ -709,6 +960,7 @@
     if(M < 0) M = 0; if(M > 59) M = 59;
     return `${String(H).padStart(2,'0')}:${String(M).padStart(2,'0')}`;
   }
+
   function tryNormalizeHHMM(value){
     if(!value) return '';
     const v = value.toString().trim();
@@ -724,10 +976,18 @@
     if(digits.length === 1) return clampToValidHHMM(digits, '0');
     return '';
   }
+
   function isValidHHMM(v){ return !!v && /^([01]\d|2[0-3]):([0-5]\d)$/.test(v); }
 
   function attachTimeInputBehavior(el, helperMsgId){
     if(!el) return;
+
+    // remove old (avoid duplicate)
+    if(el._timeHandlers){
+      el.removeEventListener('input', el._timeHandlers.onInput);
+      el.removeEventListener('blur', el._timeHandlers.onBlur);
+      el.removeEventListener('keydown', el._timeHandlers.onKeyDown);
+    }
 
     const onInput = () => {
       const digits = sanitizeTimeDigits(el.value);
@@ -752,89 +1012,115 @@
       }
     };
 
+    const onKeyDown = (e) => {
+      const allowed = ['Backspace','Tab','ArrowLeft','ArrowRight','Delete','Home','End'];
+      if(allowed.includes(e.key)) return;
+      if(/^[0-9:]$/.test(e.key)) return;
+      e.preventDefault();
+    };
+
     el.addEventListener('input', onInput);
     el.addEventListener('blur', onBlur);
+    el.addEventListener('keydown', onKeyDown);
+
+    el._timeHandlers = { onInput, onBlur, onKeyDown };
+  }
+
+  function normalizeTimeTo24(value){
+    const t = tryNormalizeHHMM(normalizeText(value));
+    return t || normalizeText(value);
+  }
+
+  // ==============================
+  // ✅ AUTO SCROLL HANDLERS (FINAL)
+  // ==============================
+  function attachAutoScrollForInputs() {
+    const selector = '#pageInput input, #pageInput textarea, #pageInput select';
+    const inputs = document.querySelectorAll(selector);
+
+    inputs.forEach(el => {
+      if (el._autoScrollHandler) {
+        el.removeEventListener('focus', el._autoScrollHandler);
+        el.removeEventListener('click', el._autoScrollHandler);
+      }
+
+      const handler = (e) => {
+        const pageInput = document.getElementById('pageInput');
+        if (!pageInput || pageInput.style.display === 'none') return;
+
+        // ✅ cepat (biar tidak "lama bergerak")
+        const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 60 : 30;
+
+        lockAutoScroll(220);
+
+        setTimeout(() => {
+          if(!autoScrollAllowed()) return;
+
+          const id = e.target && e.target.id ? e.target.id : '';
+
+          // ✅ khusus bawah: Status/Petugas/Kategori/AreaKerja/Item -> scroll smart
+          if(['Status','Petugas','Kategori','AreaKerja','Item'].includes(id)){
+            scrollBottomSectionSmart(e.target);
+          } else {
+            scrollToLabelAndInput(e.target);
+          }
+        }, delay);
+      };
+
+      // ✅ focus + click (biar pasti jalan di HP yang aneh)
+      el.addEventListener('focus', handler, {passive:true});
+      el.addEventListener('click', handler, {passive:true});
+
+      el._autoScrollHandler = handler;
+    });
+  }
+
+  // ✅ tombol PILIH juga ikut scroll smart dulu
+  function attachQuickScrollHandlersForButtons() {
+    const btnMap = [
+      ['btnPilihStatus','Status'],
+      ['btnPilihPetugas','Petugas'],
+      ['btnPilihKategori','Kategori'],
+      ['btnPilihArea','AreaKerja']
+    ];
+
+    btnMap.forEach(([btnId, targetId])=>{
+      const b = document.getElementById(btnId);
+      const target = document.getElementById(targetId);
+      if(!b || !target) return;
+
+      if(b._autoBtnHandler){
+        b.removeEventListener('click', b._autoBtnHandler);
+        b.removeEventListener('pointerdown', b._autoBtnHandler);
+        b.removeEventListener('touchstart', b._autoBtnHandler);
+      }
+
+      const h = () => {
+        lockAutoScroll(250);
+        setTimeout(()=> {
+          if(!autoScrollAllowed()) return;
+          scrollBottomSectionSmart(target);
+        }, 20);
+      };
+
+      b.addEventListener('pointerdown', h, {passive:true});
+      b.addEventListener('touchstart', h, {passive:true});
+      b.addEventListener('click', h, {passive:true});
+
+      b._autoBtnHandler = h;
+    });
   }
 
   function attachAutoHandlers(){
     attachTimeInputBehavior(document.getElementById('Pukul'), 'msg');
     attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
     attachAutoScrollForInputs();
-    attachQuickScrollHandlersForInputs();
+    attachQuickScrollHandlersForButtons();
   }
 
-  // ✅ AUTO SCROLL: cepat dan tetap aman
-  function attachAutoScrollForInputs() {
-    const selector = '#pageInput input, #pageInput textarea, #pageInput select';
-    const inputs = document.querySelectorAll(selector);
-
-    inputs.forEach(el => {
-      if (el._autoScrollHandler) el.removeEventListener('focus', el._autoScrollHandler);
-
-      const handler = (e) => {
-        const pageInput = document.getElementById('pageInput');
-        if (pageInput && pageInput.style.display === 'none') return;
-
-        const delay = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 180 : 60;
-
-        setTimeout(() => {
-          if (_userIsScrolling) return;
-          scrollToLabelAndInput(e.target);
-        }, delay);
-      };
-
-      el.addEventListener('focus', handler);
-      el._autoScrollHandler = handler;
-    });
-  }
-
-  // ✅ klik langsung juga auto scroll cepat
-  document.addEventListener('pointerdown', (e) => {
-    const target = e.target;
-    if (!target) return;
-    const pageInput = document.getElementById('pageInput');
-    if (!pageInput || pageInput.style.display === 'none') return;
-
-    const tag = target.tagName ? target.tagName.toLowerCase() : '';
-    if (tag === 'input' || tag === 'textarea' || tag === 'select') {
-      setTimeout(() => {
-        if (_userIsScrolling) return;
-        scrollToLabelAndInput(target);
-      }, 10);
-    }
-  });
-
-  // ✅ khusus field bawah agar selalu terlihat labelnya
-  function attachQuickScrollHandlersForInputs() {
-    const ids = ['Status','Petugas','Kategori','AreaKerja'];
-    ids.forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-
-      if(el._ensureHandler) {
-        el.removeEventListener('focus', el._ensureHandler);
-        el.removeEventListener('click', el._ensureHandler);
-      }
-
-      const h = () => {
-        setTimeout(() => {
-          if (_userIsScrolling) return;
-          scrollToLabelAndInput(el);
-        }, 120);
-      };
-
-      el.addEventListener('focus', h, {passive:true});
-      el.addEventListener('click', h, {passive:true});
-      el._ensureHandler = h;
-    });
-  }
-
-  // ====== LAPORAN (tetap sama) ======
-  function normalizeTimeTo24(value){
-    const t = tryNormalizeHHMM(normalizeText(value));
-    return t || normalizeText(value);
-  }
-
+  // ==============================
+  // ✅ INPUT SAVE (ADD)
+  // ==============================
   function getInputPayload(){
     const pukVal = document.getElementById("Pukul").value.trim();
     return {
@@ -863,7 +1149,10 @@
       setMsg("msg","Menyimpan data...");
       const payload = getInputPayload();
 
-      if(!payload.Tanggal){ setMsg("msg","❌ Tanggal wajib diisi.", true); return; }
+      if(!payload.Tanggal){
+        setMsg("msg","❌ Tanggal wajib diisi.", true);
+        return;
+      }
 
       const pukEl = document.getElementById('Pukul');
       if(pukEl && pukEl.classList.contains('input-error')){
@@ -900,21 +1189,9 @@
     });
   }
 
-  // ====== fungsi laporan lainnya (tetap dari versi sebelumnya) ======
-  // (Tetap dipertahankan, tidak dipotong)
-
-  function uniqueSorted(arr){
-    const set=new Set(arr.filter(x=>normalizeText(x)!=''));
-    return Array.from(set).sort((a,b)=>a.localeCompare(b));
-  }
-  function escapeHtml(text){
-    return (text||'').toString()
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;");
-  }
-
+  // ==============================
+  // ✅ REPORT LOAD + FILTER + SORT + REKAP
+  // ==============================
   async function loadReportsBySelectedMonth(){
     try{
       const bulan=document.getElementById("FilterBulan").value||getCurrentMonthYYYYMM();
@@ -933,6 +1210,7 @@
 
       rawData=(json.data||[]).map(x=>{
         x.ID=normalizeText(x.ID);
+        x._Sheet=normalizeText(x._Sheet||'');
         x.Tanggal=normalizeText(x.Tanggal);
         x.Pelapor=normalizeText(x.Pelapor);
         x.Ruang=normalizeText(x.Ruang);
@@ -964,7 +1242,7 @@
   function buildFilterOptionsFromData(data){
     const kategoriList = uniqueSorted(data.map(x=>x.Kategori));
     const areaList = uniqueSorted(data.map(x=>x.AreaKerja));
-    const itemList=uniqueSorted(data.map(x=>x.Item));
+    const itemList = uniqueSorted(data.map(x=>x.Item));
 
     const combinedKategori = uniqueSorted([...(STATIC_KATEGORI||[]), ...kategoriList]);
     const combinedArea = uniqueSorted([...(STATIC_AREA||[]), ...areaList]);
@@ -1007,7 +1285,7 @@
   function applySort(){
     viewData.sort((a,b)=>{
       const ka=toDateKey(a.Tanggal), kb=toDateKey(b.Tanggal);
-      return (sortMode==='UP')? ka.localeCompare(kb) : kb.localeCompare(ka);
+      return (sortMode==='UP') ? ka.localeCompare(kb) : kb.localeCompare(ka);
     });
   }
   function sortUp(){ sortMode='UP'; applyFilters(); }
@@ -1024,7 +1302,11 @@
       tr.innerHTML=`
         <td style="text-align:center;"><b>${idx+1}</b></td>
         <td style="text-align:center;">${escapeHtml(row.Tanggal)}</td>
-        <td>${escapeHtml(row.Pelapor)}<div class="muted" style="font-size:12px; margin-top:6px;">${row.NoLK? "[NO. LK : "+escapeHtml(row.NoLK)+"]":""}</div></td>
+        <td>${escapeHtml(row.Pelapor)}
+          <div class="muted" style="font-size:12px; margin-top:6px;">
+            ${row.NoLK? "[NO. LK : "+escapeHtml(row.NoLK)+"]":""}
+          </div>
+        </td>
         <td style="text-align:center;">${escapeHtml(row.Ruang)}</td>
         <td style="text-align:center;">${escapeHtml(row.Pukul)}</td>
         <td>${escapeHtml(row.MasalahKegiatan)}</td>
@@ -1035,10 +1317,50 @@
         <td style="text-align:center;">${escapeHtml(row.AreaKerja)}</td>
         <td style="text-align:center;">${escapeHtml(row.Item)}</td>
       `;
+      tr.onclick = () => openEditModal(row);
       tbody.appendChild(tr);
     });
 
+    renderMobileList();
     setMsg("msgReport","✅ Data tampil: "+viewData.length);
+  }
+
+  function renderMobileList(){
+    const list=document.getElementById("mobileList");
+    list.innerHTML='';
+    if(window.innerWidth>900){
+      list.style.display='none';
+      document.getElementById("reportTable").style.display='';
+      return;
+    }
+
+    document.getElementById("reportTable").style.display='none';
+    list.style.display='block';
+
+    viewData.forEach((r,idx)=>{
+      const div=document.createElement("div");
+      div.className='card-item';
+      const statusClass=(r.Status.toUpperCase()==='BELUM')?'status-pending':(r.Status?'status-done':'');
+
+      div.innerHTML=`
+        <div class="row">
+          <div>
+            <div style="font-size:13px; color:var(--muted)">#${idx+1} • ${escapeHtml(r.Tanggal)}</div>
+            <div class="title">${escapeHtml(r.Pelapor)} ${r.Ruang? '• '+escapeHtml(r.Ruang):''}</div>
+            <div class="meta">${r.NoLK? '[NO. LK: '+escapeHtml(r.NoLK)+']':''}</div>
+          </div>
+          <div style="text-align:right;">
+            <div><span class="status-badge ${statusClass}">${escapeHtml(r.Status||'')}</span></div>
+            <div class="meta" style="margin-top:8px;">${escapeHtml(r.Item||'')}</div>
+          </div>
+        </div>
+        <div class="desc">${escapeHtml(r.MasalahKegiatan||'')}</div>
+        <div class="card-actions">
+          <button class="btn" onclick="openEditModalFromCard(event, '${escapeHtml(r.ID)}')">Edit</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
   }
 
   function renderRekap(){
@@ -1064,17 +1386,140 @@
     arr.sort((a,b)=>b.total-a.total);
     arr.forEach(x=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${escapeHtml(x.spare)}</td><td style="text-align:center;">${escapeHtml(x.type)}</td><td style="text-align:center;"><b>${x.total}</b></td>`;
+      tr.innerHTML=`
+        <td>${escapeHtml(x.spare)}</td>
+        <td style="text-align:center;">${escapeHtml(x.type)}</td>
+        <td style="text-align:center;"><b>${x.total}</b></td>
+      `;
       tbody.appendChild(tr);
     });
   }
 
+  function toggleRekap(){
+    const p = document.getElementById('panelRekap');
+    if(!p) return;
+    p.style.display = (p.style.display === 'none' || p.style.display === '') ? 'block' : 'none';
+  }
+
+  // ==============================
+  // ✅ EDIT MODAL (UPDATE)
+  // ==============================
+  function openEditModal(row){
+    const r=row;
+    document.getElementById("modalBg").classList.add("show");
+    setMsg("msgEdit","");
+
+    document.getElementById("Edit_ID").value=r.ID||"";
+    document.getElementById("EditID").innerText="ID: "+(r.ID||"-");
+    document.getElementById("EditSheet").innerText=r._Sheet? "Sheet: "+r._Sheet : "Sheet: (bulan)";
+
+    document.getElementById("Edit_Tanggal").value=r.Tanggal||"";
+    document.getElementById("Edit_Pelapor").value=r.Pelapor||"";
+    document.getElementById("Edit_Ruang").value=r.Ruang||"";
+
+    document.getElementById("Edit_Pukul").value = isValidHHMM(normalizeTimeTo24(r.Pukul||"")) ? normalizeTimeTo24(r.Pukul||"") : (r.Pukul||"");
+    if(!isValidHHMM(document.getElementById("Edit_Pukul").value) && document.getElementById("Edit_Pukul").value)
+      document.getElementById("Edit_Pukul").classList.add('input-error');
+    else
+      document.getElementById("Edit_Pukul").classList.remove('input-error');
+
+    document.getElementById("Edit_NoLK").value=r.NoLK||"";
+    document.getElementById("Edit_MasalahKegiatan").value=r.MasalahKegiatan||"";
+    document.getElementById("Edit_Tindakan").value=r.Tindakan||"";
+    document.getElementById("Edit_Petugas").value=r.Petugas||"";
+    document.getElementById("Edit_Status").value=r.Status||"";
+    document.getElementById("Edit_Keterangan").value=r.Keterangan||"";
+    document.getElementById("Edit_Kategori").value=r.Kategori||"";
+    document.getElementById("Edit_AreaKerja").value=r.AreaKerja||"";
+    document.getElementById("Edit_Item").value=r.Item||"";
+    document.getElementById("Edit_SparePartUnit").value=r.SparePartUnit||"";
+    document.getElementById("Edit_Type").value=r.Type||"";
+    document.getElementById("Edit_Jumlah").value=r.Jumlah||"";
+
+    attachTimeInputBehavior(document.getElementById('Edit_Pukul'), 'msgEdit');
+  }
+
+  function openEditModalFromCard(e,id){
+    e.stopPropagation();
+    const row=viewData.find(x=>x.ID===id)||rawData.find(x=>x.ID===id);
+    if(row) openEditModal(row);
+  }
+
+  function closeModal(){
+    document.getElementById("modalBg").classList.remove("show");
+  }
+
+  async function saveEdit(){
+    try{
+      setMsg("msgEdit","Menyimpan update...");
+
+      const editPukulEl = document.getElementById("Edit_Pukul");
+      if(editPukulEl && editPukulEl.classList.contains('input-error')){
+        setMsg("msgEdit","❌ Format PUKUL tidak valid. Perbaiki sebelum menyimpan.", true);
+        return;
+      }
+
+      const editPukul = editPukulEl && editPukulEl.value.trim() && isValidHHMM(editPukulEl.value.trim()) ? editPukulEl.value.trim() : '';
+
+      const payload={
+        action:"update",
+        ID:document.getElementById("Edit_ID").value,
+        Tanggal:document.getElementById("Edit_Tanggal").value,
+        Pelapor:document.getElementById("Edit_Pelapor").value,
+        Ruang:document.getElementById("Edit_Ruang").value,
+        Pukul: editPukul,
+        NoLK:document.getElementById("Edit_NoLK").value,
+        MasalahKegiatan:document.getElementById("Edit_MasalahKegiatan").value,
+        Tindakan:document.getElementById("Edit_Tindakan").value,
+        Petugas:document.getElementById("Edit_Petugas").value,
+        Status:document.getElementById("Edit_Status").value,
+        Keterangan:document.getElementById("Edit_Keterangan").value,
+        Kategori:document.getElementById("Edit_Kategori").value,
+        AreaKerja:document.getElementById("Edit_AreaKerja").value,
+        Item:document.getElementById("Edit_Item").value,
+        SparePartUnit:document.getElementById("Edit_SparePartUnit").value,
+        Type:document.getElementById("Edit_Type").value,
+        Jumlah:document.getElementById("Edit_Jumlah").value
+      };
+
+      if(!payload.ID){
+        setMsg("msgEdit","❌ ID kosong, tidak bisa update.", true);
+        return;
+      }
+
+      const res=await fetch(API_URL, {method:"POST", body: JSON.stringify(payload)});
+      const json=await res.json();
+
+      if(json.ok){
+        setMsg("msgEdit","✅ Update berhasil");
+        closeModal();
+        loadReportsBySelectedMonth();
+        showSavedPopup("Update berhasil","Berhasil");
+      } else {
+        setMsg("msgEdit","❌ Gagal: "+json.msg, true);
+        showSavedPopup("Gagal update: "+(json.msg||""),"Gagal");
+      }
+    }catch(err){
+      setMsg("msgEdit","❌ Error: "+err.message, true);
+      showSavedPopup("Error: "+err.message,"Gagal");
+    }
+  }
+
+  document.getElementById("modalBg").addEventListener("click", function(e){
+    if(e.target && e.target.id==="modalBg") closeModal();
+  });
+
+  // ==============================
+  // ✅ TOAST
+  // ==============================
   function showSavedPopup(message="Data sudah tersimpan.", title="Berhasil"){
     const bg=document.getElementById("savedToast");
     if(!bg) return;
     document.getElementById("savedToastTitle").innerText = title;
     document.getElementById("savedToastMsg").innerText = message;
     bg.classList.add("show");
+    const ok=document.getElementById("savedToastOk");
+    if(ok) ok.focus();
   }
 
   function hideSavedPopup(){
@@ -1083,116 +1528,199 @@
     bg.classList.remove("show");
   }
 
-  // popup functions tetap
+  // ==============================
+  // ✅ POPUP SELECTORS
+  // ==============================
   let _petugasTargetInputId = null;
   function openPetugasPopup(inputId){
     _petugasTargetInputId = inputId || null;
-    document.getElementById('petugasPopupBg').classList.add('show');
+    const bg = document.getElementById('petugasPopupBg');
+    if(!bg) return;
+    bg.classList.add('show');
+    bg.setAttribute('aria-hidden','false');
+
+    setTimeout(()=>{ const firstOpt = document.querySelector('#petugasOptions .opt'); if(firstOpt) firstOpt.focus(); }, 50);
   }
   function closePetugasPopup(){
-    document.getElementById('petugasPopupBg').classList.remove('show');
-    _petugasTargetInputId=null;
+    const bg = document.getElementById('petugasPopupBg');
+    if(!bg) return;
+    bg.classList.remove('show');
+    bg.setAttribute('aria-hidden','true');
+    _petugasTargetInputId = null;
   }
   function selectPetugas(name){
     if(_petugasTargetInputId){
-      const el=document.getElementById(_petugasTargetInputId);
-      if(el) el.value=name;
+      const el = document.getElementById(_petugasTargetInputId);
+      if(el) el.value = name;
     }
     closePetugasPopup();
   }
+  document.getElementById('petugasPopupBg').addEventListener('click', function(e){
+    if(e.target && e.target.id === 'petugasPopupBg') closePetugasPopup();
+  });
 
   let _statusTargetInputId = null;
   function openStatusPopup(inputId){
     _statusTargetInputId = inputId || null;
-    document.getElementById('statusPopupBg').classList.add('show');
+    const bg = document.getElementById('statusPopupBg');
+    if(!bg) return;
+    bg.classList.add('show');
+    bg.setAttribute('aria-hidden','false');
+
+    setTimeout(()=>{ const firstOpt = document.querySelector('#statusOptions .opt'); if(firstOpt) firstOpt.focus(); }, 50);
   }
   function closeStatusPopup(){
-    document.getElementById('statusPopupBg').classList.remove('show');
-    _statusTargetInputId=null;
+    const bg = document.getElementById('statusPopupBg');
+    if(!bg) return;
+    bg.classList.remove('show');
+    bg.setAttribute('aria-hidden','true');
+    _statusTargetInputId = null;
   }
-  function selectStatus(v){
+  function selectStatus(value){
     if(_statusTargetInputId){
-      const el=document.getElementById(_statusTargetInputId);
-      if(el) el.value=v;
+      const el = document.getElementById(_statusTargetInputId);
+      if(el) el.value = value;
     }
     closeStatusPopup();
   }
+  document.getElementById('statusPopupBg').addEventListener('click', function(e){
+    if(e.target && e.target.id === 'statusPopupBg') closeStatusPopup();
+  });
 
-  let _kategoriTargetInputId=null;
+  let _kategoriTargetInputId = null;
   function buildKategoriDatalistAndPopup(){
-    const dl=document.getElementById('KategoriList');
-    dl.innerHTML='';
-    STATIC_KATEGORI.forEach(k=>{
-      const opt=document.createElement('option');
-      opt.value=k;
-      dl.appendChild(opt);
-    });
-
-    const listEl=document.getElementById('kategoriOptions');
-    listEl.innerHTML='';
-    STATIC_KATEGORI.forEach(k=>{
-      const div=document.createElement('div');
-      div.className='opt';
-      div.tabIndex=0;
-      div.innerHTML=`<span>${escapeHtml(k)}</span><span class="muted">Pilih</span>`;
-      div.onclick=()=>selectKategori(k);
-      listEl.appendChild(div);
-    });
+    const dl = document.getElementById('KategoriList');
+    if(dl){
+      dl.innerHTML = '';
+      for(const k of STATIC_KATEGORI){
+        const opt = document.createElement('option');
+        opt.value = k;
+        dl.appendChild(opt);
+      }
+    }
+    const listEl = document.getElementById('kategoriOptions');
+    if(listEl){
+      listEl.innerHTML = '';
+      STATIC_KATEGORI.forEach(k=>{
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.setAttribute('role','listitem');
+        div.tabIndex = 0;
+        div.innerHTML = `<span>${escapeHtml(k)}</span><span class="muted">Pilih</span>`;
+        div.addEventListener('click', ()=> selectKategori(k));
+        div.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter') selectKategori(k); });
+        listEl.appendChild(div);
+      });
+    }
   }
+
   function openKategoriPopup(inputId){
-    _kategoriTargetInputId=inputId||null;
-    document.getElementById('kategoriPopupBg').classList.add('show');
+    _kategoriTargetInputId = inputId || null;
+    const bg = document.getElementById('kategoriPopupBg');
+    if(!bg) return;
+    bg.classList.add('show');
+    bg.setAttribute('aria-hidden','false');
+
+    setTimeout(()=>{ const firstOpt = document.querySelector('#kategoriOptions .opt'); if(firstOpt) firstOpt.focus(); }, 50);
   }
   function closeKategoriPopup(){
-    document.getElementById('kategoriPopupBg').classList.remove('show');
-    _kategoriTargetInputId=null;
+    const bg = document.getElementById('kategoriPopupBg');
+    if(!bg) return;
+    bg.classList.remove('show');
+    bg.setAttribute('aria-hidden','true');
+    _kategoriTargetInputId = null;
   }
-  function selectKategori(v){
+  function selectKategori(value){
     if(_kategoriTargetInputId){
-      const el=document.getElementById(_kategoriTargetInputId);
-      if(el) el.value=v;
+      const el = document.getElementById(_kategoriTargetInputId);
+      if(el) el.value = value;
     }
     closeKategoriPopup();
   }
+  document.getElementById('kategoriPopupBg').addEventListener('click', function(e){
+    if(e.target && e.target.id === 'kategoriPopupBg') closeKategoriPopup();
+  });
 
-  let _areaTargetInputId=null;
+  let _areaTargetInputId = null;
   function buildAreaDatalistAndPopup(){
-    const dl=document.getElementById('AreaList');
-    dl.innerHTML='';
-    STATIC_AREA.forEach(a=>{
-      const opt=document.createElement('option');
-      opt.value=a;
-      dl.appendChild(opt);
-    });
-
-    const listEl=document.getElementById('areaOptions');
-    listEl.innerHTML='';
-    STATIC_AREA.forEach(a=>{
-      const div=document.createElement('div');
-      div.className='opt';
-      div.tabIndex=0;
-      div.innerHTML=`<span>${escapeHtml(a)}</span><span class="muted">Pilih</span>`;
-      div.onclick=()=>selectArea(a);
-      listEl.appendChild(div);
-    });
+    const dl = document.getElementById('AreaList');
+    if(dl){
+      dl.innerHTML = '';
+      for(const a of STATIC_AREA){
+        const opt = document.createElement('option');
+        opt.value = a;
+        dl.appendChild(opt);
+      }
+    }
+    const listEl = document.getElementById('areaOptions');
+    if(listEl){
+      listEl.innerHTML = '';
+      STATIC_AREA.forEach(a=>{
+        const div = document.createElement('div');
+        div.className = 'opt';
+        div.setAttribute('role','listitem');
+        div.tabIndex = 0;
+        div.innerHTML = `<span>${escapeHtml(a)}</span><span class="muted">Pilih</span>`;
+        div.addEventListener('click', ()=> selectArea(a));
+        div.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter') selectArea(a); });
+        listEl.appendChild(div);
+      });
+    }
   }
+
   function openAreaPopup(inputId){
-    _areaTargetInputId=inputId||null;
-    document.getElementById('areaPopupBg').classList.add('show');
+    _areaTargetInputId = inputId || null;
+    const bg = document.getElementById('areaPopupBg');
+    if(!bg) return;
+    bg.classList.add('show');
+    bg.setAttribute('aria-hidden','false');
+
+    setTimeout(()=>{ const firstOpt = document.querySelector('#areaOptions .opt'); if(firstOpt) firstOpt.focus(); }, 50);
   }
   function closeAreaPopup(){
-    document.getElementById('areaPopupBg').classList.remove('show');
-    _areaTargetInputId=null;
+    const bg = document.getElementById('areaPopupBg');
+    if(!bg) return;
+    bg.classList.remove('show');
+    bg.setAttribute('aria-hidden','true');
+    _areaTargetInputId = null;
   }
-  function selectArea(v){
+  function selectArea(value){
     if(_areaTargetInputId){
-      const el=document.getElementById(_areaTargetInputId);
-      if(el) el.value=v;
+      const el = document.getElementById(_areaTargetInputId);
+      if(el) el.value = value;
     }
     closeAreaPopup();
   }
+  document.getElementById('areaPopupBg').addEventListener('click', function(e){
+    if(e.target && e.target.id === 'areaPopupBg') closeAreaPopup();
+  });
 
-  // INIT
+  // ESC close all popups
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+
+    const petugasBg = document.getElementById('petugasPopupBg');
+    if(petugasBg && petugasBg.classList.contains('show')){ closePetugasPopup(); return; }
+
+    const statusBg = document.getElementById('statusPopupBg');
+    if(statusBg && statusBg.classList.contains('show')){ closeStatusPopup(); return; }
+
+    const kategoriBg = document.getElementById('kategoriPopupBg');
+    if(kategoriBg && kategoriBg.classList.contains('show')){ closeKategoriPopup(); return; }
+
+    const areaBg = document.getElementById('areaPopupBg');
+    if(areaBg && areaBg.classList.contains('show')){ closeAreaPopup(); return; }
+
+    const modal = document.getElementById('modalBg');
+    if(modal && modal.classList.contains('show')){ closeModal(); return; }
+
+    const toast = document.getElementById('savedToast');
+    if(toast && toast.classList.contains('show')){ hideSavedPopup(); return; }
+  });
+
+  // ==============================
+  // ✅ INIT
+  // ==============================
   buildMonthOptions();
   updateTopbarHeight();
   buildKategoriDatalistAndPopup();
@@ -1200,5 +1728,6 @@
   attachAutoHandlers();
   showPage('input');
 </script>
+
 </body>
 </html>
