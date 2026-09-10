@@ -142,9 +142,31 @@
       .grid { gap:10px; }
       .row-inline .col.small, .row-inline .col.xsmall { flex: 1 1 0; }
     }
+  
+    #authUserBox{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .auth-user{background:rgba(255,255,255,.85);border:1px solid rgba(10,20,40,.08);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;color:#042a57}
+
   </style>
 </head>
 <body>
+
+<!-- AUTH LOGIN -->
+<div id="authGate" style="position:fixed;inset:0;background:linear-gradient(135deg,#eef7ff,#f4fff8);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div style="width:min(430px,100%);background:#fff;border:1px solid rgba(10,20,40,.08);border-radius:20px;padding:28px;box-shadow:0 20px 60px rgba(10,30,70,.12);">
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.5px;color:#0a69b8;">RS PURI CINERE</div>
+      <h2 style="margin:8px 0 4px;color:#042a57;">LHT IPSRS</h2>
+      <div style="font-size:13px;color:#6b7280;">Form Laporan Harian IPSRS (SHIFT)</div>
+    </div>
+    <label style="display:block;font-weight:700;font-size:13px;color:#042a57;">USERNAME</label>
+    <input id="loginUsername" autocomplete="username" placeholder="Masukkan username" style="margin-top:8px;">
+    <label style="display:block;font-weight:700;font-size:13px;color:#042a57;margin-top:14px;">PASSWORD</label>
+    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Masukkan password" style="margin-top:8px;">
+    <button id="loginButton" class="btn primary" style="width:100%;justify-content:center;margin-top:18px;padding:12px;" onclick="doLogin()">MASUK</button>
+    <div id="loginMsg" style="font-size:13px;margin-top:12px;text-align:center;color:#e02424;min-height:18px;"></div>
+  </div>
+</div>
+
 
   <div class="topbar" id="topbar">
     <div class="brand">
@@ -588,6 +610,43 @@
   <datalist id="ItemList"></datalist>
 
 <script>
+
+  function authHeaders(){ return AUTH && AUTH.token ? {"X-LHT-Token":AUTH.token} : {}; }
+  function authToken(){ return AUTH && AUTH.token ? AUTH.token : ""; }
+  function setLoginMsg(t){ const e=document.getElementById("loginMsg"); if(e)e.innerText=t||""; }
+  function renderAuthUser(){
+    const top=document.getElementById("topbar"); if(!top || !AUTH || !AUTH.user) return;
+    let box=document.getElementById("authUserBox");
+    if(!box){ box=document.createElement("div"); box.id="authUserBox"; box.innerHTML='<span class="auth-user" id="authUserName"></span><button class="btn ghost" onclick="doLogout()">KELUAR</button>'; top.appendChild(box); }
+    const u=AUTH.user; document.getElementById("authUserName").innerText=(u.nama_petugas||u.username||"")+(u.bidang?" • "+u.bidang:"");
+    const pet=document.getElementById("Petugas"); if(pet && u.role!=="ADMIN"){ pet.value=u.nama_petugas||""; pet.readOnly=true; pet.style.background="#f3f6fa"; }
+  }
+  async function doLogin(){
+    const username=(document.getElementById("loginUsername").value||"").trim();
+    const password=document.getElementById("loginPassword").value||"";
+    if(!username||!password){setLoginMsg("Username dan password wajib diisi.");return;}
+    const b=document.getElementById("loginButton"); b.disabled=true; b.innerText="MEMERIKSA..."; setLoginMsg("");
+    try{
+      const r=await fetch(API_URL+"?action=login&username="+encodeURIComponent(username)+"&password="+encodeURIComponent(password));
+      const j=await r.json();
+      if(!j.ok){setLoginMsg(j.msg||"Login gagal.");return;}
+      AUTH={token:j.token,user:j.user}; localStorage.setItem("LHT_IPSRS_AUTH",JSON.stringify(AUTH));
+      document.getElementById("authGate").style.display="none"; renderAuthUser();
+      if(typeof showPage==='function') showPage('input');
+    }catch(e){setLoginMsg("Tidak dapat terhubung ke server: "+e.message);}
+    finally{b.disabled=false;b.innerText="MASUK";}
+  }
+  async function doLogout(){
+    try{ if(AUTH&&AUTH.token) await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'logout',token:AUTH.token})}); }catch(e){}
+    AUTH=null; localStorage.removeItem("LHT_IPSRS_AUTH"); location.reload();
+  }
+  async function ensureAuth(){
+    if(!API_URL || API_URL.indexOf('PASTE_APPS_SCRIPT')===0){ document.getElementById('authGate').style.display='flex'; setLoginMsg('API Apps Script belum dipasang. Setelah deploy Apps Script, masukkan URL Web App pada API_URL.'); return false; }
+    if(!AUTH||!AUTH.token){document.getElementById('authGate').style.display='flex';return false;}
+    try{ const r=await fetch(API_URL+'?action=me&token='+encodeURIComponent(AUTH.token)); const j=await r.json(); if(!j.ok) throw new Error('expired'); AUTH.user=j.user; localStorage.setItem('LHT_IPSRS_AUTH',JSON.stringify(AUTH)); document.getElementById('authGate').style.display='none'; renderAuthUser(); return true; }catch(e){AUTH=null;localStorage.removeItem('LHT_IPSRS_AUTH');document.getElementById('authGate').style.display='flex';return false;}
+  }
+  document.addEventListener('DOMContentLoaded',()=>{ const pw=document.getElementById('loginPassword'); if(pw) pw.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();}); });
+
   function updateTopbarHeight() {
     const topbar = document.getElementById('topbar');
     if (!topbar) return;
@@ -603,7 +662,9 @@
     window._updateTopbarTimeout = setTimeout(() => { updateTopbarHeight(); window._updateTopbarTimeout = null; }, 100);
   });
 
-  const API_URL = "https://script.google.com/macros/s/AKfycbwimKYX9R60RFrZ7ya8q5SSsr_-BaWYSNoYM_snZJTI5qNfJIfNEZPmGRw2tgNMcrH4/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbx1p8_7tdrizDJZxu0C4Aaqkr_8-8EOuAVeSan-nL5CYef7shQ0sAFMXXl9WdM0EheF/exec";
+
+  let AUTH = JSON.parse(localStorage.getItem("LHT_IPSRS_AUTH") || "null");
 
   const STATIC_KATEGORI = [
     "PERBAIKAN DENGAN PENGGANTIAN SPARE PART BARU",
@@ -984,6 +1045,7 @@
 
     return {
       action:'add',
+      token:authToken(),
       Tanggal:document.getElementById("Tanggal").value.trim(),
       Pelapor:document.getElementById("Pelapor").value.trim(),
       Ruang:document.getElementById("Ruang").value.trim(),
@@ -1098,7 +1160,7 @@
       setJudulBulan(bulan);
       setMsg("msgReport","Memuat laporan bulan "+bulan+" ...");
 
-      const res=await fetch(API_URL+"?action=get&bulan="+bulan);
+      const res=await fetch(API_URL+"?action=get&bulan="+encodeURIComponent(bulan)+"&token="+encodeURIComponent(authToken()));
       const json=await res.json();
 
       if(!json.ok){
@@ -1212,6 +1274,7 @@
         <td style="text-align:center;">${escapeHtml(row.AreaKerja)}</td>
         <td style="text-align:center;">${escapeHtml(row.Item)}</td>
       `;
+      tr.onclick=()=>openEdit(row);
       tbody.appendChild(tr);
     });
 
@@ -1487,9 +1550,19 @@
     p.style.display = (p.style.display==='none' || p.style.display==='') ? 'block' : 'none';
   }
 
-  // ✅ dummy EDIT (jika belum ada Apps Script edit)
   function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
-  function saveEdit(){ setMsg("msgEdit","(Fitur edit belum dihubungkan ke Apps Script)", true); }
+  function openEdit(row){
+    const map={ID:'Edit_ID',Tanggal:'Edit_Tanggal',Pelapor:'Edit_Pelapor',Ruang:'Edit_Ruang',Pukul:'Edit_Pukul',NoLK:'Edit_NoLK',MasalahKegiatan:'Edit_MasalahKegiatan',Tindakan:'Edit_Tindakan',SparePartUnit:'Edit_SparePartUnit',Type:'Edit_Type',Jumlah:'Edit_Jumlah',Keterangan:'Edit_Keterangan',Petugas:'Edit_Petugas',Status:'Edit_Status',Kategori:'Edit_Kategori',AreaKerja:'Edit_AreaKerja',Item:'Edit_Item'};
+    Object.keys(map).forEach(k=>{const e=document.getElementById(map[k]); if(e)e.value=row[k]??'';});
+    document.getElementById('EditID').innerText='ID: '+(row.ID||row.report_id||'-');
+    document.getElementById('modalBg').classList.add('show');
+  }
+  function getEditPayload(){ const g=id=>(document.getElementById(id)?.value||'').trim(); return {action:'update',token:authToken(),report_id:g('Edit_ID'),Tanggal:g('Edit_Tanggal'),Pelapor:g('Edit_Pelapor'),Ruang:g('Edit_Ruang'),Pukul:g('Edit_Pukul'),NoLK:g('Edit_NoLK'),MasalahKegiatan:g('Edit_MasalahKegiatan'),Tindakan:g('Edit_Tindakan'),SparePartUnit:g('Edit_SparePartUnit'),Type:g('Edit_Type'),Jumlah:g('Edit_Jumlah'),Keterangan:g('Edit_Keterangan'),Petugas:g('Edit_Petugas'),Status:g('Edit_Status'),Kategori:g('Edit_Kategori'),AreaKerja:g('Edit_AreaKerja'),Item:g('Edit_Item')}; }
+  async function saveEdit(){
+    const payload=getEditPayload();
+    if(!payload.report_id){setMsg('msgEdit','ID laporan tidak ditemukan.',true);return;}
+    try{ const r=await fetch(API_URL,{method:'POST',body:JSON.stringify(payload)}); const j=await r.json(); if(!j.ok){setMsg('msgEdit','❌ '+(j.msg||'Gagal update.'),true);return;} setMsg('msgEdit','✅ Data berhasil diperbarui.'); closeModal(); await loadReportsBySelectedMonth(); }catch(e){setMsg('msgEdit','❌ '+e.message,true);}
+  }
 
   // INIT
   buildMonthOptions();
