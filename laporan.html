@@ -632,7 +632,7 @@
       if(!j.ok){setLoginMsg(j.msg||"Login gagal.");return;}
       AUTH={token:j.token,user:j.user}; localStorage.setItem("LHT_IPSRS_AUTH",JSON.stringify(AUTH));
       document.getElementById("authGate").style.display="none"; renderAuthUser();
-      if(typeof showPage==='function') showPage('input');
+      if(typeof showPage==='function') showPage('laporan');
     }catch(e){setLoginMsg("Tidak dapat terhubung ke server: "+e.message);}
     finally{b.disabled=false;b.innerText="MASUK";}
   }
@@ -1571,7 +1571,12 @@
   buildAreaDatalistAndPopup();
   attachAutoHandlers();
   refreshItemOptionsFromCurrentArea();
-  showPage('laporan');
+
+  // Pastikan sesi login dibaca dan divalidasi sebelum halaman laporan ditampilkan.
+  (async function initAuth(){
+    const ok = await ensureAuth();
+    if (ok) showPage('laporan');
+  })();
 </script>
 </body>
 </html>
